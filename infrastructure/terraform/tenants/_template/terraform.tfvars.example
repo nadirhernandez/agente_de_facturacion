@@ -1,0 +1,41 @@
+# Datos del cliente. Ninguno de estos valores es secreto.
+tenant_id   = "comercial-la-estrella"
+tenant_name = "Comercial La Estrella, S.A."
+account_id  = "111122223333"
+nit_emisor  = "4857291"
+
+quicksight_admin_email = "ti@laestrella.com.gt"
+notification_email     = "gerencia@laestrella.com.gt"
+app_users              = ["gerente@laestrella.com.gt"]
+
+# Opcional: principal externo autorizado a depositar los JSON en raw/.
+# Déjalo vacío si tu sistema entrega con credenciales de esta misma cuenta.
+data_writer_principals = ["arn:aws:iam::503561412084:role/EnvioFacturas"]
+
+# Subir para clientes de alto volumen.
+glue_workers = 2
+
+# Poner en false si la cuenta ya tenía QuickSight habilitado.
+manage_quicksight_subscription = true
+
+# Rol de QuickSight de los usuarios de la app.
+# El chat con los datos requiere un rol Pro; READER solo ve el dashboard.
+app_user_role = "READER_PRO"
+
+# Opcional: dominio propio del cliente para la app. El certificado ACM tiene que
+# estar emitido en us-east-1 y cubrir estos nombres. Tras el apply, apuntar el
+# CNAME al valor del output cloudfront_domain.
+# app_domain_aliases  = ["analitica.laestrella.com.gt"]
+# app_certificate_arn = "arn:aws:acm:us-east-1:111122223333:certificate/xxxxxxxx"
+
+# Opcional: marca del cliente en la pantalla de inicio de sesión.
+# Sin esto, Cognito usa los valores por defecto de AWS.
+# app_branding = {
+#   settings_json = file("branding/managed-login.json")
+#   assets = [{
+#     category   = "FORM_LOGO"
+#     color_mode = "LIGHT"
+#     extension  = "PNG"
+#     bytes      = filebase64("branding/logo.png")
+#   }]
+# }

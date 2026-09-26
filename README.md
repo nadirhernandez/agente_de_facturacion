@@ -35,7 +35,7 @@ Los archivos son **sintéticos** y no contienen información real de personas o 
 | `data/raw/facturas_demo.jsonl` | Documento/factura con `items` anidados | Simula la fuente original de emisión de DTE |
 | `data/curated/ventas_documentos_demo.csv` | Una fila por factura | KPIs de cantidad de documentos e importe total |
 | `data/curated/ventas_lineas_demo.csv` | Una fila por ítem facturado | Fuente recomendada para Athena y QuickSight |
-| `sql/athena/01_create_sales_demo_table.sql` | SQL | Crea tabla y vista consumible por QuickSight |
+| `sql/model/` | SQL | Única fuente de las tablas Iceberg y las vistas que consume QuickSight |
 
 El generador es determinista: `python3 scripts/generate_sales_demo.py` reproduce los mismos datos.
 
@@ -57,15 +57,12 @@ Dimensiones: `fecha`, `departamento`, `municipio`, `establecimiento`, `canal`, `
 
 ## Carga a AWS
 
-1. Crea un bucket, por ejemplo `s3://<bucket>/curated/ventas_lineas_demo/`.
-2. Sube `data/curated/ventas_lineas_demo.csv` a ese prefijo.
-3. Actualiza el valor `REEMPLAZAR-BUCKET` en el SQL de Athena.
-4. Ejecuta `sql/athena/01_create_sales_demo_table.sql` en Athena.
-5. En QuickSight crea un dataset desde `sales_demo.vw_ventas_comerciales`.
-6. Importa el dataset a SPICE para una demo fluida.
-7. Construye o despliega el dashboard `Pulso de Facturación` y configura el Topic de ventas.
+Todo se despliega con Terraform; no hay pasos manuales en Athena. El flujo completo, desde el JSON
+hasta SPICE, está en [`docs/HANDOFF.md`](docs/HANDOFF.md), sección "Modelo en Iceberg", y la
+operación diaria en [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
 
-Para una carga productiva, convierte los CSV a Parquet y particiona por `anio` y `mes`.
+Los CSV de `data/curated/` son el ejemplo aplanado del generador; el pipeline real parte del JSON
+de `data/raw/`.
 
 ## Preguntas de aceptación de la demo
 

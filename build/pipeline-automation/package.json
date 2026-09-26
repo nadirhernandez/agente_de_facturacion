@@ -1,0 +1,15 @@
+{
+  "name": "@ventas-inteligentes/pipeline-automation",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/refresh_spice.mjs && node --check src/sales_alerts.mjs && node --check src/start_ingestion.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-athena": "3.1140.0",
+    "@aws-sdk/client-glue": "3.1140.0",
+    "@aws-sdk/client-quicksight": "3.1140.0",
+    "@aws-sdk/client-sns": "3.1140.0"
+  }
+}

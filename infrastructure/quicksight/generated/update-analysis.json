@@ -1,0 +1,540 @@
+{
+  "AwsAccountId": "503561412084",
+  "AnalysisId": "1a340c35-223b-4a2c-b385-a60c28f771d8",
+  "Name": "Ventas Inteligentes GT analysis",
+  "Definition": {
+    "DataSetIdentifierDeclarations": [
+      {
+        "DataSetArn": "arn:aws:quicksight:us-east-1:503561412084:dataset/ventas-comerciales-dev",
+        "Identifier": "VentasComerciales"
+      }
+    ],
+    "Sheets": [
+      {
+        "SheetId": "f4b7de62-f81d-48fa-b411-64faace12957",
+        "Name": "Pulso de Facturaci\u00f3n",
+        "ContentType": "INTERACTIVE",
+        "Visuals": [
+          {
+            "KPIVisual": {
+              "VisualId": "kpi-facturacion-total",
+              "Title": {
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-title>Facturaci\u00f3n total</visual-title>"
+                }
+              },
+              "Subtitle": {
+                "Visibility": "HIDDEN"
+              },
+              "ChartConfiguration": {
+                "FieldWells": {
+                  "Values": [
+                    {
+                      "NumericalMeasureField": {
+                        "FieldId": "kpi-total-value",
+                        "Column": {
+                          "DataSetIdentifier": "VentasComerciales",
+                          "ColumnName": "facturacion_total_linea"
+                        },
+                        "AggregationFunction": {
+                          "SimpleNumericalAggregation": "SUM"
+                        }
+                      }
+                    }
+                  ],
+                  "TargetValues": [],
+                  "TrendGroups": []
+                },
+                "SortConfiguration": {},
+                "KPIOptions": {
+                  "PrimaryValueDisplayType": "ACTUAL",
+                  "Sparkline": {
+                    "Visibility": "HIDDEN",
+                    "Type": "AREA"
+                  },
+                  "VisualLayoutOptions": {
+                    "StandardLayout": {
+                      "Type": "VERTICAL"
+                    }
+                  }
+                }
+              },
+              "Actions": [],
+              "ColumnHierarchies": []
+            }
+          },
+          {
+            "KPIVisual": {
+              "VisualId": "kpi-ventas-sin-iva",
+              "Title": {
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-title>Ventas sin IVA</visual-title>"
+                }
+              },
+              "Subtitle": {
+                "Visibility": "HIDDEN"
+              },
+              "ChartConfiguration": {
+                "FieldWells": {
+                  "Values": [
+                    {
+                      "NumericalMeasureField": {
+                        "FieldId": "kpi-neto-value",
+                        "Column": {
+                          "DataSetIdentifier": "VentasComerciales",
+                          "ColumnName": "ventas_sin_iva_linea"
+                        },
+                        "AggregationFunction": {
+                          "SimpleNumericalAggregation": "SUM"
+                        }
+                      }
+                    }
+                  ],
+                  "TargetValues": [],
+                  "TrendGroups": []
+                },
+                "SortConfiguration": {},
+                "KPIOptions": {
+                  "PrimaryValueDisplayType": "ACTUAL",
+                  "Sparkline": {
+                    "Visibility": "HIDDEN",
+                    "Type": "AREA"
+                  },
+                  "VisualLayoutOptions": {
+                    "StandardLayout": {
+                      "Type": "VERTICAL"
+                    }
+                  }
+                }
+              },
+              "Actions": [],
+              "ColumnHierarchies": []
+            }
+          },
+          {
+            "KPIVisual": {
+              "VisualId": "kpi-facturas",
+              "Title": {
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-title>Facturas emitidas</visual-title>"
+                }
+              },
+              "Subtitle": {
+                "Visibility": "HIDDEN"
+              },
+              "ChartConfiguration": {
+                "FieldWells": {
+                  "Values": [
+                    {
+                      "CategoricalMeasureField": {
+                        "FieldId": "kpi-facturas-value",
+                        "Column": {
+                          "DataSetIdentifier": "VentasComerciales",
+                          "ColumnName": "factura_id"
+                        },
+                        "AggregationFunction": "DISTINCT_COUNT"
+                      }
+                    }
+                  ],
+                  "TargetValues": [],
+                  "TrendGroups": []
+                },
+                "SortConfiguration": {},
+                "KPIOptions": {
+                  "PrimaryValueDisplayType": "ACTUAL",
+                  "Sparkline": {
+                    "Visibility": "HIDDEN",
+                    "Type": "AREA"
+                  },
+                  "VisualLayoutOptions": {
+                    "StandardLayout": {
+                      "Type": "VERTICAL"
+                    }
+                  }
+                }
+              },
+              "Actions": [],
+              "ColumnHierarchies": []
+            }
+          },
+          {
+            "KPIVisual": {
+              "VisualId": "kpi-unidades",
+              "Title": {
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-title>Unidades vendidas</visual-title>"
+                }
+              },
+              "Subtitle": {
+                "Visibility": "HIDDEN"
+              },
+              "ChartConfiguration": {
+                "FieldWells": {
+                  "Values": [
+                    {
+                      "NumericalMeasureField": {
+                        "FieldId": "kpi-unidades-value",
+                        "Column": {
+                          "DataSetIdentifier": "VentasComerciales",
+                          "ColumnName": "unidades_vendidas"
+                        },
+                        "AggregationFunction": {
+                          "SimpleNumericalAggregation": "SUM"
+                        }
+                      }
+                    }
+                  ],
+                  "TargetValues": [],
+                  "TrendGroups": []
+                },
+                "SortConfiguration": {},
+                "KPIOptions": {
+                  "PrimaryValueDisplayType": "ACTUAL",
+                  "Sparkline": {
+                    "Visibility": "HIDDEN",
+                    "Type": "AREA"
+                  },
+                  "VisualLayoutOptions": {
+                    "StandardLayout": {
+                      "Type": "VERTICAL"
+                    }
+                  }
+                }
+              },
+              "Actions": [],
+              "ColumnHierarchies": []
+            }
+          },
+          {
+            "LineChartVisual": {
+              "VisualId": "linea-tendencia-mensual",
+              "Title": {
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-title>Tendencia mensual de facturaci\u00f3n</visual-title>"
+                }
+              },
+              "Subtitle": {
+                "Visibility": "HIDDEN"
+              },
+              "ChartConfiguration": {
+                "FieldWells": {
+                  "LineChartAggregatedFieldWells": {
+                    "Category": [
+                      {
+                        "DateDimensionField": {
+                          "FieldId": "tendencia-fecha",
+                          "Column": {
+                            "DataSetIdentifier": "VentasComerciales",
+                            "ColumnName": "fecha"
+                          },
+                          "DateGranularity": "MONTH",
+                          "HierarchyId": "tendencia-fecha-hierarchy"
+                        }
+                      }
+                    ],
+                    "Values": [
+                      {
+                        "NumericalMeasureField": {
+                          "FieldId": "tendencia-total",
+                          "Column": {
+                            "DataSetIdentifier": "VentasComerciales",
+                            "ColumnName": "facturacion_total_linea"
+                          },
+                          "AggregationFunction": {
+                            "SimpleNumericalAggregation": "SUM"
+                          }
+                        }
+                      }
+                    ],
+                    "Colors": [],
+                    "SmallMultiples": []
+                  }
+                },
+                "SortConfiguration": {},
+                "Type": "LINE"
+              },
+              "Actions": [],
+              "ColumnHierarchies": [
+                {
+                  "DateTimeHierarchy": {
+                    "HierarchyId": "tendencia-fecha-hierarchy",
+                    "DrillDownFilters": []
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "BarChartVisual": {
+              "VisualId": "barras-region",
+              "Title": {
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-title>Facturaci\u00f3n por regi\u00f3n</visual-title>"
+                }
+              },
+              "Subtitle": {
+                "Visibility": "HIDDEN"
+              },
+              "ChartConfiguration": {
+                "FieldWells": {
+                  "BarChartAggregatedFieldWells": {
+                    "Category": [
+                      {
+                        "CategoricalDimensionField": {
+                          "FieldId": "region-category",
+                          "Column": {
+                            "DataSetIdentifier": "VentasComerciales",
+                            "ColumnName": "region"
+                          }
+                        }
+                      }
+                    ],
+                    "Values": [
+                      {
+                        "NumericalMeasureField": {
+                          "FieldId": "region-total",
+                          "Column": {
+                            "DataSetIdentifier": "VentasComerciales",
+                            "ColumnName": "facturacion_total_linea"
+                          },
+                          "AggregationFunction": {
+                            "SimpleNumericalAggregation": "SUM"
+                          }
+                        }
+                      }
+                    ],
+                    "Colors": [],
+                    "SmallMultiples": []
+                  }
+                },
+                "SortConfiguration": {},
+                "Orientation": "VERTICAL"
+              },
+              "Actions": [],
+              "ColumnHierarchies": []
+            }
+          },
+          {
+            "BarChartVisual": {
+              "VisualId": "barras-categoria",
+              "Title": {
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-title>Ventas sin IVA por categor\u00eda</visual-title>"
+                }
+              },
+              "Subtitle": {
+                "Visibility": "HIDDEN"
+              },
+              "ChartConfiguration": {
+                "FieldWells": {
+                  "BarChartAggregatedFieldWells": {
+                    "Category": [
+                      {
+                        "CategoricalDimensionField": {
+                          "FieldId": "categoria-category",
+                          "Column": {
+                            "DataSetIdentifier": "VentasComerciales",
+                            "ColumnName": "categoria"
+                          }
+                        }
+                      }
+                    ],
+                    "Values": [
+                      {
+                        "NumericalMeasureField": {
+                          "FieldId": "categoria-neto",
+                          "Column": {
+                            "DataSetIdentifier": "VentasComerciales",
+                            "ColumnName": "ventas_sin_iva_linea"
+                          },
+                          "AggregationFunction": {
+                            "SimpleNumericalAggregation": "SUM"
+                          }
+                        }
+                      }
+                    ],
+                    "Colors": [],
+                    "SmallMultiples": []
+                  }
+                },
+                "SortConfiguration": {},
+                "Orientation": "VERTICAL"
+              },
+              "Actions": [],
+              "ColumnHierarchies": []
+            }
+          },
+          {
+            "BarChartVisual": {
+              "VisualId": "barras-producto",
+              "Title": {
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-title>Facturaci\u00f3n por producto</visual-title>"
+                }
+              },
+              "Subtitle": {
+                "Visibility": "HIDDEN"
+              },
+              "ChartConfiguration": {
+                "FieldWells": {
+                  "BarChartAggregatedFieldWells": {
+                    "Category": [
+                      {
+                        "CategoricalDimensionField": {
+                          "FieldId": "producto-category",
+                          "Column": {
+                            "DataSetIdentifier": "VentasComerciales",
+                            "ColumnName": "producto"
+                          }
+                        }
+                      }
+                    ],
+                    "Values": [
+                      {
+                        "NumericalMeasureField": {
+                          "FieldId": "producto-total",
+                          "Column": {
+                            "DataSetIdentifier": "VentasComerciales",
+                            "ColumnName": "facturacion_total_linea"
+                          },
+                          "AggregationFunction": {
+                            "SimpleNumericalAggregation": "SUM"
+                          }
+                        }
+                      }
+                    ],
+                    "Colors": [],
+                    "SmallMultiples": []
+                  }
+                },
+                "SortConfiguration": {},
+                "Orientation": "VERTICAL"
+              },
+              "Actions": [],
+              "ColumnHierarchies": []
+            }
+          }
+        ],
+        "Layouts": [
+          {
+            "Configuration": {
+              "GridLayout": {
+                "Elements": [
+                  {
+                    "ElementId": "kpi-facturacion-total",
+                    "ElementType": "VISUAL",
+                    "ColumnIndex": 0,
+                    "RowIndex": 0,
+                    "ColumnSpan": 9,
+                    "RowSpan": 6
+                  },
+                  {
+                    "ElementId": "kpi-ventas-sin-iva",
+                    "ElementType": "VISUAL",
+                    "ColumnIndex": 9,
+                    "RowIndex": 0,
+                    "ColumnSpan": 9,
+                    "RowSpan": 6
+                  },
+                  {
+                    "ElementId": "kpi-facturas",
+                    "ElementType": "VISUAL",
+                    "ColumnIndex": 18,
+                    "RowIndex": 0,
+                    "ColumnSpan": 9,
+                    "RowSpan": 6
+                  },
+                  {
+                    "ElementId": "kpi-unidades",
+                    "ElementType": "VISUAL",
+                    "ColumnIndex": 27,
+                    "RowIndex": 0,
+                    "ColumnSpan": 9,
+                    "RowSpan": 6
+                  },
+                  {
+                    "ElementId": "linea-tendencia-mensual",
+                    "ElementType": "VISUAL",
+                    "ColumnIndex": 0,
+                    "RowIndex": 6,
+                    "ColumnSpan": 18,
+                    "RowSpan": 12
+                  },
+                  {
+                    "ElementId": "barras-region",
+                    "ElementType": "VISUAL",
+                    "ColumnIndex": 18,
+                    "RowIndex": 6,
+                    "ColumnSpan": 18,
+                    "RowSpan": 12
+                  },
+                  {
+                    "ElementId": "barras-categoria",
+                    "ElementType": "VISUAL",
+                    "ColumnIndex": 0,
+                    "RowIndex": 18,
+                    "ColumnSpan": 18,
+                    "RowSpan": 12
+                  },
+                  {
+                    "ElementId": "barras-producto",
+                    "ElementType": "VISUAL",
+                    "ColumnIndex": 18,
+                    "RowIndex": 18,
+                    "ColumnSpan": 18,
+                    "RowSpan": 12
+                  }
+                ],
+                "CanvasSizeOptions": {
+                  "ScreenCanvasSizeOptions": {
+                    "ResizeOption": "FIXED",
+                    "OptimizedViewPortWidth": "1600px"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "CalculatedFields": [],
+    "ParameterDeclarations": [],
+    "FilterGroups": [],
+    "AnalysisDefaults": {
+      "DefaultNewSheetConfiguration": {
+        "InteractiveLayoutConfiguration": {
+          "Grid": {
+            "CanvasSizeOptions": {
+              "ScreenCanvasSizeOptions": {
+                "ResizeOption": "FIXED",
+                "OptimizedViewPortWidth": "1600px"
+              }
+            }
+          }
+        },
+        "SheetContentType": "INTERACTIVE"
+      }
+    },
+    "Options": {
+      "WeekStart": "SUNDAY",
+      "QBusinessInsightsStatus": "DISABLED",
+      "ExcludedDataSetArns": [],
+      "CustomActionDefaults": {
+        "highlightOperation": {
+          "Trigger": "DATA_POINT_CLICK"
+        }
+      }
+    },
+    "QueryExecutionOptions": {
+      "QueryExecutionMode": "AUTO"
+    }
+  }
+}

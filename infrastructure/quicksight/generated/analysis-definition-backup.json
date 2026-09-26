@@ -1,0 +1,8 @@
+{
+  "DataSetIdentifierDeclarations": [
+    {
+      "DataSetArn": "arn:aws:quicksight:us-east-1:503561412084:dataset/ventas-comerciales-dev",
+      "Identifier": "VentasComerciales"
+    }
+  ]
+}

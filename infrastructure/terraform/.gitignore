@@ -1,0 +1,14 @@
+# Terraform working directories and state files must never be committed.
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Local overrides and potential credentials.
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json

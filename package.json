@@ -1,0 +1,17 @@
+{
+  "name": "dashboards-dinamicos",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "services/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:web": "npm run build --workspace @ventas-inteligentes/web",
+    "dev:web": "npm run dev --workspace @ventas-inteligentes/web"
+  },
+  "engines": {
+    "node": ">=21.0.0"
+  }
+}

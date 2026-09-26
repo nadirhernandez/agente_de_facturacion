@@ -1,0 +1,721 @@
+doc_id,fecha_emision,fecha,anio,mes,estado,codigo_moneda,serie,nit_receptor,cliente,establecimiento_codigo,establecimiento,departamento,municipio,canal,gran_total,monto_gravable,iva
+GT-DEMO-000064,2025-09-01T10:47:00-06:00,2025-09-01,2025,9,emitido,GTQ,A1,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,964.69,861.34,103.35
+GT-DEMO-000369,2025-09-01T18:45:00-06:00,2025-09-01,2025,9,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,249.2,222.5,26.7
+GT-DEMO-000439,2025-09-02T17:47:00-06:00,2025-09-02,2025,9,emitido,GTQ,B2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2264.35,2021.74,242.61
+GT-DEMO-000440,2025-09-03T11:18:00-06:00,2025-09-03,2025,9,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,371.0,331.25,39.75
+GT-DEMO-000352,2025-09-03T17:15:00-06:00,2025-09-03,2025,9,emitido,GTQ,B1,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1350.34,1205.67,144.67
+GT-DEMO-000701,2025-09-03T18:44:00-06:00,2025-09-03,2025,9,emitido,GTQ,C2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,294.2,262.68,31.52
+GT-DEMO-000117,2025-09-04T13:06:00-06:00,2025-09-04,2025,9,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1789.02,1597.34,191.68
+GT-DEMO-000531,2025-09-05T12:29:00-06:00,2025-09-05,2025,9,emitido,GTQ,B3,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,322.85,288.26,34.59
+GT-DEMO-000162,2025-09-06T10:51:00-06:00,2025-09-06,2025,9,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,671.11,599.2,71.91
+GT-DEMO-000657,2025-09-06T14:09:00-06:00,2025-09-06,2025,9,emitido,GTQ,C1,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,893.84,798.07,95.77
+GT-DEMO-000398,2025-09-07T15:36:00-06:00,2025-09-07,2025,9,emitido,GTQ,B1,7492631,"Tecnología y Más, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,358.02,319.66,38.36
+GT-DEMO-000545,2025-09-09T08:49:00-06:00,2025-09-09,2025,9,emitido,GTQ,B3,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,882.74,788.17,94.57
+GT-DEMO-000616,2025-09-10T09:15:00-06:00,2025-09-10,2025,9,emitido,GTQ,C1,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,360.4,321.79,38.61
+GT-DEMO-000145,2025-09-11T15:19:00-06:00,2025-09-11,2025,9,emitido,GTQ,A2,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1974.35,1762.81,211.54
+GT-DEMO-000097,2025-09-11T16:12:00-06:00,2025-09-11,2025,9,emitido,GTQ,A1,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1338.2,1194.82,143.38
+GT-DEMO-000581,2025-09-12T14:38:00-06:00,2025-09-12,2025,9,emitido,GTQ,B3,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,477.69,426.51,51.18
+GT-DEMO-000153,2025-09-12T18:35:00-06:00,2025-09-12,2025,9,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,533.45,476.29,57.16
+GT-DEMO-000680,2025-09-13T10:57:00-06:00,2025-09-13,2025,9,emitido,GTQ,C1,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,458.93,409.76,49.17
+GT-DEMO-000558,2025-09-13T13:45:00-06:00,2025-09-13,2025,9,emitido,GTQ,B3,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,374.5,334.38,40.12
+GT-DEMO-000711,2025-09-14T09:55:00-06:00,2025-09-14,2025,9,emitido,GTQ,C2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,680.36,607.47,72.89
+GT-DEMO-000214,2025-09-14T16:05:00-06:00,2025-09-14,2025,9,emitido,GTQ,A3,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1763.73,1574.76,188.97
+GT-DEMO-000532,2025-09-14T17:55:00-06:00,2025-09-14,2025,9,emitido,GTQ,B3,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1733.48,1547.75,185.73
+GT-DEMO-000641,2025-09-15T09:58:00-06:00,2025-09-15,2025,9,emitido,GTQ,C1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1881.63,1680.02,201.61
+GT-DEMO-000593,2025-09-15T11:37:00-06:00,2025-09-15,2025,9,emitido,GTQ,B3,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1920.96,1715.14,205.82
+GT-DEMO-000330,2025-09-15T15:50:00-06:00,2025-09-15,2025,9,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,193.89,173.12,20.77
+GT-DEMO-000428,2025-09-17T09:40:00-06:00,2025-09-17,2025,9,emitido,GTQ,B2,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2058.64,1838.07,220.57
+GT-DEMO-000442,2025-09-18T08:08:00-06:00,2025-09-18,2025,9,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,464.0,414.29,49.71
+GT-DEMO-000346,2025-09-18T09:06:00-06:00,2025-09-18,2025,9,emitido,GTQ,B1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,421.83,376.64,45.19
+GT-DEMO-000294,2025-09-18T13:23:00-06:00,2025-09-18,2025,9,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,570.13,509.04,61.09
+GT-DEMO-000412,2025-09-18T14:25:00-06:00,2025-09-18,2025,9,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,319.55,285.31,34.24
+GT-DEMO-000096,2025-09-18T16:34:00-06:00,2025-09-18,2025,9,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,823.55,735.32,88.23
+GT-DEMO-000068,2025-09-19T15:28:00-06:00,2025-09-19,2025,9,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1574.0,1405.36,168.64
+GT-DEMO-000431,2025-09-20T09:04:00-06:00,2025-09-20,2025,9,emitido,GTQ,B2,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,390.36,348.53,41.83
+GT-DEMO-000684,2025-09-20T09:33:00-06:00,2025-09-20,2025,9,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1131.45,1010.22,121.23
+GT-DEMO-000365,2025-09-20T14:16:00-06:00,2025-09-20,2025,9,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,345.56,308.53,37.03
+GT-DEMO-000555,2025-09-20T17:07:00-06:00,2025-09-20,2025,9,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1046.73,934.58,112.15
+GT-DEMO-000177,2025-09-20T17:59:00-06:00,2025-09-20,2025,9,emitido,GTQ,A2,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,601.25,536.83,64.42
+GT-DEMO-000718,2025-09-21T09:09:00-06:00,2025-09-21,2025,9,emitido,GTQ,C2,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1806.18,1612.66,193.52
+GT-DEMO-000703,2025-09-21T10:17:00-06:00,2025-09-21,2025,9,emitido,GTQ,C2,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,638.14,569.77,68.37
+GT-DEMO-000425,2025-09-21T14:50:00-06:00,2025-09-21,2025,9,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1293.4,1154.82,138.58
+GT-DEMO-000291,2025-09-22T17:19:00-06:00,2025-09-22,2025,9,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2335.86,2085.59,250.27
+GT-DEMO-000272,2025-09-23T12:23:00-06:00,2025-09-23,2025,9,emitido,GTQ,A3,3561894,"Farmacias Vida, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,862.49,770.09,92.4
+GT-DEMO-000208,2025-09-23T14:45:00-06:00,2025-09-23,2025,9,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,45.91,40.99,4.92
+GT-DEMO-000511,2025-09-24T11:28:00-06:00,2025-09-24,2025,9,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1432.11,1278.67,153.44
+GT-DEMO-000139,2025-09-24T14:27:00-06:00,2025-09-24,2025,9,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,362.32,323.5,38.82
+GT-DEMO-000267,2025-09-25T15:31:00-06:00,2025-09-25,2025,9,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,527.04,470.57,56.47
+GT-DEMO-000501,2025-09-26T09:56:00-06:00,2025-09-26,2025,9,emitido,GTQ,B3,7812456,"Servicios Integrales Maya, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,953.7,851.52,102.18
+GT-DEMO-000104,2025-09-28T08:00:00-06:00,2025-09-28,2025,9,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,645.86,576.67,69.19
+GT-DEMO-000709,2025-09-29T10:37:00-06:00,2025-09-29,2025,9,emitido,GTQ,C2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,174.48,155.79,18.69
+GT-DEMO-000681,2025-09-29T12:02:00-06:00,2025-09-29,2025,9,emitido,GTQ,C1,8146293,"Hotel Vista Real, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,278.7,248.84,29.86
+GT-DEMO-000030,2025-09-29T12:56:00-06:00,2025-09-29,2025,9,emitido,GTQ,A1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,730.82,652.52,78.3
+GT-DEMO-000196,2025-09-29T13:43:00-06:00,2025-09-29,2025,9,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2560.75,2286.38,274.37
+GT-DEMO-000143,2025-09-30T15:40:00-06:00,2025-09-30,2025,9,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,999.0,891.96,107.04
+GT-DEMO-000638,2025-09-30T16:24:00-06:00,2025-09-30,2025,9,emitido,GTQ,C1,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,160.92,143.68,17.24
+GT-DEMO-000580,2025-10-01T13:00:00-06:00,2025-10-01,2025,10,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,762.56,680.86,81.7
+GT-DEMO-000137,2025-10-02T11:17:00-06:00,2025-10-02,2025,10,emitido,GTQ,A2,8146293,"Hotel Vista Real, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,514.96,459.79,55.17
+GT-DEMO-000463,2025-10-02T15:14:00-06:00,2025-10-02,2025,10,emitido,GTQ,B2,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,267.88,239.18,28.7
+GT-DEMO-000231,2025-10-02T18:19:00-06:00,2025-10-02,2025,10,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,69.27,61.85,7.42
+GT-DEMO-000679,2025-10-03T08:18:00-06:00,2025-10-03,2025,10,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,269.6,240.71,28.89
+GT-DEMO-000478,2025-10-03T13:26:00-06:00,2025-10-03,2025,10,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1026.66,916.66,110.0
+GT-DEMO-000316,2025-10-03T17:07:00-06:00,2025-10-03,2025,10,emitido,GTQ,B1,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,503.07,449.17,53.9
+GT-DEMO-000702,2025-10-04T14:00:00-06:00,2025-10-04,2025,10,emitido,GTQ,C2,8146293,"Hotel Vista Real, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,786.0,701.78,84.22
+GT-DEMO-000007,2025-10-05T12:47:00-06:00,2025-10-05,2025,10,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,962.17,859.08,103.09
+GT-DEMO-000530,2025-10-05T16:46:00-06:00,2025-10-05,2025,10,emitido,GTQ,B3,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1620.42,1446.81,173.61
+GT-DEMO-000336,2025-10-06T09:18:00-06:00,2025-10-06,2025,10,emitido,GTQ,B1,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,42.26,37.73,4.53
+GT-DEMO-000406,2025-10-06T09:53:00-06:00,2025-10-06,2025,10,anulado,GTQ,B2,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,615.05,549.15,65.9
+GT-DEMO-000001,2025-10-06T13:52:00-06:00,2025-10-06,2025,10,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,437.58,390.69,46.89
+GT-DEMO-000313,2025-10-07T09:14:00-06:00,2025-10-07,2025,10,emitido,GTQ,B1,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,314.41,280.72,33.69
+GT-DEMO-000612,2025-10-07T14:46:00-06:00,2025-10-07,2025,10,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1054.37,941.4,112.97
+GT-DEMO-000317,2025-10-07T16:28:00-06:00,2025-10-07,2025,10,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1967.65,1756.83,210.82
+GT-DEMO-000411,2025-10-08T09:10:00-06:00,2025-10-08,2025,10,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1271.13,1134.94,136.19
+GT-DEMO-000538,2025-10-08T15:01:00-06:00,2025-10-08,2025,10,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,954.12,851.89,102.23
+GT-DEMO-000018,2025-10-08T15:26:00-06:00,2025-10-08,2025,10,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1118.01,998.23,119.78
+GT-DEMO-000688,2025-10-08T17:26:00-06:00,2025-10-08,2025,10,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,352.75,314.96,37.79
+GT-DEMO-000704,2025-10-08T18:02:00-06:00,2025-10-08,2025,10,emitido,GTQ,C2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1052.17,939.44,112.73
+GT-DEMO-000065,2025-10-09T13:34:00-06:00,2025-10-09,2025,10,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,590.33,527.09,63.24
+GT-DEMO-000230,2025-10-09T17:13:00-06:00,2025-10-09,2025,10,emitido,GTQ,A3,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,192.11,171.53,20.58
+GT-DEMO-000254,2025-10-10T08:12:00-06:00,2025-10-10,2025,10,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,414.81,370.36,44.45
+GT-DEMO-000059,2025-10-10T11:28:00-06:00,2025-10-10,2025,10,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,517.89,462.4,55.49
+GT-DEMO-000296,2025-10-10T11:44:00-06:00,2025-10-10,2025,10,emitido,GTQ,A3,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,522.48,466.5,55.98
+GT-DEMO-000576,2025-10-11T12:06:00-06:00,2025-10-11,2025,10,emitido,GTQ,B3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1247.63,1113.95,133.68
+GT-DEMO-000335,2025-10-11T13:35:00-06:00,2025-10-11,2025,10,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,603.37,538.72,64.65
+GT-DEMO-000033,2025-10-11T18:13:00-06:00,2025-10-11,2025,10,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,387.7,346.16,41.54
+GT-DEMO-000621,2025-10-12T09:07:00-06:00,2025-10-12,2025,10,emitido,GTQ,C1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1112.07,992.93,119.14
+GT-DEMO-000303,2025-10-12T09:50:00-06:00,2025-10-12,2025,10,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,910.35,812.81,97.54
+GT-DEMO-000427,2025-10-12T12:16:00-06:00,2025-10-12,2025,10,emitido,GTQ,B2,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,444.48,396.86,47.62
+GT-DEMO-000567,2025-10-12T12:49:00-06:00,2025-10-12,2025,10,emitido,GTQ,B3,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,342.31,305.63,36.68
+GT-DEMO-000253,2025-10-13T08:48:00-06:00,2025-10-13,2025,10,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,956.52,854.04,102.48
+GT-DEMO-000678,2025-10-13T16:17:00-06:00,2025-10-13,2025,10,emitido,GTQ,C1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,214.45,191.47,22.98
+GT-DEMO-000712,2025-10-15T10:00:00-06:00,2025-10-15,2025,10,emitido,GTQ,C2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1782.2,1591.25,190.95
+GT-DEMO-000514,2025-10-15T11:53:00-06:00,2025-10-15,2025,10,emitido,GTQ,B3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1268.35,1132.46,135.89
+GT-DEMO-000695,2025-10-16T10:23:00-06:00,2025-10-16,2025,10,emitido,GTQ,C1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,925.43,826.28,99.15
+GT-DEMO-000592,2025-10-17T09:09:00-06:00,2025-10-17,2025,10,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,668.24,596.65,71.59
+GT-DEMO-000509,2025-10-19T09:17:00-06:00,2025-10-19,2025,10,emitido,GTQ,B3,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,146.88,131.14,15.74
+GT-DEMO-000600,2025-10-19T11:41:00-06:00,2025-10-19,2025,10,emitido,GTQ,B3,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,279.21,249.3,29.91
+GT-DEMO-000419,2025-10-21T12:26:00-06:00,2025-10-21,2025,10,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,557.68,497.93,59.75
+GT-DEMO-000690,2025-10-21T15:10:00-06:00,2025-10-21,2025,10,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,586.35,523.53,62.82
+GT-DEMO-000714,2025-10-21T15:14:00-06:00,2025-10-21,2025,10,emitido,GTQ,C2,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,210.76,188.18,22.58
+GT-DEMO-000289,2025-10-22T08:28:00-06:00,2025-10-22,2025,10,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1288.61,1150.54,138.07
+GT-DEMO-000082,2025-10-23T11:20:00-06:00,2025-10-23,2025,10,emitido,GTQ,A1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,284.82,254.3,30.52
+GT-DEMO-000716,2025-10-23T11:30:00-06:00,2025-10-23,2025,10,emitido,GTQ,C2,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,270.56,241.57,28.99
+GT-DEMO-000015,2025-10-23T17:17:00-06:00,2025-10-23,2025,10,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,505.3,451.17,54.13
+GT-DEMO-000029,2025-10-26T13:05:00-06:00,2025-10-26,2025,10,emitido,GTQ,A1,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1172.93,1047.25,125.68
+GT-DEMO-000169,2025-10-27T12:52:00-06:00,2025-10-27,2025,10,emitido,GTQ,A2,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,270.05,241.12,28.93
+GT-DEMO-000295,2025-10-28T10:00:00-06:00,2025-10-28,2025,10,emitido,GTQ,A3,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,959.88,857.04,102.84
+GT-DEMO-000342,2025-10-28T10:22:00-06:00,2025-10-28,2025,10,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,462.01,412.51,49.5
+GT-DEMO-000219,2025-10-28T13:01:00-06:00,2025-10-28,2025,10,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,823.56,735.32,88.24
+GT-DEMO-000192,2025-10-28T14:33:00-06:00,2025-10-28,2025,10,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1924.4,1718.21,206.19
+GT-DEMO-000240,2025-10-29T08:26:00-06:00,2025-10-29,2025,10,emitido,GTQ,A3,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,100.38,89.62,10.76
+GT-DEMO-000187,2025-10-29T12:15:00-06:00,2025-10-29,2025,10,emitido,GTQ,A2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1529.17,1365.33,163.84
+GT-DEMO-000524,2025-10-31T12:27:00-06:00,2025-10-31,2025,10,emitido,GTQ,B3,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,168.75,150.67,18.08
+GT-DEMO-000449,2025-10-31T17:04:00-06:00,2025-10-31,2025,10,anulado,GTQ,B2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,676.96,604.43,72.53
+GT-DEMO-000651,2025-11-01T11:03:00-06:00,2025-11-01,2025,11,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,387.57,346.05,41.52
+GT-DEMO-000628,2025-11-01T11:10:00-06:00,2025-11-01,2025,11,anulado,GTQ,C1,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,910.46,812.92,97.54
+GT-DEMO-000023,2025-11-02T12:54:00-06:00,2025-11-02,2025,11,emitido,GTQ,A1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,85.78,76.59,9.19
+GT-DEMO-000407,2025-11-02T13:15:00-06:00,2025-11-02,2025,11,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2078.8,1856.07,222.73
+GT-DEMO-000529,2025-11-02T15:44:00-06:00,2025-11-02,2025,11,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,197.27,176.14,21.13
+GT-DEMO-000014,2025-11-02T17:01:00-06:00,2025-11-02,2025,11,emitido,GTQ,A1,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,475.17,424.26,50.91
+GT-DEMO-000054,2025-11-04T14:32:00-06:00,2025-11-04,2025,11,emitido,GTQ,A1,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,541.36,483.36,58.0
+GT-DEMO-000634,2025-11-05T08:52:00-06:00,2025-11-05,2025,11,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,325.94,291.02,34.92
+GT-DEMO-000341,2025-11-05T16:09:00-06:00,2025-11-05,2025,11,emitido,GTQ,B1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,588.24,525.22,63.02
+GT-DEMO-000276,2025-11-06T13:56:00-06:00,2025-11-06,2025,11,emitido,GTQ,A3,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,401.88,358.83,43.05
+GT-DEMO-000384,2025-11-06T16:37:00-06:00,2025-11-06,2025,11,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,386.1,344.73,41.37
+GT-DEMO-000026,2025-11-07T17:23:00-06:00,2025-11-07,2025,11,emitido,GTQ,A1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1201.83,1073.06,128.77
+GT-DEMO-000120,2025-11-08T11:31:00-06:00,2025-11-08,2025,11,emitido,GTQ,A2,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1216.52,1086.17,130.35
+GT-DEMO-000323,2025-11-08T12:06:00-06:00,2025-11-08,2025,11,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,309.92,276.72,33.2
+GT-DEMO-000562,2025-11-08T18:14:00-06:00,2025-11-08,2025,11,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,2103.8,1878.4,225.4
+GT-DEMO-000472,2025-11-09T08:17:00-06:00,2025-11-09,2025,11,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,236.63,211.28,25.35
+GT-DEMO-000443,2025-11-10T11:59:00-06:00,2025-11-10,2025,11,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,3893.3,3476.16,417.14
+GT-DEMO-000619,2025-11-10T13:14:00-06:00,2025-11-10,2025,11,emitido,GTQ,C1,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,299.33,267.26,32.07
+GT-DEMO-000212,2025-11-11T16:46:00-06:00,2025-11-11,2025,11,emitido,GTQ,A3,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1076.75,961.39,115.36
+GT-DEMO-000358,2025-11-13T10:00:00-06:00,2025-11-13,2025,11,emitido,GTQ,B1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1365.6,1219.29,146.31
+GT-DEMO-000696,2025-11-13T15:10:00-06:00,2025-11-13,2025,11,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,552.96,493.71,59.25
+GT-DEMO-000158,2025-11-13T18:42:00-06:00,2025-11-13,2025,11,emitido,GTQ,A2,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2176.26,1943.09,233.17
+GT-DEMO-000664,2025-11-14T15:21:00-06:00,2025-11-14,2025,11,emitido,GTQ,C1,3561894,"Farmacias Vida, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1688.14,1507.27,180.87
+GT-DEMO-000168,2025-11-15T08:26:00-06:00,2025-11-15,2025,11,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,669.8,598.04,71.76
+GT-DEMO-000170,2025-11-15T18:58:00-06:00,2025-11-15,2025,11,emitido,GTQ,A2,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,821.2,733.21,87.99
+GT-DEMO-000552,2025-11-16T09:37:00-06:00,2025-11-16,2025,11,emitido,GTQ,B3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1136.17,1014.44,121.73
+GT-DEMO-000182,2025-11-16T18:45:00-06:00,2025-11-16,2025,11,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,601.36,536.92,64.44
+GT-DEMO-000239,2025-11-17T18:45:00-06:00,2025-11-17,2025,11,emitido,GTQ,A3,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,399.06,356.3,42.76
+GT-DEMO-000050,2025-11-18T09:52:00-06:00,2025-11-18,2025,11,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,631.92,564.22,67.7
+GT-DEMO-000220,2025-11-18T10:50:00-06:00,2025-11-18,2025,11,emitido,GTQ,A3,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2057.45,1837.01,220.44
+GT-DEMO-000461,2025-11-19T13:30:00-06:00,2025-11-19,2025,11,emitido,GTQ,B2,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,258.18,230.52,27.66
+GT-DEMO-000284,2025-11-19T15:33:00-06:00,2025-11-19,2025,11,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,264.8,236.43,28.37
+GT-DEMO-000028,2025-11-19T17:28:00-06:00,2025-11-19,2025,11,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,338.64,302.36,36.28
+GT-DEMO-000126,2025-11-20T18:16:00-06:00,2025-11-20,2025,11,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,644.8,575.71,69.09
+GT-DEMO-000385,2025-11-21T09:04:00-06:00,2025-11-21,2025,11,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,943.2,842.15,101.05
+GT-DEMO-000058,2025-11-22T09:07:00-06:00,2025-11-22,2025,11,emitido,GTQ,A1,6283947,"Distribuidora del Pacífico, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,200.88,179.36,21.52
+GT-DEMO-000025,2025-11-22T12:25:00-06:00,2025-11-22,2025,11,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1106.49,987.94,118.55
+GT-DEMO-000102,2025-11-23T12:46:00-06:00,2025-11-23,2025,11,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,989.94,883.87,106.07
+GT-DEMO-000481,2025-11-24T12:48:00-06:00,2025-11-24,2025,11,emitido,GTQ,B2,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,383.4,342.33,41.07
+GT-DEMO-000103,2025-11-24T14:42:00-06:00,2025-11-24,2025,11,emitido,GTQ,A2,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,702.48,627.21,75.27
+GT-DEMO-000269,2025-11-24T15:07:00-06:00,2025-11-24,2025,11,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,849.06,758.09,90.97
+GT-DEMO-000687,2025-11-25T08:30:00-06:00,2025-11-25,2025,11,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,291.92,260.64,31.28
+GT-DEMO-000152,2025-11-25T16:40:00-06:00,2025-11-25,2025,11,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,566.07,505.42,60.65
+GT-DEMO-000668,2025-11-25T17:41:00-06:00,2025-11-25,2025,11,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1533.18,1368.91,164.27
+GT-DEMO-000676,2025-11-26T15:40:00-06:00,2025-11-26,2025,11,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1663.62,1485.38,178.24
+GT-DEMO-000209,2025-11-27T16:04:00-06:00,2025-11-27,2025,11,emitido,GTQ,A3,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,466.48,416.5,49.98
+GT-DEMO-000422,2025-11-27T16:16:00-06:00,2025-11-27,2025,11,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,102.36,91.39,10.97
+GT-DEMO-000643,2025-11-27T16:29:00-06:00,2025-11-27,2025,11,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,693.94,619.59,74.35
+GT-DEMO-000574,2025-11-28T11:04:00-06:00,2025-11-28,2025,11,emitido,GTQ,B3,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,69.79,62.31,7.48
+GT-DEMO-000089,2025-11-29T09:31:00-06:00,2025-11-29,2025,11,emitido,GTQ,A1,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,2471.93,2207.08,264.85
+GT-DEMO-000597,2025-11-29T10:23:00-06:00,2025-11-29,2025,11,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,3142.08,2805.43,336.65
+GT-DEMO-000195,2025-11-29T10:49:00-06:00,2025-11-29,2025,11,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,511.35,456.56,54.79
+GT-DEMO-000224,2025-11-30T11:08:00-06:00,2025-11-30,2025,11,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,453.07,404.53,48.54
+GT-DEMO-000615,2025-11-30T15:08:00-06:00,2025-11-30,2025,11,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2661.02,2375.91,285.11
+GT-DEMO-000022,2025-12-01T08:18:00-06:00,2025-12-01,2025,12,emitido,GTQ,A1,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1732.85,1547.19,185.66
+GT-DEMO-000127,2025-12-01T10:01:00-06:00,2025-12-01,2025,12,emitido,GTQ,A2,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,634.02,566.09,67.93
+GT-DEMO-000180,2025-12-01T15:22:00-06:00,2025-12-01,2025,12,emitido,GTQ,A2,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,496.91,443.67,53.24
+GT-DEMO-000072,2025-12-01T17:50:00-06:00,2025-12-01,2025,12,emitido,GTQ,A1,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,134.66,120.23,14.43
+GT-DEMO-000565,2025-12-02T12:40:00-06:00,2025-12-02,2025,12,emitido,GTQ,B3,7812456,"Servicios Integrales Maya, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2924.96,2611.58,313.38
+GT-DEMO-000130,2025-12-03T11:12:00-06:00,2025-12-03,2025,12,anulado,GTQ,A2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,697.04,622.36,74.68
+GT-DEMO-000637,2025-12-03T12:04:00-06:00,2025-12-03,2025,12,emitido,GTQ,C1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2260.42,2018.23,242.19
+GT-DEMO-000135,2025-12-04T10:50:00-06:00,2025-12-04,2025,12,emitido,GTQ,A2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,912.27,814.52,97.75
+GT-DEMO-000183,2025-12-04T15:33:00-06:00,2025-12-04,2025,12,emitido,GTQ,A2,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2139.73,1910.47,229.26
+GT-DEMO-000401,2025-12-05T08:12:00-06:00,2025-12-05,2025,12,emitido,GTQ,B2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,749.2,668.92,80.28
+GT-DEMO-000112,2025-12-05T13:40:00-06:00,2025-12-05,2025,12,emitido,GTQ,A2,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,157.86,140.95,16.91
+GT-DEMO-000040,2025-12-06T09:36:00-06:00,2025-12-06,2025,12,emitido,GTQ,A1,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1032.64,922.0,110.64
+GT-DEMO-000242,2025-12-07T08:10:00-06:00,2025-12-07,2025,12,emitido,GTQ,A3,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,781.65,697.9,83.75
+GT-DEMO-000225,2025-12-07T10:30:00-06:00,2025-12-07,2025,12,emitido,GTQ,A3,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,223.7,199.73,23.97
+GT-DEMO-000526,2025-12-07T11:59:00-06:00,2025-12-07,2025,12,emitido,GTQ,B3,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1277.32,1140.47,136.85
+GT-DEMO-000142,2025-12-07T14:31:00-06:00,2025-12-07,2025,12,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,514.83,459.67,55.16
+GT-DEMO-000647,2025-12-08T16:36:00-06:00,2025-12-08,2025,12,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1335.67,1192.57,143.1
+GT-DEMO-000590,2025-12-09T11:03:00-06:00,2025-12-09,2025,12,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,640.41,571.79,68.62
+GT-DEMO-000397,2025-12-09T14:44:00-06:00,2025-12-09,2025,12,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,328.44,293.25,35.19
+GT-DEMO-000205,2025-12-10T13:34:00-06:00,2025-12-10,2025,12,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1038.28,927.04,111.24
+GT-DEMO-000251,2025-12-10T15:22:00-06:00,2025-12-10,2025,12,emitido,GTQ,A3,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,415.31,370.81,44.5
+GT-DEMO-000098,2025-12-10T18:21:00-06:00,2025-12-10,2025,12,emitido,GTQ,A1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1194.15,1066.21,127.94
+GT-DEMO-000493,2025-12-11T08:53:00-06:00,2025-12-11,2025,12,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,301.21,268.94,32.27
+GT-DEMO-000174,2025-12-11T17:31:00-06:00,2025-12-11,2025,12,emitido,GTQ,A2,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2637.1,2354.55,282.55
+GT-DEMO-000016,2025-12-12T13:59:00-06:00,2025-12-12,2025,12,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,527.66,471.13,56.53
+GT-DEMO-000086,2025-12-12T15:11:00-06:00,2025-12-12,2025,12,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,721.89,644.55,77.34
+GT-DEMO-000611,2025-12-12T17:25:00-06:00,2025-12-12,2025,12,emitido,GTQ,C1,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1248.53,1114.75,133.78
+GT-DEMO-000399,2025-12-13T10:55:00-06:00,2025-12-13,2025,12,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1339.32,1195.82,143.5
+GT-DEMO-000188,2025-12-13T17:59:00-06:00,2025-12-13,2025,12,emitido,GTQ,A2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,470.64,420.22,50.42
+GT-DEMO-000586,2025-12-14T16:18:00-06:00,2025-12-14,2025,12,anulado,GTQ,B3,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,877.51,783.49,94.02
+GT-DEMO-000041,2025-12-14T18:41:00-06:00,2025-12-14,2025,12,emitido,GTQ,A1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,816.27,728.82,87.45
+GT-DEMO-000482,2025-12-15T08:01:00-06:00,2025-12-15,2025,12,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1440.99,1286.6,154.39
+GT-DEMO-000044,2025-12-15T09:34:00-06:00,2025-12-15,2025,12,emitido,GTQ,A1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,275.66,246.13,29.53
+GT-DEMO-000019,2025-12-15T18:53:00-06:00,2025-12-15,2025,12,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,356.7,318.48,38.22
+GT-DEMO-000507,2025-12-16T11:07:00-06:00,2025-12-16,2025,12,emitido,GTQ,B3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1073.06,958.09,114.97
+GT-DEMO-000216,2025-12-16T13:19:00-06:00,2025-12-16,2025,12,emitido,GTQ,A3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,755.59,674.63,80.96
+GT-DEMO-000424,2025-12-16T16:26:00-06:00,2025-12-16,2025,12,emitido,GTQ,B2,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,659.48,588.82,70.66
+GT-DEMO-000210,2025-12-17T08:13:00-06:00,2025-12-17,2025,12,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,692.8,618.57,74.23
+GT-DEMO-000049,2025-12-17T08:17:00-06:00,2025-12-17,2025,12,emitido,GTQ,A1,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,469.48,419.18,50.3
+GT-DEMO-000263,2025-12-17T08:50:00-06:00,2025-12-17,2025,12,emitido,GTQ,A3,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,274.95,245.49,29.46
+GT-DEMO-000293,2025-12-17T10:31:00-06:00,2025-12-17,2025,12,emitido,GTQ,A3,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,414.6,370.18,44.42
+GT-DEMO-000306,2025-12-17T14:32:00-06:00,2025-12-17,2025,12,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,292.1,260.8,31.3
+GT-DEMO-000200,2025-12-17T18:07:00-06:00,2025-12-17,2025,12,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,132.86,118.63,14.23
+GT-DEMO-000087,2025-12-18T08:00:00-06:00,2025-12-18,2025,12,emitido,GTQ,A1,6283947,"Distribuidora del Pacífico, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,196.64,175.57,21.07
+GT-DEMO-000095,2025-12-18T14:04:00-06:00,2025-12-18,2025,12,emitido,GTQ,A1,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1333.97,1191.05,142.92
+GT-DEMO-000460,2025-12-20T15:37:00-06:00,2025-12-20,2025,12,emitido,GTQ,B2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,338.54,302.27,36.27
+GT-DEMO-000673,2025-12-21T17:16:00-06:00,2025-12-21,2025,12,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,905.77,808.72,97.05
+GT-DEMO-000366,2025-12-22T10:37:00-06:00,2025-12-22,2025,12,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,356.73,318.51,38.22
+GT-DEMO-000613,2025-12-22T17:36:00-06:00,2025-12-22,2025,12,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,202.48,180.79,21.69
+GT-DEMO-000275,2025-12-23T10:49:00-06:00,2025-12-23,2025,12,emitido,GTQ,A3,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2321.28,2072.57,248.71
+GT-DEMO-000282,2025-12-23T11:37:00-06:00,2025-12-23,2025,12,emitido,GTQ,A3,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,484.22,432.34,51.88
+GT-DEMO-000504,2025-12-23T12:01:00-06:00,2025-12-23,2025,12,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1199.09,1070.62,128.47
+GT-DEMO-000008,2025-12-23T17:56:00-06:00,2025-12-23,2025,12,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,868.48,775.43,93.05
+GT-DEMO-000213,2025-12-24T10:17:00-06:00,2025-12-24,2025,12,emitido,GTQ,A3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,921.13,822.44,98.69
+GT-DEMO-000498,2025-12-24T10:34:00-06:00,2025-12-24,2025,12,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,575.23,513.6,61.63
+GT-DEMO-000319,2025-12-24T18:27:00-06:00,2025-12-24,2025,12,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1853.32,1654.75,198.57
+GT-DEMO-000697,2025-12-25T15:31:00-06:00,2025-12-25,2025,12,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,853.76,762.29,91.47
+GT-DEMO-000032,2025-12-25T17:36:00-06:00,2025-12-25,2025,12,emitido,GTQ,A1,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,939.6,838.93,100.67
+GT-DEMO-000495,2025-12-26T11:07:00-06:00,2025-12-26,2025,12,emitido,GTQ,B2,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,687.44,613.79,73.65
+GT-DEMO-000698,2025-12-26T11:11:00-06:00,2025-12-26,2025,12,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,744.54,664.77,79.77
+GT-DEMO-000166,2025-12-26T12:24:00-06:00,2025-12-26,2025,12,emitido,GTQ,A2,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,415.44,370.93,44.51
+GT-DEMO-000345,2025-12-26T18:23:00-06:00,2025-12-26,2025,12,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,492.87,440.06,52.81
+GT-DEMO-000415,2025-12-28T08:21:00-06:00,2025-12-28,2025,12,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,331.28,295.78,35.5
+GT-DEMO-000494,2025-12-28T09:45:00-06:00,2025-12-28,2025,12,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,533.01,475.9,57.11
+GT-DEMO-000490,2025-12-28T11:40:00-06:00,2025-12-28,2025,12,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,335.24,299.32,35.92
+GT-DEMO-000539,2025-12-28T11:55:00-06:00,2025-12-28,2025,12,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,572.53,511.19,61.34
+GT-DEMO-000435,2025-12-28T12:23:00-06:00,2025-12-28,2025,12,emitido,GTQ,B2,7812456,"Servicios Integrales Maya, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,2405.07,2147.39,257.68
+GT-DEMO-000693,2025-12-28T17:10:00-06:00,2025-12-28,2025,12,emitido,GTQ,C1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,949.7,847.95,101.75
+GT-DEMO-000113,2025-12-28T17:35:00-06:00,2025-12-28,2025,12,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,223.15,199.24,23.91
+GT-DEMO-000488,2025-12-29T08:28:00-06:00,2025-12-29,2025,12,emitido,GTQ,B2,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,868.68,775.61,93.07
+GT-DEMO-000595,2025-12-29T09:49:00-06:00,2025-12-29,2025,12,emitido,GTQ,B3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,337.18,301.06,36.12
+GT-DEMO-000605,2025-12-29T16:38:00-06:00,2025-12-29,2025,12,emitido,GTQ,C1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,298.37,266.4,31.97
+GT-DEMO-000635,2025-12-29T16:40:00-06:00,2025-12-29,2025,12,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2421.05,2161.65,259.4
+GT-DEMO-000138,2025-12-30T08:08:00-06:00,2025-12-30,2025,12,emitido,GTQ,A2,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2246.84,2006.11,240.73
+GT-DEMO-000584,2025-12-31T16:27:00-06:00,2025-12-31,2025,12,emitido,GTQ,B3,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,441.06,393.8,47.26
+GT-DEMO-000566,2026-01-01T15:29:00-06:00,2026-01-01,2026,1,emitido,GTQ,B3,7812456,"Servicios Integrales Maya, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,65.58,58.55,7.03
+GT-DEMO-000039,2026-01-02T15:30:00-06:00,2026-01-02,2026,1,anulado,GTQ,A1,8146293,"Hotel Vista Real, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,898.83,802.53,96.3
+GT-DEMO-000623,2026-01-03T14:39:00-06:00,2026-01-03,2026,1,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,172.45,153.97,18.48
+GT-DEMO-000279,2026-01-03T16:55:00-06:00,2026-01-03,2026,1,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,590.9,527.59,63.31
+GT-DEMO-000163,2026-01-04T14:08:00-06:00,2026-01-04,2026,1,emitido,GTQ,A2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,989.02,883.06,105.96
+GT-DEMO-000617,2026-01-04T17:54:00-06:00,2026-01-04,2026,1,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1404.1,1253.66,150.44
+GT-DEMO-000354,2026-01-05T12:46:00-06:00,2026-01-05,2026,1,emitido,GTQ,B1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,879.12,784.94,94.18
+GT-DEMO-000551,2026-01-06T16:30:00-06:00,2026-01-06,2026,1,emitido,GTQ,B3,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,979.78,874.81,104.97
+GT-DEMO-000301,2026-01-07T09:05:00-06:00,2026-01-07,2026,1,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,181.8,162.32,19.48
+GT-DEMO-000674,2026-01-08T16:06:00-06:00,2026-01-08,2026,1,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,3186.3,2844.91,341.39
+GT-DEMO-000079,2026-01-09T13:46:00-06:00,2026-01-09,2026,1,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,602.61,538.05,64.56
+GT-DEMO-000292,2026-01-10T13:08:00-06:00,2026-01-10,2026,1,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1293.05,1154.51,138.54
+GT-DEMO-000513,2026-01-10T15:59:00-06:00,2026-01-10,2026,1,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,365.76,326.57,39.19
+GT-DEMO-000124,2026-01-11T08:59:00-06:00,2026-01-11,2026,1,emitido,GTQ,A2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,408.38,364.63,43.75
+GT-DEMO-000046,2026-01-12T15:41:00-06:00,2026-01-12,2026,1,emitido,GTQ,A1,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,614.84,548.96,65.88
+GT-DEMO-000088,2026-01-13T09:14:00-06:00,2026-01-13,2026,1,emitido,GTQ,A1,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,182.61,163.04,19.57
+GT-DEMO-000164,2026-01-13T12:57:00-06:00,2026-01-13,2026,1,emitido,GTQ,A2,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,406.02,362.52,43.5
+GT-DEMO-000589,2026-01-13T14:32:00-06:00,2026-01-13,2026,1,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,437.7,390.81,46.89
+GT-DEMO-000314,2026-01-14T09:09:00-06:00,2026-01-14,2026,1,emitido,GTQ,B1,4857291,"Comercial La Estrella, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,240.22,214.49,25.73
+GT-DEMO-000165,2026-01-14T13:01:00-06:00,2026-01-14,2026,1,emitido,GTQ,A2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1225.71,1094.38,131.33
+GT-DEMO-000362,2026-01-15T11:03:00-06:00,2026-01-15,2026,1,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,347.3,310.09,37.21
+GT-DEMO-000265,2026-01-15T16:51:00-06:00,2026-01-15,2026,1,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,350.73,313.15,37.58
+GT-DEMO-000134,2026-01-16T09:56:00-06:00,2026-01-16,2026,1,emitido,GTQ,A2,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,588.81,525.73,63.08
+GT-DEMO-000609,2026-01-16T11:20:00-06:00,2026-01-16,2026,1,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2266.65,2023.79,242.86
+GT-DEMO-000404,2026-01-18T15:19:00-06:00,2026-01-18,2026,1,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1695.42,1513.77,181.65
+GT-DEMO-000496,2026-01-18T15:20:00-06:00,2026-01-18,2026,1,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,170.68,152.39,18.29
+GT-DEMO-000386,2026-01-19T09:58:00-06:00,2026-01-19,2026,1,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,594.41,530.72,63.69
+GT-DEMO-000649,2026-01-19T13:03:00-06:00,2026-01-19,2026,1,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1156.48,1032.56,123.92
+GT-DEMO-000324,2026-01-19T15:05:00-06:00,2026-01-19,2026,1,emitido,GTQ,B1,4857291,"Comercial La Estrella, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,558.86,498.98,59.88
+GT-DEMO-000554,2026-01-19T17:50:00-06:00,2026-01-19,2026,1,emitido,GTQ,B3,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,251.16,224.25,26.91
+GT-DEMO-000523,2026-01-20T08:46:00-06:00,2026-01-20,2026,1,emitido,GTQ,B3,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,193.14,172.45,20.69
+GT-DEMO-000326,2026-01-20T13:34:00-06:00,2026-01-20,2026,1,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,526.72,470.29,56.43
+GT-DEMO-000215,2026-01-22T08:41:00-06:00,2026-01-22,2026,1,emitido,GTQ,A3,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,580.08,517.93,62.15
+GT-DEMO-000560,2026-01-23T08:35:00-06:00,2026-01-23,2026,1,emitido,GTQ,B3,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,462.56,413.0,49.56
+GT-DEMO-000655,2026-01-24T11:46:00-06:00,2026-01-24,2026,1,emitido,GTQ,C1,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,869.92,776.72,93.2
+GT-DEMO-000217,2026-01-24T16:57:00-06:00,2026-01-24,2026,1,emitido,GTQ,A3,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,178.56,159.43,19.13
+GT-DEMO-000505,2026-01-25T12:01:00-06:00,2026-01-25,2026,1,emitido,GTQ,B3,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,836.83,747.17,89.66
+GT-DEMO-000508,2026-01-25T12:22:00-06:00,2026-01-25,2026,1,emitido,GTQ,B3,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,297.65,265.76,31.89
+GT-DEMO-000654,2026-01-25T13:16:00-06:00,2026-01-25,2026,1,emitido,GTQ,C1,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,143.19,127.85,15.34
+GT-DEMO-000610,2026-01-25T14:32:00-06:00,2026-01-25,2026,1,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,346.6,309.47,37.13
+GT-DEMO-000223,2026-01-26T09:26:00-06:00,2026-01-26,2026,1,emitido,GTQ,A3,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2211.0,1974.1,236.9
+GT-DEMO-000658,2026-01-26T10:04:00-06:00,2026-01-26,2026,1,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2824.52,2521.89,302.63
+GT-DEMO-000542,2026-01-26T12:38:00-06:00,2026-01-26,2026,1,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,353.95,316.03,37.92
+GT-DEMO-000243,2026-01-27T12:03:00-06:00,2026-01-27,2026,1,anulado,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,313.93,280.3,33.63
+GT-DEMO-000475,2026-01-27T15:03:00-06:00,2026-01-27,2026,1,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,677.68,605.07,72.61
+GT-DEMO-000666,2026-01-27T16:21:00-06:00,2026-01-27,2026,1,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,434.22,387.7,46.52
+GT-DEMO-000264,2026-01-27T17:32:00-06:00,2026-01-27,2026,1,emitido,GTQ,A3,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,563.92,503.5,60.42
+GT-DEMO-000441,2026-01-28T09:42:00-06:00,2026-01-28,2026,1,emitido,GTQ,B2,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,135.2,120.71,14.49
+GT-DEMO-000355,2026-01-30T16:16:00-06:00,2026-01-30,2026,1,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,438.66,391.66,47.0
+GT-DEMO-000642,2026-01-30T18:03:00-06:00,2026-01-30,2026,1,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,478.96,427.64,51.32
+GT-DEMO-000302,2026-01-31T14:03:00-06:00,2026-01-31,2026,1,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,960.52,857.6,102.92
+GT-DEMO-000261,2026-02-01T08:38:00-06:00,2026-02-01,2026,2,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,189.6,169.29,20.31
+GT-DEMO-000471,2026-02-01T11:53:00-06:00,2026-02-01,2026,2,emitido,GTQ,B2,4857291,"Comercial La Estrella, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,181.8,162.32,19.48
+GT-DEMO-000445,2026-02-01T16:46:00-06:00,2026-02-01,2026,2,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,195.33,174.4,20.93
+GT-DEMO-000429,2026-02-02T12:47:00-06:00,2026-02-02,2026,2,emitido,GTQ,B2,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1937.7,1730.09,207.61
+GT-DEMO-000232,2026-02-03T17:01:00-06:00,2026-02-03,2026,2,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,474.84,423.97,50.87
+GT-DEMO-000133,2026-02-04T14:03:00-06:00,2026-02-04,2026,2,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,426.74,381.02,45.72
+GT-DEMO-000416,2026-02-05T10:48:00-06:00,2026-02-05,2026,2,emitido,GTQ,B2,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,550.0,491.07,58.93
+GT-DEMO-000151,2026-02-05T16:41:00-06:00,2026-02-05,2026,2,emitido,GTQ,A2,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1192.63,1064.85,127.78
+GT-DEMO-000541,2026-02-06T09:47:00-06:00,2026-02-06,2026,2,emitido,GTQ,B3,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,70.12,62.61,7.51
+GT-DEMO-000377,2026-02-06T13:40:00-06:00,2026-02-06,2026,2,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2353.31,2101.17,252.14
+GT-DEMO-000570,2026-02-06T18:48:00-06:00,2026-02-06,2026,2,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,373.36,333.36,40.0
+GT-DEMO-000645,2026-02-07T09:20:00-06:00,2026-02-07,2026,2,emitido,GTQ,C1,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1303.03,1163.42,139.61
+GT-DEMO-000131,2026-02-07T16:07:00-06:00,2026-02-07,2026,2,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,549.05,490.22,58.83
+GT-DEMO-000454,2026-02-08T09:59:00-06:00,2026-02-08,2026,2,emitido,GTQ,B2,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,321.24,286.82,34.42
+GT-DEMO-000204,2026-02-08T12:16:00-06:00,2026-02-08,2026,2,emitido,GTQ,A3,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,319.55,285.31,34.24
+GT-DEMO-000420,2026-02-08T14:30:00-06:00,2026-02-08,2026,2,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1275.36,1138.71,136.65
+GT-DEMO-000640,2026-02-08T14:44:00-06:00,2026-02-08,2026,2,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,129.74,115.84,13.9
+GT-DEMO-000692,2026-02-08T18:47:00-06:00,2026-02-08,2026,2,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,2002.07,1787.56,214.51
+GT-DEMO-000331,2026-02-09T08:06:00-06:00,2026-02-09,2026,2,emitido,GTQ,B1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,810.74,723.87,86.87
+GT-DEMO-000626,2026-02-09T08:41:00-06:00,2026-02-09,2026,2,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,821.96,733.89,88.07
+GT-DEMO-000057,2026-02-09T12:25:00-06:00,2026-02-09,2026,2,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1299.82,1160.56,139.26
+GT-DEMO-000320,2026-02-09T17:51:00-06:00,2026-02-09,2026,2,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2211.9,1974.91,236.99
+GT-DEMO-000048,2026-02-11T10:00:00-06:00,2026-02-11,2026,2,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,614.72,548.86,65.86
+GT-DEMO-000644,2026-02-11T15:14:00-06:00,2026-02-11,2026,2,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1943.02,1734.84,208.18
+GT-DEMO-000067,2026-02-11T15:30:00-06:00,2026-02-11,2026,2,emitido,GTQ,A1,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2213.33,1976.19,237.14
+GT-DEMO-000344,2026-02-12T13:05:00-06:00,2026-02-12,2026,2,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,518.38,462.84,55.54
+GT-DEMO-000667,2026-02-13T08:36:00-06:00,2026-02-13,2026,2,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1609.56,1437.11,172.45
+GT-DEMO-000334,2026-02-13T10:27:00-06:00,2026-02-13,2026,2,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,604.11,539.39,64.72
+GT-DEMO-000519,2026-02-13T15:02:00-06:00,2026-02-13,2026,2,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1669.61,1490.73,178.88
+GT-DEMO-000579,2026-02-13T17:46:00-06:00,2026-02-13,2026,2,emitido,GTQ,B3,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,642.06,573.27,68.79
+GT-DEMO-000502,2026-02-14T18:12:00-06:00,2026-02-14,2026,2,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,229.41,204.83,24.58
+GT-DEMO-000297,2026-02-14T18:27:00-06:00,2026-02-14,2026,2,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,642.75,573.88,68.87
+GT-DEMO-000132,2026-02-14T18:31:00-06:00,2026-02-14,2026,2,emitido,GTQ,A2,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,836.33,746.73,89.6
+GT-DEMO-000433,2026-02-15T12:34:00-06:00,2026-02-15,2026,2,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,643.39,574.45,68.94
+GT-DEMO-000106,2026-02-16T08:28:00-06:00,2026-02-16,2026,2,emitido,GTQ,A2,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,824.8,736.43,88.37
+GT-DEMO-000477,2026-02-16T11:55:00-06:00,2026-02-16,2026,2,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1015.27,906.48,108.79
+GT-DEMO-000333,2026-02-17T09:39:00-06:00,2026-02-17,2026,2,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1209.25,1079.68,129.57
+GT-DEMO-000671,2026-02-17T13:37:00-06:00,2026-02-17,2026,2,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1120.38,1000.35,120.03
+GT-DEMO-000669,2026-02-17T14:03:00-06:00,2026-02-17,2026,2,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,388.54,346.91,41.63
+GT-DEMO-000448,2026-02-17T17:17:00-06:00,2026-02-17,2026,2,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1116.16,996.57,119.59
+GT-DEMO-000176,2026-02-18T17:44:00-06:00,2026-02-18,2026,2,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2516.97,2247.29,269.68
+GT-DEMO-000092,2026-02-19T16:40:00-06:00,2026-02-19,2026,2,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1213.02,1083.06,129.96
+GT-DEMO-000503,2026-02-20T16:10:00-06:00,2026-02-20,2026,2,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,572.24,510.93,61.31
+GT-DEMO-000211,2026-02-21T12:20:00-06:00,2026-02-21,2026,2,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,377.38,336.95,40.43
+GT-DEMO-000578,2026-02-21T16:47:00-06:00,2026-02-21,2026,2,emitido,GTQ,B3,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,985.46,879.87,105.59
+GT-DEMO-000108,2026-02-22T08:49:00-06:00,2026-02-22,2026,2,emitido,GTQ,A2,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,590.16,526.93,63.23
+GT-DEMO-000450,2026-02-22T08:56:00-06:00,2026-02-22,2026,2,emitido,GTQ,B2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,162.45,145.04,17.41
+GT-DEMO-000699,2026-02-22T09:10:00-06:00,2026-02-22,2026,2,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,878.75,784.6,94.15
+GT-DEMO-000603,2026-02-22T16:27:00-06:00,2026-02-22,2026,2,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2149.99,1919.64,230.35
+GT-DEMO-000202,2026-02-23T09:10:00-06:00,2026-02-23,2026,2,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1086.62,970.2,116.42
+GT-DEMO-000436,2026-02-23T11:31:00-06:00,2026-02-23,2026,2,emitido,GTQ,B2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,787.33,702.97,84.36
+GT-DEMO-000547,2026-02-23T13:22:00-06:00,2026-02-23,2026,2,anulado,GTQ,B3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,421.44,376.29,45.15
+GT-DEMO-000691,2026-02-23T17:59:00-06:00,2026-02-23,2026,2,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,923.97,824.97,99.0
+GT-DEMO-000111,2026-02-24T09:34:00-06:00,2026-02-24,2026,2,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1008.41,900.37,108.04
+GT-DEMO-000233,2026-02-25T11:31:00-06:00,2026-02-25,2026,2,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,642.74,573.88,68.86
+GT-DEMO-000004,2026-02-25T13:12:00-06:00,2026-02-25,2026,2,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,249.86,223.09,26.77
+GT-DEMO-000350,2026-02-25T17:52:00-06:00,2026-02-25,2026,2,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,604.35,539.6,64.75
+GT-DEMO-000235,2026-02-27T17:02:00-06:00,2026-02-27,2026,2,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1261.32,1126.17,135.15
+GT-DEMO-000271,2026-02-28T10:21:00-06:00,2026-02-28,2026,2,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,990.57,884.44,106.13
+GT-DEMO-000060,2026-02-28T13:19:00-06:00,2026-02-28,2026,2,emitido,GTQ,A1,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,901.44,804.86,96.58
+GT-DEMO-000672,2026-02-28T17:46:00-06:00,2026-02-28,2026,2,emitido,GTQ,C1,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,475.59,424.63,50.96
+GT-DEMO-000027,2026-03-01T09:59:00-06:00,2026-03-01,2026,3,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,2110.03,1883.96,226.07
+GT-DEMO-000665,2026-03-01T10:49:00-06:00,2026-03-01,2026,3,emitido,GTQ,C1,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,392.83,350.74,42.09
+GT-DEMO-000338,2026-03-01T11:52:00-06:00,2026-03-01,2026,3,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,834.59,745.17,89.42
+GT-DEMO-000245,2026-03-01T16:57:00-06:00,2026-03-01,2026,3,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,657.44,587.0,70.44
+GT-DEMO-000252,2026-03-01T17:26:00-06:00,2026-03-01,2026,3,emitido,GTQ,A3,7812456,"Servicios Integrales Maya, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,129.9,115.98,13.92
+GT-DEMO-000249,2026-03-02T09:17:00-06:00,2026-03-02,2026,3,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,337.26,301.13,36.13
+GT-DEMO-000535,2026-03-02T13:05:00-06:00,2026-03-02,2026,3,emitido,GTQ,B3,7492631,"Tecnología y Más, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1141.2,1018.93,122.27
+GT-DEMO-000321,2026-03-02T15:44:00-06:00,2026-03-02,2026,3,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1420.54,1268.34,152.2
+GT-DEMO-000010,2026-03-02T16:01:00-06:00,2026-03-02,2026,3,emitido,GTQ,A1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,141.14,126.02,15.12
+GT-DEMO-000304,2026-03-04T09:39:00-06:00,2026-03-04,2026,3,emitido,GTQ,B1,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,957.35,854.78,102.57
+GT-DEMO-000055,2026-03-04T17:06:00-06:00,2026-03-04,2026,3,anulado,GTQ,A1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,175.32,156.54,18.78
+GT-DEMO-000395,2026-03-04T18:15:00-06:00,2026-03-04,2026,3,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1820.6,1625.54,195.06
+GT-DEMO-000083,2026-03-05T09:24:00-06:00,2026-03-05,2026,3,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,248.0,221.43,26.57
+GT-DEMO-000418,2026-03-07T18:38:00-06:00,2026-03-07,2026,3,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1461.32,1304.75,156.57
+GT-DEMO-000121,2026-03-09T09:42:00-06:00,2026-03-09,2026,3,emitido,GTQ,A2,7812456,"Servicios Integrales Maya, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,127.14,113.52,13.62
+GT-DEMO-000085,2026-03-09T11:32:00-06:00,2026-03-09,2026,3,emitido,GTQ,A1,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,210.4,187.86,22.54
+GT-DEMO-000522,2026-03-10T08:47:00-06:00,2026-03-10,2026,3,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,979.33,874.41,104.92
+GT-DEMO-000337,2026-03-10T16:59:00-06:00,2026-03-10,2026,3,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,523.53,467.44,56.09
+GT-DEMO-000189,2026-03-11T12:05:00-06:00,2026-03-11,2026,3,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,752.68,672.04,80.64
+GT-DEMO-000717,2026-03-11T16:10:00-06:00,2026-03-11,2026,3,emitido,GTQ,C2,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,460.86,411.48,49.38
+GT-DEMO-000707,2026-03-11T18:04:00-06:00,2026-03-11,2026,3,emitido,GTQ,C2,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,705.52,629.93,75.59
+GT-DEMO-000470,2026-03-12T11:13:00-06:00,2026-03-12,2026,3,emitido,GTQ,B2,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,312.49,279.01,33.48
+GT-DEMO-000518,2026-03-13T11:20:00-06:00,2026-03-13,2026,3,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,605.48,540.61,64.87
+GT-DEMO-000661,2026-03-13T18:31:00-06:00,2026-03-13,2026,3,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2440.39,2178.92,261.47
+GT-DEMO-000311,2026-03-14T12:08:00-06:00,2026-03-14,2026,3,emitido,GTQ,B1,7492631,"Tecnología y Más, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,669.08,597.39,71.69
+GT-DEMO-000594,2026-03-14T13:41:00-06:00,2026-03-14,2026,3,emitido,GTQ,B3,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,254.92,227.61,27.31
+GT-DEMO-000105,2026-03-14T18:18:00-06:00,2026-03-14,2026,3,emitido,GTQ,A2,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1955.18,1745.7,209.48
+GT-DEMO-000364,2026-03-15T13:38:00-06:00,2026-03-15,2026,3,emitido,GTQ,B1,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,197.5,176.34,21.16
+GT-DEMO-000328,2026-03-16T16:35:00-06:00,2026-03-16,2026,3,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,932.9,832.94,99.96
+GT-DEMO-000706,2026-03-17T18:40:00-06:00,2026-03-17,2026,3,emitido,GTQ,C2,7812456,"Servicios Integrales Maya, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,379.53,338.87,40.66
+GT-DEMO-000351,2026-03-18T12:37:00-06:00,2026-03-18,2026,3,anulado,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,536.68,479.18,57.5
+GT-DEMO-000389,2026-03-18T14:19:00-06:00,2026-03-18,2026,3,emitido,GTQ,B1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,370.73,331.01,39.72
+GT-DEMO-000458,2026-03-18T14:29:00-06:00,2026-03-18,2026,3,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,595.52,531.72,63.8
+GT-DEMO-000287,2026-03-18T18:23:00-06:00,2026-03-18,2026,3,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,462.07,412.56,49.51
+GT-DEMO-000510,2026-03-18T18:32:00-06:00,2026-03-18,2026,3,emitido,GTQ,B3,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2111.06,1884.88,226.18
+GT-DEMO-000116,2026-03-19T12:00:00-06:00,2026-03-19,2026,3,emitido,GTQ,A2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,725.13,647.44,77.69
+GT-DEMO-000171,2026-03-19T12:52:00-06:00,2026-03-19,2026,3,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,236.25,210.94,25.31
+GT-DEMO-000228,2026-03-19T18:51:00-06:00,2026-03-19,2026,3,emitido,GTQ,A3,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2228.44,1989.68,238.76
+GT-DEMO-000237,2026-03-20T16:17:00-06:00,2026-03-20,2026,3,emitido,GTQ,A3,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,333.45,297.72,35.73
+GT-DEMO-000154,2026-03-21T09:45:00-06:00,2026-03-21,2026,3,emitido,GTQ,A2,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,154.94,138.34,16.6
+GT-DEMO-000479,2026-03-22T10:43:00-06:00,2026-03-22,2026,3,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,352.48,314.71,37.77
+GT-DEMO-000042,2026-03-22T12:46:00-06:00,2026-03-22,2026,3,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1703.64,1521.11,182.53
+GT-DEMO-000325,2026-03-22T15:25:00-06:00,2026-03-22,2026,3,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,700.22,625.2,75.02
+GT-DEMO-000457,2026-03-23T10:17:00-06:00,2026-03-23,2026,3,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,106.5,95.09,11.41
+GT-DEMO-000262,2026-03-23T16:06:00-06:00,2026-03-23,2026,3,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,413.88,369.54,44.34
+GT-DEMO-000556,2026-03-24T11:34:00-06:00,2026-03-24,2026,3,emitido,GTQ,B3,7812456,"Servicios Integrales Maya, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,932.02,832.16,99.86
+GT-DEMO-000184,2026-03-24T14:01:00-06:00,2026-03-24,2026,3,emitido,GTQ,A2,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,700.23,625.21,75.02
+GT-DEMO-000114,2026-03-25T16:20:00-06:00,2026-03-25,2026,3,emitido,GTQ,A2,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,858.3,766.34,91.96
+GT-DEMO-000432,2026-03-27T09:22:00-06:00,2026-03-27,2026,3,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,266.65,238.08,28.57
+GT-DEMO-000186,2026-03-27T16:42:00-06:00,2026-03-27,2026,3,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,718.36,641.4,76.96
+GT-DEMO-000540,2026-03-28T14:44:00-06:00,2026-03-28,2026,3,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,898.94,802.64,96.3
+GT-DEMO-000051,2026-03-30T13:14:00-06:00,2026-03-30,2026,3,emitido,GTQ,A1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,893.3,797.6,95.7
+GT-DEMO-000491,2026-03-30T16:12:00-06:00,2026-03-30,2026,3,emitido,GTQ,B2,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,652.72,582.78,69.94
+GT-DEMO-000181,2026-03-31T09:45:00-06:00,2026-03-31,2026,3,emitido,GTQ,A2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,391.2,349.29,41.91
+GT-DEMO-000618,2026-04-01T08:50:00-06:00,2026-04-01,2026,4,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,450.67,402.38,48.29
+GT-DEMO-000446,2026-04-01T09:53:00-06:00,2026-04-01,2026,4,emitido,GTQ,B2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1235.31,1102.96,132.35
+GT-DEMO-000685,2026-04-01T12:48:00-06:00,2026-04-01,2026,4,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,871.18,777.84,93.34
+GT-DEMO-000719,2026-04-01T17:28:00-06:00,2026-04-01,2026,4,emitido,GTQ,C2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2324.13,2075.12,249.01
+GT-DEMO-000568,2026-04-03T09:40:00-06:00,2026-04-03,2026,4,emitido,GTQ,B3,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,401.6,358.57,43.03
+GT-DEMO-000009,2026-04-03T09:55:00-06:00,2026-04-03,2026,4,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,668.34,596.73,71.61
+GT-DEMO-000588,2026-04-04T14:08:00-06:00,2026-04-04,2026,4,emitido,GTQ,B3,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,422.97,377.65,45.32
+GT-DEMO-000630,2026-04-04T14:23:00-06:00,2026-04-04,2026,4,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,564.71,504.2,60.51
+GT-DEMO-000281,2026-04-04T18:43:00-06:00,2026-04-04,2026,4,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,762.25,680.58,81.67
+GT-DEMO-000394,2026-04-05T08:19:00-06:00,2026-04-05,2026,4,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,564.76,504.25,60.51
+GT-DEMO-000305,2026-04-05T14:28:00-06:00,2026-04-05,2026,4,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,302.65,270.23,32.42
+GT-DEMO-000094,2026-04-07T08:23:00-06:00,2026-04-07,2026,4,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,947.09,845.62,101.47
+GT-DEMO-000003,2026-04-07T08:58:00-06:00,2026-04-07,2026,4,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,587.51,524.56,62.95
+GT-DEMO-000167,2026-04-07T09:38:00-06:00,2026-04-07,2026,4,emitido,GTQ,A2,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,278.24,248.43,29.81
+GT-DEMO-000715,2026-04-07T18:50:00-06:00,2026-04-07,2026,4,emitido,GTQ,C2,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1125.93,1005.29,120.64
+GT-DEMO-000357,2026-04-08T08:55:00-06:00,2026-04-08,2026,4,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,800.92,715.11,85.81
+GT-DEMO-000720,2026-04-08T13:34:00-06:00,2026-04-08,2026,4,emitido,GTQ,C2,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,331.92,296.36,35.56
+GT-DEMO-000274,2026-04-08T16:54:00-06:00,2026-04-08,2026,4,emitido,GTQ,A3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,215.52,192.43,23.09
+GT-DEMO-000713,2026-04-09T17:06:00-06:00,2026-04-09,2026,4,emitido,GTQ,C2,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,380.72,339.93,40.79
+GT-DEMO-000557,2026-04-10T13:18:00-06:00,2026-04-10,2026,4,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,795.32,710.11,85.21
+GT-DEMO-000140,2026-04-11T08:17:00-06:00,2026-04-11,2026,4,emitido,GTQ,A2,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,784.72,700.64,84.08
+GT-DEMO-000599,2026-04-11T15:08:00-06:00,2026-04-11,2026,4,emitido,GTQ,B3,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,914.48,816.5,97.98
+GT-DEMO-000409,2026-04-12T10:12:00-06:00,2026-04-12,2026,4,emitido,GTQ,B2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,257.89,230.26,27.63
+GT-DEMO-000073,2026-04-12T12:46:00-06:00,2026-04-12,2026,4,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,378.18,337.66,40.52
+GT-DEMO-000656,2026-04-15T08:03:00-06:00,2026-04-15,2026,4,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1044.35,932.46,111.89
+GT-DEMO-000620,2026-04-15T08:40:00-06:00,2026-04-15,2026,4,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2769.13,2472.44,296.69
+GT-DEMO-000221,2026-04-15T12:06:00-06:00,2026-04-15,2026,4,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1137.28,1015.43,121.85
+GT-DEMO-000521,2026-04-16T15:40:00-06:00,2026-04-16,2026,4,emitido,GTQ,B3,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,411.16,367.11,44.05
+GT-DEMO-000426,2026-04-16T16:15:00-06:00,2026-04-16,2026,4,emitido,GTQ,B2,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1071.9,957.05,114.85
+GT-DEMO-000550,2026-04-17T10:55:00-06:00,2026-04-17,2026,4,emitido,GTQ,B3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,239.89,214.19,25.7
+GT-DEMO-000455,2026-04-18T18:54:00-06:00,2026-04-18,2026,4,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,565.36,504.79,60.57
+GT-DEMO-000506,2026-04-19T09:38:00-06:00,2026-04-19,2026,4,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,130.28,116.32,13.96
+GT-DEMO-000484,2026-04-19T11:14:00-06:00,2026-04-19,2026,4,emitido,GTQ,B2,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,289.15,258.17,30.98
+GT-DEMO-000474,2026-04-19T16:42:00-06:00,2026-04-19,2026,4,emitido,GTQ,B2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,601.63,537.17,64.46
+GT-DEMO-000607,2026-04-20T10:04:00-06:00,2026-04-20,2026,4,emitido,GTQ,C1,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,881.44,787.0,94.44
+GT-DEMO-000438,2026-04-20T16:49:00-06:00,2026-04-20,2026,4,emitido,GTQ,B2,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2028.3,1810.98,217.32
+GT-DEMO-000091,2026-04-21T17:21:00-06:00,2026-04-21,2026,4,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1727.15,1542.1,185.05
+GT-DEMO-000464,2026-04-21T18:46:00-06:00,2026-04-21,2026,4,emitido,GTQ,B2,7264519,"Transportes del Sur, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,243.92,217.79,26.13
+GT-DEMO-000172,2026-04-22T08:14:00-06:00,2026-04-22,2026,4,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1422.01,1269.65,152.36
+GT-DEMO-000115,2026-04-22T11:03:00-06:00,2026-04-22,2026,4,emitido,GTQ,A2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,567.66,506.84,60.82
+GT-DEMO-000413,2026-04-23T14:09:00-06:00,2026-04-23,2026,4,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,346.35,309.24,37.11
+GT-DEMO-000421,2026-04-23T15:34:00-06:00,2026-04-23,2026,4,emitido,GTQ,B2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,392.76,350.68,42.08
+GT-DEMO-000069,2026-04-24T09:33:00-06:00,2026-04-24,2026,4,emitido,GTQ,A1,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,213.63,190.74,22.89
+GT-DEMO-000118,2026-04-24T17:46:00-06:00,2026-04-24,2026,4,emitido,GTQ,A2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,426.84,381.11,45.73
+GT-DEMO-000388,2026-04-25T16:36:00-06:00,2026-04-25,2026,4,emitido,GTQ,B1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,271.24,242.18,29.06
+GT-DEMO-000453,2026-04-26T12:00:00-06:00,2026-04-26,2026,4,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1029.88,919.54,110.34
+GT-DEMO-000708,2026-04-26T15:11:00-06:00,2026-04-26,2026,4,anulado,GTQ,C2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1166.9,1041.88,125.02
+GT-DEMO-000465,2026-04-26T15:15:00-06:00,2026-04-26,2026,4,emitido,GTQ,B2,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1604.85,1432.91,171.94
+GT-DEMO-000591,2026-04-28T08:23:00-06:00,2026-04-28,2026,4,emitido,GTQ,B3,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,785.22,701.09,84.13
+GT-DEMO-000632,2026-04-28T10:51:00-06:00,2026-04-28,2026,4,emitido,GTQ,C1,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,58.4,52.14,6.26
+GT-DEMO-000602,2026-04-28T12:43:00-06:00,2026-04-28,2026,4,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,284.37,253.9,30.47
+GT-DEMO-000686,2026-04-29T08:29:00-06:00,2026-04-29,2026,4,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,414.54,370.13,44.41
+GT-DEMO-000290,2026-04-29T09:43:00-06:00,2026-04-29,2026,4,emitido,GTQ,A3,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,66.9,59.73,7.17
+GT-DEMO-000434,2026-04-29T16:26:00-06:00,2026-04-29,2026,4,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,968.6,864.82,103.78
+GT-DEMO-000363,2026-04-29T18:35:00-06:00,2026-04-29,2026,4,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,664.87,593.64,71.23
+GT-DEMO-000361,2026-04-30T17:30:00-06:00,2026-04-30,2026,4,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,683.64,610.39,73.25
+GT-DEMO-000161,2026-04-30T18:38:00-06:00,2026-04-30,2026,4,emitido,GTQ,A2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,460.11,410.81,49.3
+GT-DEMO-000675,2026-05-01T13:13:00-06:00,2026-05-01,2026,5,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,815.5,728.13,87.37
+GT-DEMO-000414,2026-05-02T10:51:00-06:00,2026-05-02,2026,5,emitido,GTQ,B2,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1776.04,1585.75,190.29
+GT-DEMO-000286,2026-05-02T15:25:00-06:00,2026-05-02,2026,5,anulado,GTQ,A3,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,881.58,787.12,94.46
+GT-DEMO-000270,2026-05-02T17:15:00-06:00,2026-05-02,2026,5,emitido,GTQ,A3,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1359.54,1213.88,145.66
+GT-DEMO-000056,2026-05-03T10:28:00-06:00,2026-05-03,2026,5,emitido,GTQ,A1,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,740.32,661.0,79.32
+GT-DEMO-000332,2026-05-04T15:48:00-06:00,2026-05-04,2026,5,emitido,GTQ,B1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1370.8,1223.94,146.86
+GT-DEMO-000639,2026-05-05T15:23:00-06:00,2026-05-05,2026,5,emitido,GTQ,C1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,85.68,76.5,9.18
+GT-DEMO-000451,2026-05-05T17:05:00-06:00,2026-05-05,2026,5,emitido,GTQ,B2,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,391.32,349.39,41.93
+GT-DEMO-000408,2026-05-05T17:27:00-06:00,2026-05-05,2026,5,emitido,GTQ,B2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,764.8,682.86,81.94
+GT-DEMO-000569,2026-05-07T16:00:00-06:00,2026-05-07,2026,5,emitido,GTQ,B3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,492.21,439.48,52.73
+GT-DEMO-000631,2026-05-08T10:11:00-06:00,2026-05-08,2026,5,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,652.52,582.6,69.92
+GT-DEMO-000548,2026-05-08T11:59:00-06:00,2026-05-08,2026,5,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,558.81,498.94,59.87
+GT-DEMO-000417,2026-05-08T12:00:00-06:00,2026-05-08,2026,5,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,387.4,345.89,41.51
+GT-DEMO-000572,2026-05-08T12:37:00-06:00,2026-05-08,2026,5,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,873.48,779.89,93.59
+GT-DEMO-000444,2026-05-08T16:35:00-06:00,2026-05-08,2026,5,emitido,GTQ,B2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1275.75,1139.06,136.69
+GT-DEMO-000197,2026-05-09T10:50:00-06:00,2026-05-09,2026,5,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,263.53,235.29,28.24
+GT-DEMO-000257,2026-05-09T18:44:00-06:00,2026-05-09,2026,5,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1263.55,1128.17,135.38
+GT-DEMO-000234,2026-05-10T15:11:00-06:00,2026-05-10,2026,5,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,244.33,218.15,26.18
+GT-DEMO-000512,2026-05-11T15:54:00-06:00,2026-05-11,2026,5,emitido,GTQ,B3,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1042.18,930.52,111.66
+GT-DEMO-000024,2026-05-12T09:45:00-06:00,2026-05-12,2026,5,emitido,GTQ,A1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,343.45,306.65,36.8
+GT-DEMO-000071,2026-05-12T14:56:00-06:00,2026-05-12,2026,5,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,691.13,617.08,74.05
+GT-DEMO-000627,2026-05-12T18:20:00-06:00,2026-05-12,2026,5,emitido,GTQ,C1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1027.94,917.81,110.13
+GT-DEMO-000405,2026-05-13T08:50:00-06:00,2026-05-13,2026,5,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,332.85,297.19,35.66
+GT-DEMO-000199,2026-05-13T08:57:00-06:00,2026-05-13,2026,5,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,307.51,274.56,32.95
+GT-DEMO-000650,2026-05-13T09:06:00-06:00,2026-05-13,2026,5,emitido,GTQ,C1,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,226.02,201.8,24.22
+GT-DEMO-000017,2026-05-13T11:52:00-06:00,2026-05-13,2026,5,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,444.06,396.49,47.57
+GT-DEMO-000596,2026-05-13T12:45:00-06:00,2026-05-13,2026,5,emitido,GTQ,B3,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2483.61,2217.51,266.1
+GT-DEMO-000150,2026-05-13T14:19:00-06:00,2026-05-13,2026,5,emitido,GTQ,A2,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,805.35,719.06,86.29
+GT-DEMO-000222,2026-05-13T16:47:00-06:00,2026-05-13,2026,5,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,578.91,516.89,62.02
+GT-DEMO-000226,2026-05-13T18:45:00-06:00,2026-05-13,2026,5,emitido,GTQ,A3,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,522.35,466.38,55.97
+GT-DEMO-000203,2026-05-14T11:18:00-06:00,2026-05-14,2026,5,emitido,GTQ,A3,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1663.64,1485.39,178.25
+GT-DEMO-000299,2026-05-14T13:01:00-06:00,2026-05-14,2026,5,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,520.72,464.93,55.79
+GT-DEMO-000608,2026-05-14T14:18:00-06:00,2026-05-14,2026,5,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,787.9,703.49,84.41
+GT-DEMO-000061,2026-05-14T14:38:00-06:00,2026-05-14,2026,5,emitido,GTQ,A1,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,302.54,270.13,32.41
+GT-DEMO-000053,2026-05-15T12:57:00-06:00,2026-05-15,2026,5,emitido,GTQ,A1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,611.81,546.26,65.55
+GT-DEMO-000689,2026-05-15T14:00:00-06:00,2026-05-15,2026,5,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,290.08,259.0,31.08
+GT-DEMO-000376,2026-05-15T16:11:00-06:00,2026-05-15,2026,5,emitido,GTQ,B1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1616.09,1442.94,173.15
+GT-DEMO-000312,2026-05-16T08:10:00-06:00,2026-05-16,2026,5,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1471.44,1313.79,157.65
+GT-DEMO-000466,2026-05-16T10:48:00-06:00,2026-05-16,2026,5,emitido,GTQ,B2,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,755.32,674.39,80.93
+GT-DEMO-000310,2026-05-16T12:48:00-06:00,2026-05-16,2026,5,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1630.96,1456.22,174.74
+GT-DEMO-000090,2026-05-16T15:42:00-06:00,2026-05-16,2026,5,emitido,GTQ,A1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1158.75,1034.6,124.15
+GT-DEMO-000080,2026-05-16T17:01:00-06:00,2026-05-16,2026,5,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1469.08,1311.68,157.4
+GT-DEMO-000107,2026-05-17T11:00:00-06:00,2026-05-17,2026,5,emitido,GTQ,A2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,296.18,264.45,31.73
+GT-DEMO-000549,2026-05-17T13:02:00-06:00,2026-05-17,2026,5,emitido,GTQ,B3,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,479.53,428.15,51.38
+GT-DEMO-000598,2026-05-17T15:04:00-06:00,2026-05-17,2026,5,emitido,GTQ,B3,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,799.98,714.27,85.71
+GT-DEMO-000229,2026-05-17T18:42:00-06:00,2026-05-17,2026,5,emitido,GTQ,A3,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1109.7,990.81,118.89
+GT-DEMO-000516,2026-05-18T08:45:00-06:00,2026-05-18,2026,5,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,217.1,193.84,23.26
+GT-DEMO-000035,2026-05-18T09:05:00-06:00,2026-05-18,2026,5,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,216.36,193.18,23.18
+GT-DEMO-000062,2026-05-18T11:15:00-06:00,2026-05-18,2026,5,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,456.05,407.19,48.86
+GT-DEMO-000648,2026-05-19T11:41:00-06:00,2026-05-19,2026,5,emitido,GTQ,C1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1707.6,1524.65,182.95
+GT-DEMO-000077,2026-05-19T13:17:00-06:00,2026-05-19,2026,5,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,699.05,624.15,74.9
+GT-DEMO-000191,2026-05-20T08:10:00-06:00,2026-05-20,2026,5,emitido,GTQ,A2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1076.44,961.11,115.33
+GT-DEMO-000476,2026-05-20T08:58:00-06:00,2026-05-20,2026,5,emitido,GTQ,B2,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1182.55,1055.85,126.7
+GT-DEMO-000066,2026-05-20T14:31:00-06:00,2026-05-20,2026,5,emitido,GTQ,A1,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1295.05,1156.3,138.75
+GT-DEMO-000660,2026-05-23T17:36:00-06:00,2026-05-23,2026,5,emitido,GTQ,C1,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,950.84,848.96,101.88
+GT-DEMO-000318,2026-05-24T09:01:00-06:00,2026-05-24,2026,5,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2246.02,2005.37,240.65
+GT-DEMO-000288,2026-05-24T10:00:00-06:00,2026-05-24,2026,5,emitido,GTQ,A3,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,381.66,340.77,40.89
+GT-DEMO-000606,2026-05-24T11:28:00-06:00,2026-05-24,2026,5,emitido,GTQ,C1,5973814,"Constructora Horizonte, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,510.54,455.84,54.7
+GT-DEMO-000141,2026-05-24T14:35:00-06:00,2026-05-24,2026,5,emitido,GTQ,A2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,318.35,284.24,34.11
+GT-DEMO-000670,2026-05-26T10:02:00-06:00,2026-05-26,2026,5,emitido,GTQ,C1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,233.87,208.81,25.06
+GT-DEMO-000178,2026-05-26T14:53:00-06:00,2026-05-26,2026,5,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2314.76,2066.75,248.01
+GT-DEMO-000437,2026-05-26T17:16:00-06:00,2026-05-26,2026,5,emitido,GTQ,B2,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,849.33,758.34,90.99
+GT-DEMO-000710,2026-05-26T18:49:00-06:00,2026-05-26,2026,5,emitido,GTQ,C2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,372.03,332.17,39.86
+GT-DEMO-000447,2026-05-27T16:01:00-06:00,2026-05-27,2026,5,emitido,GTQ,B2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2018.79,1802.49,216.3
+GT-DEMO-000322,2026-05-27T16:46:00-06:00,2026-05-27,2026,5,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,492.58,439.8,52.78
+GT-DEMO-000190,2026-05-28T10:40:00-06:00,2026-05-28,2026,5,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,584.95,522.27,62.68
+GT-DEMO-000157,2026-05-28T14:21:00-06:00,2026-05-28,2026,5,emitido,GTQ,A2,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1520.64,1357.71,162.93
+GT-DEMO-000663,2026-05-28T16:09:00-06:00,2026-05-28,2026,5,emitido,GTQ,C1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,452.55,404.06,48.49
+GT-DEMO-000147,2026-05-29T09:16:00-06:00,2026-05-29,2026,5,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1216.21,1085.9,130.31
+GT-DEMO-000329,2026-05-30T17:03:00-06:00,2026-05-30,2026,5,emitido,GTQ,B1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,472.92,422.25,50.67
+GT-DEMO-000128,2026-05-30T17:07:00-06:00,2026-05-30,2026,5,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2297.08,2050.97,246.11
+GT-DEMO-000280,2026-05-31T13:23:00-06:00,2026-05-31,2026,5,emitido,GTQ,A3,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,929.19,829.63,99.56
+GT-DEMO-000662,2026-05-31T17:20:00-06:00,2026-05-31,2026,5,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,505.16,451.03,54.13
+GT-DEMO-000149,2026-06-02T09:29:00-06:00,2026-06-02,2026,6,emitido,GTQ,A2,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,282.8,252.5,30.3
+GT-DEMO-000378,2026-06-04T18:54:00-06:00,2026-06-04,2026,6,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,413.23,368.96,44.27
+GT-DEMO-000359,2026-06-05T09:26:00-06:00,2026-06-05,2026,6,emitido,GTQ,B1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2840.04,2535.76,304.28
+GT-DEMO-000246,2026-06-05T16:48:00-06:00,2026-06-05,2026,6,emitido,GTQ,A3,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2526.88,2256.14,270.74
+GT-DEMO-000012,2026-06-05T18:52:00-06:00,2026-06-05,2026,6,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,440.58,393.38,47.2
+GT-DEMO-000391,2026-06-06T11:36:00-06:00,2026-06-06,2026,6,emitido,GTQ,B1,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,464.07,414.35,49.72
+GT-DEMO-000485,2026-06-06T15:09:00-06:00,2026-06-06,2026,6,emitido,GTQ,B2,7812456,"Servicios Integrales Maya, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1264.64,1129.14,135.5
+GT-DEMO-000585,2026-06-08T14:18:00-06:00,2026-06-08,2026,6,emitido,GTQ,B3,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2550.17,2276.94,273.23
+GT-DEMO-000193,2026-06-09T08:20:00-06:00,2026-06-09,2026,6,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,671.59,599.63,71.96
+GT-DEMO-000652,2026-06-09T11:58:00-06:00,2026-06-09,2026,6,emitido,GTQ,C1,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,413.57,369.26,44.31
+GT-DEMO-000372,2026-06-10T16:58:00-06:00,2026-06-10,2026,6,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,379.08,338.46,40.62
+GT-DEMO-000038,2026-06-11T13:16:00-06:00,2026-06-11,2026,6,emitido,GTQ,A1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,448.92,400.82,48.1
+GT-DEMO-000227,2026-06-11T14:44:00-06:00,2026-06-11,2026,6,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1691.14,1509.94,181.2
+GT-DEMO-000489,2026-06-12T18:04:00-06:00,2026-06-12,2026,6,emitido,GTQ,B2,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2567.85,2292.73,275.12
+GT-DEMO-000459,2026-06-13T13:52:00-06:00,2026-06-13,2026,6,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,450.66,402.38,48.28
+GT-DEMO-000534,2026-06-14T10:27:00-06:00,2026-06-14,2026,6,emitido,GTQ,B3,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,730.47,652.21,78.26
+GT-DEMO-000047,2026-06-14T14:48:00-06:00,2026-06-14,2026,6,emitido,GTQ,A1,4857291,"Comercial La Estrella, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,782.04,698.25,83.79
+GT-DEMO-000298,2026-06-14T16:45:00-06:00,2026-06-14,2026,6,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,617.83,551.64,66.19
+GT-DEMO-000283,2026-06-15T17:59:00-06:00,2026-06-15,2026,6,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1072.0,957.15,114.85
+GT-DEMO-000379,2026-06-16T09:17:00-06:00,2026-06-16,2026,6,emitido,GTQ,B1,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,259.63,231.81,27.82
+GT-DEMO-000499,2026-06-16T14:40:00-06:00,2026-06-16,2026,6,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1995.9,1782.05,213.85
+GT-DEMO-000677,2026-06-16T14:44:00-06:00,2026-06-16,2026,6,emitido,GTQ,C1,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,42.37,37.83,4.54
+GT-DEMO-000387,2026-06-17T11:23:00-06:00,2026-06-17,2026,6,emitido,GTQ,B1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,773.2,690.36,82.84
+GT-DEMO-000247,2026-06-17T16:52:00-06:00,2026-06-17,2026,6,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,285.15,254.6,30.55
+GT-DEMO-000173,2026-06-18T08:55:00-06:00,2026-06-18,2026,6,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,718.62,641.63,76.99
+GT-DEMO-000396,2026-06-19T09:33:00-06:00,2026-06-19,2026,6,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,100.67,89.88,10.79
+GT-DEMO-000185,2026-06-19T11:25:00-06:00,2026-06-19,2026,6,emitido,GTQ,A2,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,106.16,94.79,11.37
+GT-DEMO-000070,2026-06-19T15:07:00-06:00,2026-06-19,2026,6,emitido,GTQ,A1,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,857.44,765.57,91.87
+GT-DEMO-000266,2026-06-20T12:55:00-06:00,2026-06-20,2026,6,emitido,GTQ,A3,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,630.28,562.75,67.53
+GT-DEMO-000375,2026-06-21T13:39:00-06:00,2026-06-21,2026,6,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,515.9,460.63,55.27
+GT-DEMO-000045,2026-06-22T08:07:00-06:00,2026-06-22,2026,6,emitido,GTQ,A1,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,275.01,245.54,29.47
+GT-DEMO-000129,2026-06-23T14:27:00-06:00,2026-06-23,2026,6,emitido,GTQ,A2,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,500.25,446.65,53.6
+GT-DEMO-000575,2026-06-23T18:27:00-06:00,2026-06-23,2026,6,emitido,GTQ,B3,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,787.85,703.43,84.42
+GT-DEMO-000259,2026-06-24T17:33:00-06:00,2026-06-24,2026,6,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,124.42,111.09,13.33
+GT-DEMO-000348,2026-06-25T15:51:00-06:00,2026-06-25,2026,6,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,763.9,682.06,81.84
+GT-DEMO-000373,2026-06-25T17:00:00-06:00,2026-06-25,2026,6,emitido,GTQ,B1,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,953.97,851.76,102.21
+GT-DEMO-000646,2026-06-26T09:46:00-06:00,2026-06-26,2026,6,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1181.6,1055.0,126.6
+GT-DEMO-000483,2026-06-26T14:33:00-06:00,2026-06-26,2026,6,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1426.26,1273.45,152.81
+GT-DEMO-000582,2026-06-27T08:32:00-06:00,2026-06-27,2026,6,emitido,GTQ,B3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1928.15,1721.56,206.59
+GT-DEMO-000601,2026-06-27T12:17:00-06:00,2026-06-27,2026,6,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,135.24,120.75,14.49
+GT-DEMO-000146,2026-06-27T16:56:00-06:00,2026-06-27,2026,6,emitido,GTQ,A2,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,923.84,824.86,98.98
+GT-DEMO-000544,2026-06-28T09:40:00-06:00,2026-06-28,2026,6,emitido,GTQ,B3,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,276.68,247.04,29.64
+GT-DEMO-000110,2026-06-28T11:04:00-06:00,2026-06-28,2026,6,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,256.88,229.36,27.52
+GT-DEMO-000078,2026-06-28T14:21:00-06:00,2026-06-28,2026,6,emitido,GTQ,A1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,864.87,772.21,92.66
+GT-DEMO-000380,2026-06-28T17:35:00-06:00,2026-06-28,2026,6,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,299.73,267.61,32.12
+GT-DEMO-000536,2026-06-29T10:11:00-06:00,2026-06-29,2026,6,emitido,GTQ,B3,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,66.09,59.01,7.08
+GT-DEMO-000277,2026-06-29T13:10:00-06:00,2026-06-29,2026,6,emitido,GTQ,A3,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,728.19,650.17,78.02
+GT-DEMO-000700,2026-06-29T13:59:00-06:00,2026-06-29,2026,6,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,455.09,406.33,48.76
+GT-DEMO-000300,2026-06-29T18:23:00-06:00,2026-06-29,2026,6,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,485.39,433.39,52.0
+GT-DEMO-000309,2026-06-30T08:59:00-06:00,2026-06-30,2026,6,emitido,GTQ,B1,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,670.77,598.9,71.87
+GT-DEMO-000076,2026-06-30T12:42:00-06:00,2026-06-30,2026,6,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,242.7,216.7,26.0
+GT-DEMO-000347,2026-06-30T15:12:00-06:00,2026-06-30,2026,6,emitido,GTQ,B1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,185.85,165.94,19.91
+GT-DEMO-000093,2026-07-01T15:03:00-06:00,2026-07-01,2026,7,emitido,GTQ,A1,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,416.99,372.32,44.67
+GT-DEMO-000370,2026-07-03T18:49:00-06:00,2026-07-03,2026,7,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1208.5,1079.01,129.49
+GT-DEMO-000327,2026-07-04T09:12:00-06:00,2026-07-04,2026,7,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,947.28,845.79,101.49
+GT-DEMO-000160,2026-07-04T10:38:00-06:00,2026-07-04,2026,7,emitido,GTQ,A2,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,259.92,232.07,27.85
+GT-DEMO-000353,2026-07-04T12:16:00-06:00,2026-07-04,2026,7,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,2072.56,1850.5,222.06
+GT-DEMO-000099,2026-07-04T13:44:00-06:00,2026-07-04,2026,7,emitido,GTQ,A1,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,449.94,401.73,48.21
+GT-DEMO-000553,2026-07-04T17:10:00-06:00,2026-07-04,2026,7,emitido,GTQ,B3,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,57.4,51.25,6.15
+GT-DEMO-000371,2026-07-04T18:55:00-06:00,2026-07-04,2026,7,emitido,GTQ,B1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,517.27,461.85,55.42
+GT-DEMO-000148,2026-07-05T13:28:00-06:00,2026-07-05,2026,7,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,702.07,626.85,75.22
+GT-DEMO-000400,2026-07-05T13:56:00-06:00,2026-07-05,2026,7,emitido,GTQ,B1,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,139.58,124.63,14.95
+GT-DEMO-000636,2026-07-05T15:28:00-06:00,2026-07-05,2026,7,emitido,GTQ,C1,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,199.53,178.15,21.38
+GT-DEMO-000075,2026-07-06T12:55:00-06:00,2026-07-06,2026,7,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2282.21,2037.68,244.53
+GT-DEMO-000021,2026-07-06T16:26:00-06:00,2026-07-06,2026,7,emitido,GTQ,A1,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,201.42,179.84,21.58
+GT-DEMO-000571,2026-07-07T09:29:00-06:00,2026-07-07,2026,7,anulado,GTQ,B3,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,425.4,379.81,45.59
+GT-DEMO-000136,2026-07-08T14:35:00-06:00,2026-07-08,2026,7,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1337.42,1194.13,143.29
+GT-DEMO-000084,2026-07-09T11:36:00-06:00,2026-07-09,2026,7,emitido,GTQ,A1,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,346.45,309.33,37.12
+GT-DEMO-000278,2026-07-10T10:42:00-06:00,2026-07-10,2026,7,emitido,GTQ,A3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,209.02,186.63,22.39
+GT-DEMO-000339,2026-07-10T13:06:00-06:00,2026-07-10,2026,7,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,790.21,705.55,84.66
+GT-DEMO-000013,2026-07-10T18:14:00-06:00,2026-07-10,2026,7,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,4897.71,4372.96,524.75
+GT-DEMO-000036,2026-07-11T14:27:00-06:00,2026-07-11,2026,7,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,337.7,301.52,36.18
+GT-DEMO-000037,2026-07-12T09:00:00-06:00,2026-07-12,2026,7,emitido,GTQ,A1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1154.54,1030.84,123.7
+GT-DEMO-000682,2026-07-12T12:02:00-06:00,2026-07-12,2026,7,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,290.67,259.52,31.15
+GT-DEMO-000198,2026-07-12T12:14:00-06:00,2026-07-12,2026,7,emitido,GTQ,A2,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1227.65,1096.12,131.53
+GT-DEMO-000537,2026-07-12T15:39:00-06:00,2026-07-12,2026,7,emitido,GTQ,B3,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1699.94,1517.8,182.14
+GT-DEMO-000694,2026-07-13T16:38:00-06:00,2026-07-13,2026,7,emitido,GTQ,C1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,683.09,609.9,73.19
+GT-DEMO-000402,2026-07-13T18:08:00-06:00,2026-07-13,2026,7,emitido,GTQ,B2,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,586.69,523.83,62.86
+GT-DEMO-000256,2026-07-14T18:23:00-06:00,2026-07-14,2026,7,emitido,GTQ,A3,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,743.26,663.62,79.64
+GT-DEMO-000500,2026-07-15T11:16:00-06:00,2026-07-15,2026,7,emitido,GTQ,B2,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,192.09,171.51,20.58
+GT-DEMO-000423,2026-07-15T18:23:00-06:00,2026-07-15,2026,7,emitido,GTQ,B2,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,818.1,730.45,87.65
+GT-DEMO-000207,2026-07-16T15:31:00-06:00,2026-07-16,2026,7,emitido,GTQ,A3,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,816.81,729.29,87.52
+GT-DEMO-000467,2026-07-17T10:34:00-06:00,2026-07-17,2026,7,emitido,GTQ,B2,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,646.65,577.37,69.28
+GT-DEMO-000368,2026-07-17T12:01:00-06:00,2026-07-17,2026,7,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1685.42,1504.84,180.58
+GT-DEMO-000005,2026-07-17T17:23:00-06:00,2026-07-17,2026,7,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,292.25,260.94,31.31
+GT-DEMO-000653,2026-07-18T09:55:00-06:00,2026-07-18,2026,7,emitido,GTQ,C1,9037812,"Grupo Empresarial Centroamericano, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,996.91,890.1,106.81
+GT-DEMO-000343,2026-07-18T11:42:00-06:00,2026-07-18,2026,7,emitido,GTQ,B1,9037812,"Grupo Empresarial Centroamericano, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,808.98,722.3,86.68
+GT-DEMO-000533,2026-07-18T13:07:00-06:00,2026-07-18,2026,7,emitido,GTQ,B3,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2091.75,1867.64,224.11
+GT-DEMO-000659,2026-07-18T16:10:00-06:00,2026-07-18,2026,7,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,310.94,277.62,33.32
+GT-DEMO-000156,2026-07-18T18:40:00-06:00,2026-07-18,2026,7,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,230.64,205.93,24.71
+GT-DEMO-000403,2026-07-18T18:49:00-06:00,2026-07-18,2026,7,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,571.52,510.29,61.23
+GT-DEMO-000144,2026-07-19T14:19:00-06:00,2026-07-19,2026,7,anulado,GTQ,A2,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1419.66,1267.55,152.11
+GT-DEMO-000307,2026-07-20T10:12:00-06:00,2026-07-20,2026,7,emitido,GTQ,B1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,562.09,501.88,60.21
+GT-DEMO-000194,2026-07-20T16:12:00-06:00,2026-07-20,2026,7,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,497.39,444.1,53.29
+GT-DEMO-000430,2026-07-20T18:27:00-06:00,2026-07-20,2026,7,emitido,GTQ,B2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2228.29,1989.55,238.74
+GT-DEMO-000034,2026-07-21T17:11:00-06:00,2026-07-21,2026,7,emitido,GTQ,A1,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,401.75,358.71,43.04
+GT-DEMO-000011,2026-07-22T10:26:00-06:00,2026-07-22,2026,7,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1117.31,997.59,119.72
+GT-DEMO-000468,2026-07-23T11:36:00-06:00,2026-07-23,2026,7,emitido,GTQ,B2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2415.86,2157.02,258.84
+GT-DEMO-000020,2026-07-23T14:01:00-06:00,2026-07-23,2026,7,emitido,GTQ,A1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1782.2,1591.25,190.95
+GT-DEMO-000390,2026-07-23T14:03:00-06:00,2026-07-23,2026,7,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,683.53,610.3,73.23
+GT-DEMO-000527,2026-07-23T15:44:00-06:00,2026-07-23,2026,7,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2175.84,1942.71,233.13
+GT-DEMO-000250,2026-07-23T17:29:00-06:00,2026-07-23,2026,7,emitido,GTQ,A3,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1116.46,996.84,119.62
+GT-DEMO-000410,2026-07-24T08:42:00-06:00,2026-07-24,2026,7,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,711.96,635.68,76.28
+GT-DEMO-000179,2026-07-24T13:31:00-06:00,2026-07-24,2026,7,emitido,GTQ,A2,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,418.98,374.09,44.89
+GT-DEMO-000052,2026-07-24T17:01:00-06:00,2026-07-24,2026,7,emitido,GTQ,A1,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1042.96,931.21,111.75
+GT-DEMO-000074,2026-07-25T13:41:00-06:00,2026-07-25,2026,7,emitido,GTQ,A1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,66.05,58.97,7.08
+GT-DEMO-000123,2026-07-25T16:24:00-06:00,2026-07-25,2026,7,emitido,GTQ,A2,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,34.27,30.6,3.67
+GT-DEMO-000393,2026-07-26T15:25:00-06:00,2026-07-26,2026,7,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,292.74,261.38,31.36
+GT-DEMO-000520,2026-07-26T17:14:00-06:00,2026-07-26,2026,7,emitido,GTQ,B3,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,265.24,236.82,28.42
+GT-DEMO-000206,2026-07-27T09:58:00-06:00,2026-07-27,2026,7,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1903.68,1699.71,203.97
+GT-DEMO-000480,2026-07-27T10:15:00-06:00,2026-07-27,2026,7,emitido,GTQ,B2,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1935.42,1728.06,207.36
+GT-DEMO-000497,2026-07-27T12:12:00-06:00,2026-07-27,2026,7,emitido,GTQ,B2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,170.0,151.79,18.21
+GT-DEMO-000119,2026-07-27T13:35:00-06:00,2026-07-27,2026,7,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,427.38,381.59,45.79
+GT-DEMO-000155,2026-07-28T09:27:00-06:00,2026-07-28,2026,7,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1786.59,1595.17,191.42
+GT-DEMO-000683,2026-07-28T13:23:00-06:00,2026-07-28,2026,7,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1819.47,1624.52,194.95
+GT-DEMO-000525,2026-07-31T10:08:00-06:00,2026-07-31,2026,7,emitido,GTQ,B3,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,494.94,441.91,53.03
+GT-DEMO-000360,2026-07-31T10:19:00-06:00,2026-07-31,2026,7,emitido,GTQ,B1,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,3106.44,2773.61,332.83
+GT-DEMO-000517,2026-07-31T16:34:00-06:00,2026-07-31,2026,7,emitido,GTQ,B3,9037812,"Grupo Empresarial Centroamericano, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,2072.24,1850.21,222.03
+GT-DEMO-000456,2026-08-01T08:42:00-06:00,2026-08-01,2026,8,emitido,GTQ,B2,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,256.8,229.29,27.51
+GT-DEMO-000273,2026-08-01T13:11:00-06:00,2026-08-01,2026,8,emitido,GTQ,A3,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1151.35,1027.99,123.36
+GT-DEMO-000268,2026-08-01T15:19:00-06:00,2026-08-01,2026,8,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2649.57,2365.68,283.89
+GT-DEMO-000236,2026-08-02T13:38:00-06:00,2026-08-02,2026,8,emitido,GTQ,A3,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,472.18,421.59,50.59
+GT-DEMO-000367,2026-08-02T14:37:00-06:00,2026-08-02,2026,8,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1106.88,988.29,118.59
+GT-DEMO-000244,2026-08-03T18:24:00-06:00,2026-08-03,2026,8,emitido,GTQ,A3,6283947,"Distribuidora del Pacífico, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,516.24,460.93,55.31
+GT-DEMO-000308,2026-08-04T09:28:00-06:00,2026-08-04,2026,8,emitido,GTQ,B1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,533.3,476.16,57.14
+GT-DEMO-000383,2026-08-05T10:00:00-06:00,2026-08-05,2026,8,emitido,GTQ,B1,7492631,"Tecnología y Más, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,293.62,262.16,31.46
+GT-DEMO-000006,2026-08-05T15:35:00-06:00,2026-08-05,2026,8,emitido,GTQ,A1,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,2287.34,2042.27,245.07
+GT-DEMO-000469,2026-08-05T18:50:00-06:00,2026-08-05,2026,8,emitido,GTQ,B2,7492631,"Tecnología y Más, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,538.14,480.48,57.66
+GT-DEMO-000392,2026-08-06T08:18:00-06:00,2026-08-06,2026,8,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,582.73,520.29,62.44
+GT-DEMO-000100,2026-08-06T11:23:00-06:00,2026-08-06,2026,8,emitido,GTQ,A1,7264519,"Transportes del Sur, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1575.83,1407.0,168.83
+GT-DEMO-000101,2026-08-06T14:30:00-06:00,2026-08-06,2026,8,emitido,GTQ,A2,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,684.86,611.48,73.38
+GT-DEMO-000374,2026-08-06T16:36:00-06:00,2026-08-06,2026,8,emitido,GTQ,B1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,42.96,38.36,4.6
+GT-DEMO-000031,2026-08-07T12:11:00-06:00,2026-08-07,2026,8,emitido,GTQ,A1,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1746.25,1559.15,187.1
+GT-DEMO-000175,2026-08-07T16:06:00-06:00,2026-08-07,2026,8,emitido,GTQ,A2,7492631,"Tecnología y Más, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1036.91,925.82,111.09
+GT-DEMO-000285,2026-08-07T17:16:00-06:00,2026-08-07,2026,8,emitido,GTQ,A3,7812456,"Servicios Integrales Maya, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,563.27,502.92,60.35
+GT-DEMO-000218,2026-08-09T09:44:00-06:00,2026-08-09,2026,8,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,65.53,58.51,7.02
+GT-DEMO-000125,2026-08-09T10:41:00-06:00,2026-08-09,2026,8,emitido,GTQ,A2,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1269.45,1133.44,136.01
+GT-DEMO-000486,2026-08-09T11:10:00-06:00,2026-08-09,2026,8,emitido,GTQ,B2,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,2656.55,2371.92,284.63
+GT-DEMO-000546,2026-08-09T11:29:00-06:00,2026-08-09,2026,8,emitido,GTQ,B3,7264519,"Transportes del Sur, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,500.54,446.91,53.63
+GT-DEMO-000515,2026-08-10T09:48:00-06:00,2026-08-10,2026,8,emitido,GTQ,B3,6283947,"Distribuidora del Pacífico, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,482.11,430.46,51.65
+GT-DEMO-000563,2026-08-10T10:45:00-06:00,2026-08-10,2026,8,emitido,GTQ,B3,5172948,"Restaurantes El Buen Sabor, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,383.76,342.64,41.12
+GT-DEMO-000577,2026-08-10T13:26:00-06:00,2026-08-10,2026,8,emitido,GTQ,B3,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,58.85,52.54,6.31
+GT-DEMO-000109,2026-08-11T12:21:00-06:00,2026-08-11,2026,8,emitido,GTQ,A2,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,908.53,811.19,97.34
+GT-DEMO-000705,2026-08-11T13:15:00-06:00,2026-08-11,2026,8,emitido,GTQ,C2,4627185,"Supermercados del Valle, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,248.76,222.11,26.65
+GT-DEMO-000625,2026-08-11T18:32:00-06:00,2026-08-11,2026,8,emitido,GTQ,C1,CF,Consumidor Final,2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1451.64,1296.11,155.53
+GT-DEMO-000260,2026-08-12T11:17:00-06:00,2026-08-12,2026,8,anulado,GTQ,A3,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,114.56,102.29,12.27
+GT-DEMO-000248,2026-08-12T12:43:00-06:00,2026-08-12,2026,8,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,563.33,502.97,60.36
+GT-DEMO-000255,2026-08-12T13:52:00-06:00,2026-08-12,2026,8,emitido,GTQ,A3,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,236.12,210.82,25.3
+GT-DEMO-000159,2026-08-12T16:34:00-06:00,2026-08-12,2026,8,emitido,GTQ,A2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2243.15,2002.82,240.33
+GT-DEMO-000241,2026-08-12T17:04:00-06:00,2026-08-12,2026,8,emitido,GTQ,A3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,213.68,190.79,22.89
+GT-DEMO-000564,2026-08-13T11:51:00-06:00,2026-08-13,2026,8,emitido,GTQ,B3,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1809.72,1615.83,193.89
+GT-DEMO-000382,2026-08-14T09:03:00-06:00,2026-08-14,2026,8,emitido,GTQ,B1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,443.77,396.22,47.55
+GT-DEMO-000002,2026-08-14T10:29:00-06:00,2026-08-14,2026,8,emitido,GTQ,A1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1208.4,1078.93,129.47
+GT-DEMO-000492,2026-08-14T12:20:00-06:00,2026-08-14,2026,8,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,358.48,320.07,38.41
+GT-DEMO-000349,2026-08-15T08:00:00-06:00,2026-08-15,2026,8,emitido,GTQ,B1,3561894,"Farmacias Vida, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,501.43,447.71,53.72
+GT-DEMO-000633,2026-08-15T13:44:00-06:00,2026-08-15,2026,8,emitido,GTQ,C1,5172948,"Restaurantes El Buen Sabor, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,999.44,892.36,107.08
+GT-DEMO-000528,2026-08-17T09:56:00-06:00,2026-08-17,2026,8,emitido,GTQ,B3,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2746.86,2452.55,294.31
+GT-DEMO-000573,2026-08-17T17:35:00-06:00,2026-08-17,2026,8,emitido,GTQ,B3,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,503.12,449.21,53.91
+GT-DEMO-000624,2026-08-18T10:17:00-06:00,2026-08-18,2026,8,emitido,GTQ,C1,CF,Consumidor Final,4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,496.85,443.62,53.23
+GT-DEMO-000604,2026-08-19T12:45:00-06:00,2026-08-19,2026,8,emitido,GTQ,C1,3561894,"Farmacias Vida, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,2048.29,1828.84,219.45
+GT-DEMO-000201,2026-08-21T13:28:00-06:00,2026-08-21,2026,8,emitido,GTQ,A3,3561894,"Farmacias Vida, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,859.42,767.34,92.08
+GT-DEMO-000462,2026-08-21T17:45:00-06:00,2026-08-21,2026,8,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,456.7,407.77,48.93
+GT-DEMO-000081,2026-08-22T16:49:00-06:00,2026-08-22,2026,8,emitido,GTQ,A1,9037812,"Grupo Empresarial Centroamericano, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,203.97,182.12,21.85
+GT-DEMO-000543,2026-08-22T18:22:00-06:00,2026-08-22,2026,8,emitido,GTQ,B3,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,2182.6,1948.75,233.85
+GT-DEMO-000487,2026-08-23T09:46:00-06:00,2026-08-23,2026,8,emitido,GTQ,B2,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,192.41,171.79,20.62
+GT-DEMO-000559,2026-08-24T14:13:00-06:00,2026-08-24,2026,8,emitido,GTQ,B3,4627185,"Supermercados del Valle, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,843.63,753.24,90.39
+GT-DEMO-000381,2026-08-24T16:08:00-06:00,2026-08-24,2026,8,emitido,GTQ,B1,CF,Consumidor Final,3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,783.83,699.85,83.98
+GT-DEMO-000561,2026-08-24T18:42:00-06:00,2026-08-24,2026,8,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1046.3,934.2,112.1
+GT-DEMO-000614,2026-08-25T09:02:00-06:00,2026-08-25,2026,8,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,588.27,525.25,63.02
+GT-DEMO-000043,2026-08-25T11:52:00-06:00,2026-08-25,2026,8,emitido,GTQ,A1,4857291,"Comercial La Estrella, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,1813.93,1619.58,194.35
+GT-DEMO-000622,2026-08-25T13:13:00-06:00,2026-08-25,2026,8,emitido,GTQ,C1,4627185,"Supermercados del Valle, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,1681.8,1501.61,180.19
+GT-DEMO-000315,2026-08-25T15:38:00-06:00,2026-08-25,2026,8,emitido,GTQ,B1,5172948,"Restaurantes El Buen Sabor, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,823.72,735.46,88.26
+GT-DEMO-000340,2026-08-25T16:50:00-06:00,2026-08-25,2026,8,emitido,GTQ,B1,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,987.69,881.87,105.82
+GT-DEMO-000587,2026-08-26T10:37:00-06:00,2026-08-26,2026,8,emitido,GTQ,B3,7812456,"Servicios Integrales Maya, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,138.56,123.71,14.85
+GT-DEMO-000063,2026-08-26T13:38:00-06:00,2026-08-26,2026,8,emitido,GTQ,A1,8146293,"Hotel Vista Real, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,787.87,703.46,84.41
+GT-DEMO-000258,2026-08-27T11:31:00-06:00,2026-08-27,2026,8,emitido,GTQ,A3,5973814,"Constructora Horizonte, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,957.27,854.7,102.57
+GT-DEMO-000452,2026-08-27T17:18:00-06:00,2026-08-27,2026,8,emitido,GTQ,B2,8146293,"Hotel Vista Real, S.A.",2,Sucursal Quetzaltenango,Quetzaltenango,Quetzaltenango,Canal tienda,1138.88,1016.86,122.02
+GT-DEMO-000122,2026-08-27T17:19:00-06:00,2026-08-27,2026,8,emitido,GTQ,A2,7812456,"Servicios Integrales Maya, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,578.69,516.69,62.0
+GT-DEMO-000356,2026-08-28T08:41:00-06:00,2026-08-28,2026,8,emitido,GTQ,B1,4627185,"Supermercados del Valle, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,73.72,65.82,7.9
+GT-DEMO-000583,2026-08-28T10:25:00-06:00,2026-08-28,2026,8,emitido,GTQ,B3,4857291,"Comercial La Estrella, S.A.",1,Sucursal Central,Guatemala,Guatemala,Canal tienda,365.25,326.11,39.14
+GT-DEMO-000238,2026-08-28T14:47:00-06:00,2026-08-28,2026,8,emitido,GTQ,A3,7812456,"Servicios Integrales Maya, S.A.",4,Canal corporativo,Guatemala,Guatemala,Canal corporativo,490.67,438.1,52.57
+GT-DEMO-000473,2026-08-29T08:54:00-06:00,2026-08-29,2026,8,anulado,GTQ,B2,7264519,"Transportes del Sur, S.A.",3,Sucursal Escuintla,Escuintla,Escuintla,Canal tienda,940.34,839.59,100.75
+GT-DEMO-000629,2026-08-31T11:38:00-06:00,2026-08-31,2026,8,emitido,GTQ,C1,CF,Consumidor Final,1,Sucursal Central,Guatemala,Guatemala,Canal tienda,1469.55,1312.1,157.45
