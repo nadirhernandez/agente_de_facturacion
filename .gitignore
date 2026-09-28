@@ -1,0 +1,28 @@
+# Dependencies and build output
+node_modules/
+apps/web/dist/
+build/
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Test and coverage output
+coverage/
+.vitest/
+
+# Timestamped QuickSight backups written by scripts/quicksight/build_dashboard_definition.py
+infrastructure/quicksight/generated/*-[0-9]*T[0-9]*Z.json
+
+# Terraform plans contain state values in clear text
+*.tfplan
+tfplan
+
+# Local environment and editor files
+.env
+.env.*
+!.env.example
+.DS_Store
