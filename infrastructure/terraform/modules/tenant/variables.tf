@@ -33,6 +33,11 @@ variable "environment" {
   description = "Ambiente del despliegue."
   type        = string
   default     = "prod"
+
+  validation {
+    condition     = contains(["dev", "stg", "prod"], var.environment)
+    error_message = "environment debe ser dev, stg o prod."
+  }
 }
 
 variable "nit_emisor" {
@@ -59,6 +64,15 @@ variable "data_writer_principals" {
   EOT
   type        = list(string)
   default     = []
+
+  # Only concrete IAM roles or accounts: a "*" or a typo here would open raw/.
+  validation {
+    condition = alltrue([
+      for principal in var.data_writer_principals :
+      can(regex("^arn:aws:iam::[0-9]{12}:(root|role/[A-Za-z0-9+=,.@_/-]+)$", principal))
+    ])
+    error_message = "data_writer_principals solo acepta ARNs de rol IAM o de cuenta (arn:aws:iam::<12 dígitos>:role/... o :root)."
+  }
 }
 
 variable "refresh_spice_on_load" {
@@ -97,6 +111,11 @@ variable "quicksight_edition" {
   description = "Edición de QuickSight. ENTERPRISE es requerida para embedding y RLS."
   type        = string
   default     = "ENTERPRISE"
+
+  validation {
+    condition     = var.quicksight_edition == "ENTERPRISE"
+    error_message = "El embedding y RLS requieren la edición ENTERPRISE."
+  }
 }
 
 variable "spice_refresh_interval" {
@@ -108,6 +127,11 @@ variable "spice_refresh_interval" {
   EOT
   type        = string
   default     = "HOURLY"
+
+  validation {
+    condition     = contains(["MINUTE15", "MINUTE30", "HOURLY", "DAILY", "WEEKLY", "MONTHLY"], var.spice_refresh_interval)
+    error_message = "spice_refresh_interval debe ser MINUTE15, MINUTE30, HOURLY, DAILY, WEEKLY o MONTHLY."
+  }
 }
 
 variable "spice_lookback_days" {
@@ -135,12 +159,55 @@ variable "drop_threshold_pct" {
   description = "Caída porcentual que dispara una alerta de facturación."
   type        = number
   default     = 10
+
+  validation {
+    condition     = var.drop_threshold_pct > 0 && var.drop_threshold_pct <= 100
+    error_message = "drop_threshold_pct debe estar entre 0 (exclusivo) y 100."
+  }
 }
 
 variable "glue_workers" {
   description = "Workers del job de transformación. Subir para volúmenes altos."
   type        = number
   default     = 2
+
+  validation {
+    condition     = var.glue_workers >= 2 && floor(var.glue_workers) == var.glue_workers
+    error_message = "glue_workers debe ser un entero >= 2 (mínimo de Glue para G.1X)."
+  }
+}
+
+variable "glue_timeout_minutes" {
+  description = "Tiempo máximo de una ejecución de Glue. Sin límite, Glue usa 48 horas."
+  type        = number
+  default     = 60
+
+  validation {
+    condition     = var.glue_timeout_minutes >= 10 && var.glue_timeout_minutes <= 480
+    error_message = "glue_timeout_minutes debe estar entre 10 y 480."
+  }
+}
+
+variable "athena_bytes_scanned_cutoff" {
+  description = "Límite de bytes escaneados por consulta en el workgroup (freno de costo). 10 GB por defecto."
+  type        = number
+  default     = 10737418240
+
+  validation {
+    condition     = var.athena_bytes_scanned_cutoff >= 10485760
+    error_message = "Athena exige un mínimo de 10 MB (10485760 bytes)."
+  }
+}
+
+variable "log_retention_days" {
+  description = "Retención de los logs de Lambda, API Gateway y Glue."
+  type        = number
+  default     = 90
+
+  validation {
+    condition     = contains([1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1096, 1827, 2192, 2557, 2922, 3288, 3653], var.log_retention_days)
+    error_message = "log_retention_days debe ser un valor aceptado por CloudWatch Logs (p. ej. 30, 90, 365)."
+  }
 }
 
 variable "retain_data_on_destroy" {
@@ -222,12 +289,47 @@ variable "app_certificate_arn" {
   EOT
   type        = string
   default     = null
+
+  validation {
+    condition     = var.app_certificate_arn == null || startswith(coalesce(var.app_certificate_arn, "-"), "arn:aws:acm:us-east-1:")
+    error_message = "CloudFront solo acepta certificados ACM emitidos en us-east-1."
+  }
 }
 
 variable "cloudfront_price_class" {
   description = "Clase de precio de CloudFront. PriceClass_100 cubre América y Europa."
   type        = string
   default     = "PriceClass_100"
+
+  validation {
+    condition     = contains(["PriceClass_100", "PriceClass_200", "PriceClass_All"], var.cloudfront_price_class)
+    error_message = "cloudfront_price_class debe ser PriceClass_100, PriceClass_200 o PriceClass_All."
+  }
+}
+
+variable "quick_chat_agent_id" {
+  description = <<-EOT
+    Agente de Quick al que se fija el chat de la app (lo crea
+    scripts/quicksight/sync_agent.py). Con null la app usa el chat por defecto.
+    El agente debe existir antes de publicar el ID: si no, el chat carga en blanco.
+  EOT
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.quick_chat_agent_id == null || can(regex("^[A-Za-z0-9_-]{1,64}$", var.quick_chat_agent_id))
+    error_message = "quick_chat_agent_id solo admite letras, números, guion y guion bajo (máx. 64)."
+  }
+}
+
+variable "content_security_policy_enforced" {
+  description = <<-EOT
+    false publica la CSP como Content-Security-Policy-Report-Only: el navegador
+    reporta violaciones en la consola sin bloquear. Pásalo a true tras validar
+    que el dashboard y el chat embebidos cargan sin violaciones.
+  EOT
+  type        = bool
+  default     = false
 }
 
 variable "enable_local_dev_origin" {
@@ -259,4 +361,13 @@ variable "app_branding" {
   })
 
   default = null
+}
+
+variable "enable_waf" {
+  description = <<-EOT
+    Crea un Web ACL de WAF (reglas administradas de AWS + límite por IP) delante
+    de CloudFront. Requiere que el provider del tenant use us-east-1.
+  EOT
+  type        = bool
+  default     = true
 }

@@ -17,7 +17,10 @@ Revert:
 Usage:
     python3 scripts/quicksight/sync_agent.py            # create or update
     python3 scripts/quicksight/sync_agent.py --show     # print what would be sent
-    python3 scripts/quicksight/sync_agent.py --delete   # remove agent and space
+    python3 scripts/quicksight/sync_agent.py --delete   # remove agent and space (asks first; --yes skips)
+
+    --account-id, --region, --profile y --app-user-arn apuntan a otra cuenta;
+    por defecto, el piloto.
 
 The CLI 2.36.3 installed here has no agent/space commands; boto3 does.
 """
@@ -58,8 +61,9 @@ SPACE_RESOURCES = [
 ]
 
 WELCOME_MESSAGE = (
-    "Hola, soy tu analista de ventas. Pregúntame por tu facturación, tus clientes, "
-    "tus productos o tus sucursales, y te respondo con tus datos."
+    "Hola, soy su analista de ventas. Puedo analizar facturación con y sin IVA, facturas, "
+    "unidades y ticket promedio; comparar períodos y desglosar por región, sucursal, canal, "
+    "cliente, categoría o producto. Por ahora, los datos incluyen solo documentos emitidos."
 )
 
 # API limit: 3 prompts, 100 characters each.
@@ -107,8 +111,35 @@ POLL_SECONDS = 5
 POLL_LIMIT = 36  # three minutes
 
 
+def configure(account_id: str, region: str, profile: str, app_user_arn: str | None) -> None:
+    """Apunta el script a otra cuenta/región; sin argumentos, queda el piloto."""
+    global ACCOUNT_ID, REGION, PROFILE, APP_USER_ARN, SPACE_RESOURCES
+    old_account, old_region = ACCOUNT_ID, REGION
+    ACCOUNT_ID, REGION, PROFILE = account_id, region, profile
+    # Los ARN por defecto se reescriben con la cuenta y región elegidas.
+    prefix_old = f"arn:aws:quicksight:{old_region}:{old_account}:"
+    prefix_new = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:"
+    SPACE_RESOURCES = [(kind, arn.replace(prefix_old, prefix_new, 1)) for kind, arn in SPACE_RESOURCES]
+    APP_USER_ARN = app_user_arn or APP_USER_ARN.replace(prefix_old, prefix_new, 1)
+
+
 def client():
     return boto3.Session(profile_name=PROFILE, region_name=REGION).client("quicksight")
+
+
+def list_space_resources(qs) -> list[dict]:
+    """Todas las páginas de ListSpaceResources, no solo la primera."""
+    resources: list[dict] = []
+    token = None
+    while True:
+        request = {"AwsAccountId": ACCOUNT_ID, "SpaceId": SPACE_ID}
+        if token:
+            request["NextToken"] = token
+        page = qs.list_space_resources(**request)
+        resources.extend(page.get("SpaceResources") or [])
+        token = page.get("NextToken")
+        if not token:
+            return resources
 
 
 def not_found(error: ClientError) -> bool:
@@ -164,7 +195,7 @@ def ensure_space(qs) -> str:
 
     current = {
         (item["ResourceType"], item["ResourceDetails"]["resourceArn"])
-        for item in qs.list_space_resources(AwsAccountId=ACCOUNT_ID, SpaceId=SPACE_ID)["SpaceResources"]
+        for item in list_space_resources(qs)
     }
     missing = [resource for resource in SPACE_RESOURCES if resource not in current]
 
@@ -326,8 +357,15 @@ def main() -> None:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--show", action="store_true", help="Solo imprimir la configuración")
     mode.add_argument("--delete", action="store_true", help="Eliminar el agente y el space")
+    parser.add_argument("--yes", action="store_true", help="No pedir confirmación en --delete")
+    parser.add_argument("--account-id", default=ACCOUNT_ID, help="Cuenta de QuickSight")
+    parser.add_argument("--region", default=REGION, help="Región de QuickSight")
+    parser.add_argument("--profile", default=PROFILE, help="Perfil de AWS")
+    parser.add_argument("--app-user-arn", default=None,
+                        help="Usuario de QuickSight de la app (por defecto, el del piloto en esa cuenta)")
     args = parser.parse_args()
 
+    configure(args.account_id, args.region, args.profile, args.app_user_arn)
     validate_limits()
 
     if args.show:
@@ -347,6 +385,16 @@ def main() -> None:
     qs = client()
 
     if args.delete:
+        if not args.yes:
+            if not sys.stdin.isatty():
+                sys.exit("Sin terminal interactiva: usa --yes para confirmar --delete.")
+            answer = input(
+                f"Se eliminarán el agente {AGENT_ID} y el space {SPACE_ID} "
+                f"en la cuenta {ACCOUNT_ID}. ¿Continuar? [s/N] "
+            )
+            if answer.strip().lower() not in {"s", "si", "sí"}:
+                print("Cancelado. No se eliminó nada.")
+                return
         delete_all(qs)
         return
 

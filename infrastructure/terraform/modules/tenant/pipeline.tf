@@ -10,8 +10,8 @@
  * a view that is being replaced. refresh-spice picks incremental or full from
  * the dates the load actually wrote.
  *
- * No CloudWatch log groups are declared: an organization SCP forbids deleting
- * them, so Terraform must never own them.
+ * Log groups live in observability.tf with skip_destroy: an organization SCP
+ * forbids deleting them, so a destroy only forgets them.
  */
 
 data "archive_file" "pipeline" {
@@ -26,81 +26,33 @@ data "archive_file" "views" {
   output_path = "${path.module}/../../../../build/tenant-views.zip"
 }
 
-resource "aws_iam_role" "automation" {
-  name = "${local.prefix}-automation"
-  tags = local.tags
+locals {
+  automation_functions = ["start-ingestion", "refresh-spice", "deploy-views", "sales-alerts"]
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Action    = "sts:AssumeRole"
-      Principal = { Service = "lambda.amazonaws.com" }
-    }]
-  })
-}
+  arn_glue       = "arn:aws:glue:${var.region}:${var.account_id}"
+  arn_quicksight = "arn:aws:quicksight:${var.region}:${var.account_id}"
 
-resource "aws_iam_role_policy" "automation" {
-  name = "${local.prefix}-automation"
-  role = aws_iam_role.automation.id
+  catalog_resources = [
+    "${local.arn_glue}:catalog",
+    "${local.arn_glue}:database/${aws_glue_catalog_database.sales.name}",
+    "${local.arn_glue}:table/${aws_glue_catalog_database.sales.name}/*",
+  ]
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
+  # Own log group, X-Ray and the (encrypted) alerts topic, which is also the
+  # failure destination of every async invocation.
+  common_statements = {
+    for fn in local.automation_functions : fn => [
       {
-        Sid      = "WriteLogs"
+        Sid      = "WriteOwnLogs"
         Effect   = "Allow"
-        Action   = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
-        Resource = "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/lambda/${local.prefix}-*"
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = "${aws_cloudwatch_log_group.lambda[fn].arn}:*"
       },
       {
-        Sid      = "RunTransformation"
+        Sid      = "Tracing"
         Effect   = "Allow"
-        Action   = ["glue:StartJobRun", "glue:GetJobRun", "glue:GetJobRuns"]
-        Resource = "arn:aws:glue:${var.region}:${var.account_id}:job/${aws_glue_job.flatten_invoices.name}"
-      },
-      {
-        Sid    = "ReadCatalog"
-        Effect = "Allow"
-        Action = [
-          "glue:GetDatabase", "glue:GetDatabases", "glue:GetTable", "glue:GetTables",
-          "glue:GetPartition", "glue:GetPartitions",
-          "glue:CreateTable", "glue:UpdateTable", "glue:DeleteTable",
-        ]
-        Resource = [
-          "arn:aws:glue:${var.region}:${var.account_id}:catalog",
-          "arn:aws:glue:${var.region}:${var.account_id}:database/${aws_glue_catalog_database.sales.name}",
-          "arn:aws:glue:${var.region}:${var.account_id}:table/${aws_glue_catalog_database.sales.name}/*",
-        ]
-      },
-      {
-        Sid    = "QueryAthena"
-        Effect = "Allow"
-        Action = [
-          "athena:StartQueryExecution", "athena:GetQueryExecution", "athena:GetQueryResults",
-        ]
-        Resource = aws_athena_workgroup.sales.arn
-      },
-      {
-        Sid      = "ListDataBucket"
-        Effect   = "Allow"
-        Action   = ["s3:GetBucketLocation", "s3:ListBucket"]
-        Resource = aws_s3_bucket.data.arn
-      },
-      {
-        Sid      = "ReadDataWriteResults"
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:PutObject", "s3:AbortMultipartUpload"]
-        Resource = ["${aws_s3_bucket.data.arn}/curated/*", "${aws_s3_bucket.data.arn}/athena-results/*"]
-      },
-      {
-        Sid    = "RefreshSpice"
-        Effect = "Allow"
-        Action = ["quicksight:CreateIngestion", "quicksight:DescribeIngestion"]
-        Resource = [
-          "arn:aws:quicksight:${var.region}:${var.account_id}:dataset/${local.sales_data_set_id}/ingestion/*",
-          "arn:aws:quicksight:${var.region}:${var.account_id}:dataset/${local.periods_data_set_id}/ingestion/*",
-        ]
+        Action   = ["xray:PutTraceSegments", "xray:PutTelemetryRecords"]
+        Resource = "*"
       },
       {
         Sid      = "PublishAlerts"
@@ -109,19 +61,128 @@ resource "aws_iam_role_policy" "automation" {
         Resource = aws_sns_topic.alerts.arn
       },
       {
+        Sid      = "EncryptAlerts"
+        Effect   = "Allow"
+        Action   = ["kms:GenerateDataKey", "kms:Decrypt"]
+        Resource = aws_kms_key.alerts.arn
+      },
+    ]
+  }
+
+  query_statements = [
+    {
+      Sid      = "QueryWorkgroup"
+      Effect   = "Allow"
+      Action   = ["athena:StartQueryExecution", "athena:GetQueryExecution", "athena:GetQueryResults", "athena:StopQueryExecution"]
+      Resource = aws_athena_workgroup.sales.arn
+    },
+    {
+      Sid      = "ReadCatalog"
+      Effect   = "Allow"
+      Action   = ["glue:GetDatabase", "glue:GetTable", "glue:GetTables", "glue:GetPartition", "glue:GetPartitions"]
+      Resource = local.catalog_resources
+    },
+    {
+      Sid      = "ListDataBucket"
+      Effect   = "Allow"
+      Action   = ["s3:GetBucketLocation", "s3:ListBucket"]
+      Resource = aws_s3_bucket.data.arn
+    },
+    {
+      Sid      = "ReadModel"
+      Effect   = "Allow"
+      Action   = ["s3:GetObject"]
+      Resource = "${aws_s3_bucket.data.arn}/curated/*"
+    },
+    {
+      Sid      = "WriteQueryResults"
+      Effect   = "Allow"
+      Action   = ["s3:GetObject", "s3:PutObject", "s3:AbortMultipartUpload"]
+      Resource = "${aws_s3_bucket.data.arn}/athena-results/*"
+    },
+  ]
+
+  function_statements = {
+    start-ingestion = [
+      {
+        Sid      = "RunTransformation"
+        Effect   = "Allow"
+        Action   = ["glue:StartJobRun", "glue:GetJobRun"]
+        Resource = "${local.arn_glue}:job/${aws_glue_job.flatten_invoices.name}"
+      },
+    ]
+
+    refresh-spice = concat(local.query_statements, [
+      {
+        Sid    = "RefreshSpice"
+        Effect = "Allow"
+        Action = ["quicksight:CreateIngestion", "quicksight:DescribeIngestion"]
+        Resource = [
+          "${local.arn_quicksight}:dataset/${local.sales_data_set_id}/ingestion/*",
+          "${local.arn_quicksight}:dataset/${local.periods_data_set_id}/ingestion/*",
+        ]
+      },
+    ])
+
+    deploy-views = concat(local.query_statements, [
+      {
+        Sid      = "DeployModel"
+        Effect   = "Allow"
+        Action   = ["glue:CreateTable", "glue:UpdateTable", "glue:DeleteTable"]
+        Resource = local.catalog_resources
+      },
+      {
+        Sid      = "WriteIcebergMetadata"
+        Effect   = "Allow"
+        Action   = ["s3:PutObject", "s3:AbortMultipartUpload"]
+        Resource = "${aws_s3_bucket.data.arn}/${local.iceberg_prefix}*"
+      },
+      {
         Sid      = "ChainSpiceRefresh"
         Effect   = "Allow"
         Action   = ["lambda:InvokeFunction"]
         Resource = aws_lambda_function.refresh_spice.arn
       },
-    ]
+    ])
+
+    sales-alerts = local.query_statements
+  }
+}
+
+# One execution role per function, least privilege.
+resource "aws_iam_role" "automation" {
+  for_each = toset(local.automation_functions)
+
+  name = "${local.prefix}-${each.key}"
+  tags = local.tags
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Action    = "sts:AssumeRole"
+      Principal = { Service = "lambda.amazonaws.com" }
+      Condition = { StringEquals = { "aws:SourceAccount" = var.account_id } }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "automation" {
+  for_each = toset(local.automation_functions)
+
+  name = "${local.prefix}-${each.key}"
+  role = aws_iam_role.automation[each.key].id
+
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = concat(local.common_statements[each.key], local.function_statements[each.key])
   })
 }
 
 # --- Functions -------------------------------------------------------------
 resource "aws_lambda_function" "start_ingestion" {
   function_name    = "${local.prefix}-start-ingestion"
-  role             = aws_iam_role.automation.arn
+  role             = aws_iam_role.automation["start-ingestion"].arn
   handler          = "start_ingestion.handler"
   runtime          = "nodejs22.x"
   architectures    = ["arm64"]
@@ -131,6 +192,15 @@ resource "aws_lambda_function" "start_ingestion" {
   source_code_hash = data.archive_file.pipeline.output_base64sha256
   tags             = local.tags
 
+  logging_config {
+    log_format = "Text"
+    log_group  = aws_cloudwatch_log_group.lambda["start-ingestion"].name
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
+
   environment {
     variables = { GLUE_JOB_NAME = aws_glue_job.flatten_invoices.name }
   }
@@ -138,7 +208,7 @@ resource "aws_lambda_function" "start_ingestion" {
 
 resource "aws_lambda_function" "refresh_spice" {
   function_name    = "${local.prefix}-refresh-spice"
-  role             = aws_iam_role.automation.arn
+  role             = aws_iam_role.automation["refresh-spice"].arn
   handler          = "refresh_spice.handler"
   runtime          = "nodejs22.x"
   architectures    = ["arm64"]
@@ -147,6 +217,15 @@ resource "aws_lambda_function" "refresh_spice" {
   filename         = data.archive_file.pipeline.output_path
   source_code_hash = data.archive_file.pipeline.output_base64sha256
   tags             = local.tags
+
+  logging_config {
+    log_format = "Text"
+    log_group  = aws_cloudwatch_log_group.lambda["refresh-spice"].name
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
 
   environment {
     variables = {
@@ -162,7 +241,7 @@ resource "aws_lambda_function" "refresh_spice" {
 
 resource "aws_lambda_function" "sales_alerts" {
   function_name    = "${local.prefix}-sales-alerts"
-  role             = aws_iam_role.automation.arn
+  role             = aws_iam_role.automation["sales-alerts"].arn
   handler          = "sales_alerts.handler"
   runtime          = "nodejs22.x"
   architectures    = ["arm64"]
@@ -172,19 +251,29 @@ resource "aws_lambda_function" "sales_alerts" {
   source_code_hash = data.archive_file.pipeline.output_base64sha256
   tags             = local.tags
 
+  logging_config {
+    log_format = "Text"
+    log_group  = aws_cloudwatch_log_group.lambda["sales-alerts"].name
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
+
   environment {
     variables = {
       ATHENA_WORKGROUP   = aws_athena_workgroup.sales.name
       ATHENA_DATABASE    = aws_glue_catalog_database.sales.name
       ALERTS_TOPIC_ARN   = aws_sns_topic.alerts.arn
       DROP_THRESHOLD_PCT = tostring(var.drop_threshold_pct)
+      APP_URL            = local.app_url
     }
   }
 }
 
 resource "aws_lambda_function" "deploy_views" {
   function_name    = "${local.prefix}-deploy-views"
-  role             = aws_iam_role.automation.arn
+  role             = aws_iam_role.automation["deploy-views"].arn
   handler          = "deploy_views.handler"
   runtime          = "nodejs22.x"
   architectures    = ["arm64"]
@@ -193,6 +282,15 @@ resource "aws_lambda_function" "deploy_views" {
   filename         = data.archive_file.views.output_path
   source_code_hash = data.archive_file.views.output_base64sha256
   tags             = local.tags
+
+  logging_config {
+    log_format = "Text"
+    log_group  = aws_cloudwatch_log_group.lambda["deploy-views"].name
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
 
   environment {
     variables = {
@@ -222,9 +320,45 @@ resource "aws_lambda_invocation" "deploy_views" {
 }
 
 # --- Notifications ---------------------------------------------------------
+# Customer managed key: EventBridge and CloudWatch alarms can only publish to
+# an encrypted topic when the key policy lets them use the key.
+resource "aws_kms_key" "alerts" {
+  description             = "Cifrado del topic de alertas de ${var.tenant_name}"
+  enable_key_rotation     = true
+  deletion_window_in_days = 30
+  tags                    = local.tags
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AccountAdministration"
+        Effect    = "Allow"
+        Principal = { AWS = "arn:aws:iam::${var.account_id}:root" }
+        Action    = "kms:*"
+        Resource  = "*"
+      },
+      {
+        Sid       = "AlertingServices"
+        Effect    = "Allow"
+        Principal = { Service = ["events.amazonaws.com", "cloudwatch.amazonaws.com"] }
+        Action    = ["kms:GenerateDataKey*", "kms:Decrypt"]
+        Resource  = "*"
+        Condition = { StringEquals = { "aws:SourceAccount" = var.account_id } }
+      },
+    ]
+  })
+}
+
+resource "aws_kms_alias" "alerts" {
+  name          = "alias/${local.prefix}-alerts"
+  target_key_id = aws_kms_key.alerts.key_id
+}
+
 resource "aws_sns_topic" "alerts" {
-  name = "${local.prefix}-alerts"
-  tags = local.tags
+  name              = "${local.prefix}-alerts"
+  kms_master_key_id = aws_kms_key.alerts.arn
+  tags              = local.tags
 }
 
 resource "aws_sns_topic_policy" "alerts" {
@@ -232,14 +366,25 @@ resource "aws_sns_topic_policy" "alerts" {
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Sid       = "DenyInsecureTransport"
-      Effect    = "Deny"
-      Principal = { AWS = "*" }
-      Action    = "sns:Publish"
-      Resource  = aws_sns_topic.alerts.arn
-      Condition = { Bool = { "aws:SecureTransport" = "false" } }
-    }]
+    Statement = [
+      {
+        # Glue failure rule and CloudWatch alarms, only from this account.
+        Sid       = "AllowAlertingServices"
+        Effect    = "Allow"
+        Principal = { Service = ["events.amazonaws.com", "cloudwatch.amazonaws.com"] }
+        Action    = "sns:Publish"
+        Resource  = aws_sns_topic.alerts.arn
+        Condition = { StringEquals = { "aws:SourceAccount" = var.account_id } }
+      },
+      {
+        Sid       = "DenyInsecureTransport"
+        Effect    = "Deny"
+        Principal = { AWS = "*" }
+        Action    = ["sns:Publish", "sns:Subscribe"]
+        Resource  = aws_sns_topic.alerts.arn
+        Condition = { Bool = { "aws:SecureTransport" = "false" } }
+      },
+    ]
   })
 }
 
@@ -311,9 +456,11 @@ resource "aws_lambda_permission" "glue_succeeded_views" {
 }
 
 resource "aws_cloudwatch_event_rule" "weekly_review" {
+  # Monthly (the 2nd, 13:00 UTC = 07:00 Guatemala): the review compares the
+  # last complete month with the one before. Name kept to avoid a replace.
   name                = "${local.prefix}-weekly-review"
-  description         = "Revisión semanal de caídas de facturación."
-  schedule_expression = "cron(0 13 ? * MON *)"
+  description         = "Revisión mensual de caídas de facturación (mes completo vs anterior)."
+  schedule_expression = "cron(0 13 2 * ? *)"
   tags                = local.tags
 }
 
@@ -328,4 +475,56 @@ resource "aws_lambda_permission" "weekly_review" {
   function_name = aws_lambda_function.sales_alerts.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.weekly_review.arn
+}
+
+# --- Backstop and data quality ---------------------------------------------
+# Daily sweep, 01:30 Guatemala (07:30 UTC): loads any raw file whose own
+# trigger was lost. A no-op run costs about a minute of Glue.
+resource "aws_cloudwatch_event_rule" "ingestion_sweep" {
+  name                = "${local.prefix}-ingestion-sweep"
+  description         = "Barrido diario: carga cualquier archivo crudo pendiente."
+  schedule_expression = "cron(30 7 * * ? *)"
+  tags                = local.tags
+}
+
+resource "aws_cloudwatch_event_target" "ingestion_sweep" {
+  rule = aws_cloudwatch_event_rule.ingestion_sweep.name
+  arn  = aws_lambda_function.start_ingestion.arn
+}
+
+resource "aws_lambda_permission" "ingestion_sweep" {
+  statement_id  = "AllowEventBridgeIngestionSweep"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.start_ingestion.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.ingestion_sweep.arn
+}
+
+# One readable email per batch with rejected records (quarantine/_avisos/).
+resource "aws_cloudwatch_event_rule" "records_quarantined" {
+  name        = "${local.prefix}-records-quarantined"
+  description = "Glue apartó registros inválidos en quarantine/."
+  tags        = local.tags
+
+  event_pattern = jsonencode({
+    source        = ["aws.s3"]
+    "detail-type" = ["Object Created"]
+    detail = {
+      bucket = { name = [aws_s3_bucket.data.bucket] }
+      object = { key = [{ prefix = "quarantine/_avisos/" }] }
+    }
+  })
+}
+
+resource "aws_cloudwatch_event_target" "records_quarantined" {
+  rule = aws_cloudwatch_event_rule.records_quarantined.name
+  arn  = aws_sns_topic.alerts.arn
+
+  input_transformer {
+    input_paths = {
+      bucket = "$.detail.bucket.name"
+      key    = "$.detail.object.key"
+    }
+    input_template = "\"Ventas Inteligentes: la carga apartó registros inválidos en cuarentena. Detalle (motivos y archivos): s3://<bucket>/<key>\""
+  }
 }

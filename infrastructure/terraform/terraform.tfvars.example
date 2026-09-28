@@ -1,0 +1,3 @@
+# Copy to terraform.tfvars (ignored by git) and fill in.
+app_admin_email = "admin@example.com"
+alerts_email    = "alerts@example.com"

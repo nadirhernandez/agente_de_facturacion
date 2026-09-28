@@ -30,7 +30,7 @@ output "embedding_api_url" {
 
 output "cognito_hosted_ui_domain" {
   description = "Dominio del Hosted UI de Cognito."
-  value       = "https://${aws_cognito_user_pool_domain.app.domain}.auth.us-east-1.amazoncognito.com"
+  value       = "https://${aws_cognito_user_pool_domain.app.domain}.auth.${local.region}.amazoncognito.com"
 }
 
 output "cognito_client_id" {

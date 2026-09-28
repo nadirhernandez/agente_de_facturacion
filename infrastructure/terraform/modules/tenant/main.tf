@@ -77,6 +77,60 @@ resource "aws_s3_bucket_versioning" "data" {
   }
 }
 
+# ACLs disabled: every object belongs to this account, whoever uploads it.
+resource "aws_s3_bucket_ownership_controls" "data" {
+  bucket = aws_s3_bucket.data.id
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+/**
+ * Scratch prefixes expire; old versions are kept 90 days for recovery. Iceberg
+ * only reads current objects, so expiring noncurrent versions is safe.
+ * raw/ and curated/ current objects are never expired.
+ */
+resource "aws_s3_bucket_lifecycle_configuration" "data" {
+  bucket = aws_s3_bucket.data.id
+
+  rule {
+    id     = "athena-results"
+    status = "Enabled"
+    filter {
+      prefix = "athena-results/"
+    }
+    expiration {
+      days = 30
+    }
+  }
+
+  rule {
+    id     = "glue-temp"
+    status = "Enabled"
+    filter {
+      prefix = "glue-temp/"
+    }
+    expiration {
+      days = 7
+    }
+  }
+
+  rule {
+    id     = "noncurrent-versions"
+    status = "Enabled"
+    filter {}
+    noncurrent_version_expiration {
+      noncurrent_days = 90
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+
+  depends_on = [aws_s3_bucket_versioning.data]
+}
+
 resource "aws_s3_bucket_notification" "data_events" {
   bucket      = aws_s3_bucket.data.id
   eventbridge = true
@@ -100,22 +154,34 @@ data "aws_iam_policy_document" "data_bucket" {
         identifiers = var.data_writer_principals
       }
 
-      actions = [
-        "s3:PutObject",
-        "s3:PutObjectAcl",
-        "s3:ListBucket",
-        "s3:GetBucketLocation",
-      ]
+      # BucketOwnerEnforced makes every object owned by this account, so no ACL
+      # condition is needed (and PutObjectAcl is not granted).
+      actions   = ["s3:PutObject"]
+      resources = ["${aws_s3_bucket.data.arn}/${local.raw_prefix}*"]
+    }
+  }
 
-      resources = [
-        aws_s3_bucket.data.arn,
-        "${aws_s3_bucket.data.arn}/${local.raw_prefix}*",
-      ]
+  # ListBucket is a bucket-level action and never carries s3:x-amz-acl, so it
+  # lives in its own statement, limited to the raw/ prefix.
+  dynamic "statement" {
+    for_each = length(var.data_writer_principals) > 0 ? [1] : []
+
+    content {
+      sid    = "AllowExternalDeliveryList"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = var.data_writer_principals
+      }
+
+      actions   = ["s3:ListBucket"]
+      resources = [aws_s3_bucket.data.arn]
 
       condition {
-        test     = "StringEquals"
-        variable = "s3:x-amz-acl"
-        values   = ["bucket-owner-full-control"]
+        test     = "StringLike"
+        variable = "s3:prefix"
+        values   = ["${local.raw_prefix}*"]
       }
     }
   }
@@ -164,9 +230,12 @@ resource "aws_athena_workgroup" "sales" {
   configuration {
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
+    # Cost brake: a runaway query (or chat follow-ups over the fact table) stops here.
+    bytes_scanned_cutoff_per_query = var.athena_bytes_scanned_cutoff
 
     result_configuration {
-      output_location = "s3://${aws_s3_bucket.data.bucket}/athena-results/"
+      output_location       = "s3://${aws_s3_bucket.data.bucket}/athena-results/"
+      expected_bucket_owner = var.account_id
 
       encryption_configuration {
         encryption_option = "SSE_S3"
@@ -201,11 +270,10 @@ resource "aws_iam_role" "glue_etl" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "glue_service" {
-  role       = aws_iam_role.glue_etl.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-}
-
+/**
+ * Least-privilege replacement for the AWSGlueServiceRole managed policy, which
+ * grants glue:* and s3 on every aws-glue-* bucket of the account.
+ */
 resource "aws_iam_role_policy" "glue_data_access" {
   name = "${local.prefix}-glue-data"
   role = aws_iam_role.glue_etl.id
@@ -216,14 +284,61 @@ resource "aws_iam_role_policy" "glue_data_access" {
       {
         Sid      = "ListDataBucket"
         Effect   = "Allow"
-        Action   = ["s3:ListBucket"]
+        Action   = ["s3:ListBucket", "s3:GetBucketLocation"]
         Resource = aws_s3_bucket.data.arn
       },
       {
-        Sid      = "ReadWriteData"
-        Effect   = "Allow"
-        Action   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
-        Resource = "${aws_s3_bucket.data.arn}/*"
+        # Source files and the job script are read, never modified.
+        Sid    = "ReadSources"
+        Effect = "Allow"
+        Action = ["s3:GetObject"]
+        Resource = [
+          "${aws_s3_bucket.data.arn}/${local.raw_prefix}*",
+          "${aws_s3_bucket.data.arn}/scripts/glue/*",
+        ]
+      },
+      {
+        Sid    = "WriteModelAndScratch"
+        Effect = "Allow"
+        Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:AbortMultipartUpload"]
+        Resource = [
+          "${aws_s3_bucket.data.arn}/${local.iceberg_prefix}*",
+          "${aws_s3_bucket.data.arn}/glue-temp/*",
+          "${aws_s3_bucket.data.arn}/quarantine/*",
+        ]
+      },
+      {
+        Sid    = "IcebergCatalog"
+        Effect = "Allow"
+        Action = [
+          "glue:GetDatabase", "glue:GetDatabases",
+          "glue:GetTable", "glue:GetTables", "glue:UpdateTable",
+          "glue:GetPartition", "glue:GetPartitions", "glue:BatchGetPartition",
+          "glue:GetUserDefinedFunctions",
+        ]
+        Resource = [
+          "arn:aws:glue:${var.region}:${var.account_id}:catalog",
+          "arn:aws:glue:${var.region}:${var.account_id}:database/default",
+          "arn:aws:glue:${var.region}:${var.account_id}:database/${aws_glue_catalog_database.sales.name}",
+          "arn:aws:glue:${var.region}:${var.account_id}:table/${aws_glue_catalog_database.sales.name}/*",
+          "arn:aws:glue:${var.region}:${var.account_id}:userDefinedFunction/${aws_glue_catalog_database.sales.name}/*",
+        ]
+      },
+      {
+        Sid    = "JobLogs"
+        Effect = "Allow"
+        Action = ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"]
+        Resource = [
+          "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws-glue/*",
+          "arn:aws:logs:${var.region}:${var.account_id}:log-group:/ventas-inteligentes/${var.tenant_id}/glue*",
+        ]
+      },
+      {
+        Sid       = "JobMetrics"
+        Effect    = "Allow"
+        Action    = ["cloudwatch:PutMetricData"]
+        Resource  = "*"
+        Condition = { StringEquals = { "cloudwatch:namespace" = "Glue" } }
       },
     ]
   })
@@ -236,7 +351,10 @@ resource "aws_glue_job" "flatten_invoices" {
   worker_type       = "G.1X"
   number_of_workers = var.glue_workers
   max_retries       = 0
-  tags              = local.tags
+  # Glue's default is 48 hours; a hung run would bill all of it. A failure is
+  # reported by the glue_failed rule (observability.tf).
+  timeout = var.glue_timeout_minutes
+  tags    = local.tags
 
   command {
     name            = "glueetl"
@@ -254,6 +372,7 @@ resource "aws_glue_job" "flatten_invoices" {
     "--DATABASE"               = aws_glue_catalog_database.sales.name
     "--WAREHOUSE"              = local.iceberg_warehouse
     "--REPROCESS_ALL"          = "false"
+    "--QUARANTINE_PATH"        = "s3://${aws_s3_bucket.data.bucket}/quarantine/"
   }
 
   # Two concurrent MERGE runs over the same days would conflict.
@@ -262,7 +381,6 @@ resource "aws_glue_job" "flatten_invoices" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.glue_service,
     aws_iam_role_policy.glue_data_access,
   ]
 }
