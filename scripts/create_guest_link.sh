@@ -75,12 +75,19 @@ TOKENS=$(aws cognito-idp admin-initiate-auth \
 ID_TOKEN=$(echo "$TOKENS" | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).IdToken")
 REFRESH_TOKEN=$(echo "$TOKENS" | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).RefreshToken")
 
-# Codifica los tokens en base64url (sin padding) — nunca se envían al servidor.
+# By default the link only carries the id_token (~850 chars, 60-min session).
+# Set INCLUDE_REFRESH=1 to add the refresh token (~1,800 chars extra) for a 24-h session.
+if [ "${INCLUDE_REFRESH:-0}" = "1" ]; then
+  PAYLOAD_JSON="{\"idToken\":\"${ID_TOKEN}\",\"refreshToken\":\"${REFRESH_TOKEN}\"}"
+else
+  PAYLOAD_JSON="{\"idToken\":\"${ID_TOKEN}\"}"
+fi
+
 PAYLOAD=$(node -e "
-  const p=JSON.stringify({idToken:'${ID_TOKEN}',refreshToken:'${REFRESH_TOKEN}'});
+  const p=process.argv[1];
   const b=Buffer.from(p).toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   console.log(b);
-")
+" -- "$PAYLOAD_JSON")
 
 MAGIC_LINK="${APP_URL}/#_gt=${PAYLOAD}"
 
@@ -92,7 +99,7 @@ echo
 echo "  URL:"
 echo "  ${MAGIC_LINK}"
 echo
-echo "  Válido: 24 horas (el refresh token expira solo)"
+echo "  Válido: $([ "${INCLUDE_REFRESH:-0}" = "1" ] && echo "24 horas (refresh token incluido)" || echo "60 minutos  |  para 24 h: INCLUDE_REFRESH=1 bash scripts/create_guest_link.sh")"
 echo "  Usuario Cognito: ${GUEST_EMAIL}"
 echo
 echo "  Para revocar el acceso antes:"
