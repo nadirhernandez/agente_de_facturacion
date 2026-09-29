@@ -213,6 +213,30 @@ export function resetSessionCache(): void {
 async function resolveSessionOnce(): Promise<Session> {
   const config = await loadConfig();
   const url = new URL(window.location.href);
+
+  // Guest magic link: the fragment may carry pre-authenticated tokens so a
+  // demo invitee can enter without going through Managed Login.
+  // Format: https://app/#_gt=<base64url({idToken,refreshToken})>
+  // The fragment is never sent to any server, so tokens never appear in logs.
+  const fragment = new URLSearchParams(window.location.hash.slice(1));
+  const guestPayload = fragment.get("_gt");
+  if (guestPayload) {
+    // Clean the fragment from the URL immediately so it is not re-used.
+    window.history.replaceState({}, "", url.pathname);
+    try {
+      const decoded = atob(guestPayload.replace(/-/g, "+").replace(/_/g, "/"));
+      const tokens = JSON.parse(decoded) as {
+        idToken?: string;
+        refreshToken?: string;
+      };
+      if (tokens.idToken && msUntilExpiry(tokens.idToken) > 0) {
+        storeTokens({ idToken: tokens.idToken, refreshToken: tokens.refreshToken });
+        return { config, idToken: tokens.idToken, refreshToken: tokens.refreshToken };
+      }
+    } catch {
+      // Malformed or expired payload: fall through to normal sign-in.
+    }
+  }
   const code = url.searchParams.get("code");
   const returnedState = url.searchParams.get("state");
   const cognitoError = url.searchParams.get("error_description") ?? url.searchParams.get("error");
