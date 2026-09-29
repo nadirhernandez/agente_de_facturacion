@@ -29,7 +29,7 @@ Aplican tanto al piloto (`application.tf`) como al módulo por cliente (`modules
 - Bucket del frontend privado, servido solo por CloudFront con OAC, detrás de WAF
   (`waf.tf`: reglas administradas de AWS + límite de 1000 req/5 min por IP).
 - Cabeceras HSTS, `X-Content-Type-Options`, `X-Frame-Options: DENY` y `Referrer-Policy`. La CSP
-  se entrega en modo `Report-Only` (`enforce_csp = false`) hasta revisar los reportes.
+  está redactada pero no se entrega (`enforce_csp = false`); ver [`DEUDA_TECNICA.md`](DEUDA_TECNICA.md).
 - Cognito en tier PLUS con threat protection `ENFORCED`, MFA TOTP opcional, contraseñas de 12+
   caracteres, protección contra borrado y revocación de tokens.
 - Permisos de la Lambda acotados al namespace `default`, al dashboard y a los datasets del cliente.
@@ -86,8 +86,8 @@ heredar esta configuración por accidente.
 
 1. **Row-Level Security** por región, cartera o cliente. En el modelo de cuenta por cliente el
    aislamiento es la cuenta, así que solo hace falta si se comparte una cuenta entre áreas.
-2. **CSP en modo enforce** una vez revisados los reportes (`enforce_csp = true` en el piloto,
-   `content_security_policy_enforced` en el módulo).
+2. **CSP en modo enforce** tras una sesión de pruebas con login real (`enforce_csp = true` en el
+   piloto, `content_security_policy_enforced` en el módulo). Detalle en `DEUDA_TECNICA.md`.
 3. **Logs de acceso de S3 y CloudFront**, y políticas de retención.
 4. **Dominio propio y certificado ACM.** Permite subir `minimum_protocol_version` de `TLSv1` a
    `TLSv1.2_2021`. Ya soportado por el módulo con `app_domain_aliases` y `app_certificate_arn`;

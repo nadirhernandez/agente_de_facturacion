@@ -2,7 +2,7 @@
 
 > **Desplegado en `dev-infile` (503561412084) / us-east-1.**
 > App: https://d3ocvrp9ma213b.cloudfront.net
-> Guías: [`docs/RUNBOOK.md`](docs/RUNBOOK.md) · [`docs/MLP_OPERATIONS.md`](docs/MLP_OPERATIONS.md) · [`docs/APP_SECURITY.md`](docs/APP_SECURITY.md)
+> Guías: [`docs/RUNBOOK.md`](docs/RUNBOOK.md) · [`docs/MLP_OPERATIONS.md`](docs/MLP_OPERATIONS.md) · [`docs/APP_SECURITY.md`](docs/APP_SECURITY.md) · [`docs/DEUDA_TECNICA.md`](docs/DEUDA_TECNICA.md)
 
 ## Entregable final
 

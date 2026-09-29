@@ -134,9 +134,13 @@ resource "aws_cloudfront_distribution" "web" {
 
 /**
  * Browser security headers. Wildcards for API Gateway and Cognito avoid a
- * dependency cycle (both reference the distribution's domain). The CSP is
- * report-only until the embedded dashboard and chat load without violations in
- * the browser console; then set local.enforce_csp = true.
+ * dependency cycle (both reference the distribution's domain).
+ *
+ * The CSP below is drafted but NOT delivered (technical debt, see
+ * docs/DEUDA_TECNICA.md). A Report-Only header without a report-to endpoint
+ * protects nothing and floods the browser console with warnings, so it was
+ * removed. Enabling it means: set enforce_csp = true, test the embedded
+ * dashboard and Quick chat with a real login, and fix any blocked source.
  */
 locals {
   enforce_csp = false
@@ -190,16 +194,6 @@ resource "aws_cloudfront_response_headers_policy" "web" {
     }
   }
 
-  dynamic "custom_headers_config" {
-    for_each = local.enforce_csp ? [] : [1]
-    content {
-      items {
-        header   = "Content-Security-Policy-Report-Only"
-        value    = local.content_security_policy
-        override = true
-      }
-    }
-  }
 }
 
 data "aws_iam_policy_document" "web_bucket" {
