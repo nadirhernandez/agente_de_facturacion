@@ -111,23 +111,6 @@ button svg {
 .wordmark-lg .wordmark-vendor {
   font-size: 12px;
 }
-.product-hero {
-  display: grid;
-  gap: 10px;
-  justify-items: center;
-  text-align: center;
-}
-.product-hero .wordmark-name {
-  color: #102a43;
-}
-.product-hero .wordmark-vendor {
-  color: #57718b;
-}
-.tagline {
-  color: #63778a;
-  font-size: 14px;
-  margin: 0 0 10px;
-}
 
 /* Client identity: the workspace belongs to them, so their name goes large. */
 .client-identity {
@@ -800,45 +783,115 @@ h1 {
   }
 }
 
-/* ------------------------------------------------------------- gate/auth */
-.gate {
+/* --------------------------------------------------------- splash/login */
+.splash {
   align-items: center;
-  background: radial-gradient(circle at top, #edf5ff 0, #f4f7fb 44%);
-  display: flex;
-  justify-content: center;
-  min-height: 100vh;
-  padding: 24px;
-}
-.gate-card {
-  background: #fff;
-  border: 1px solid #dce6ef;
-  border-radius: 18px;
-  box-shadow: 0 20px 55px rgba(31, 62, 91, 0.11);
+  background:
+    radial-gradient(900px 520px at 78% -10%, rgba(37, 99, 235, 0.45), transparent 60%),
+    radial-gradient(700px 480px at -10% 110%, rgba(59, 141, 245, 0.22), transparent 60%),
+    linear-gradient(180deg, #102a43 0%, #0b2238 100%);
+  color: #fff;
   display: grid;
-  gap: 10px;
+  grid-template-rows: 1fr auto;
   justify-items: center;
-  max-width: 420px;
-  padding: 42px 34px;
+  min-height: 100vh;
+  padding: 32px 24px 22px;
   text-align: center;
 }
-.gate-card h1 {
-  font-size: 24px;
-  margin: 6px 0 0;
+.splash-content {
+  align-self: center;
+  animation: splash-in 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  max-width: 440px;
 }
-.gate-card p {
-  color: #63778a;
+.splash-client {
+  color: #b9d8ff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+}
+.splash .brand-mark.large {
+  box-shadow: 0 14px 40px rgba(37, 99, 235, 0.45);
+  height: 64px;
+  width: 64px;
+}
+.splash .brand-mark.large svg {
+  height: 30px;
+  width: 30px;
+}
+.splash .wordmark-lg .wordmark-name {
+  color: #fff;
+  font-size: 52px;
+}
+.splash .wordmark-lg .wordmark-vendor {
+  color: #b9d8ff;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+.splash-tagline {
+  color: #dcecff;
+  font-size: 17px;
+  line-height: 1.35;
+  margin: 2px 0 0;
+}
+.splash-error {
+  background: rgba(179, 38, 30, 0.22);
+  border: 1px solid rgba(255, 138, 128, 0.45);
+  border-radius: 10px;
+  color: #ffd2cd;
+  font-size: 14px;
+  margin: 10px 0 0;
+  padding: 10px 14px;
+}
+.splash-button {
+  align-items: center;
+  background: #fff;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+  color: #102a43;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 15px;
+  font-weight: 750;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 13px 22px;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+.splash-button:hover {
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+  transform: translateY(-1px);
+}
+.splash-button:focus-visible {
+  outline-color: #3b8df5;
+  outline-offset: 3px;
+}
+.splash-hint {
+  color: #88a9c4;
+  font-size: 12px;
   margin: 0;
 }
-.gate-error {
-  color: #b3261e;
+.splash-foot {
+  color: #6f8fab;
+  font-size: 12px;
+  margin: 0;
 }
-.auth-redirect {
-  align-items: center;
-  background: #f4f7fb;
-  display: flex;
-  gap: 14px;
-  justify-content: center;
-  min-height: 100vh;
+@keyframes splash-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 .sr-only {
   clip: rect(0, 0, 0, 0);

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App, { suggestedPrompts } from "./App";
@@ -70,11 +70,41 @@ const signedIn = () =>
   });
 
 describe("App (unauthenticated)", () => {
-  it("redirects to Managed Login when there is no session", async () => {
+  it("shows the branded landing and opens Managed Login on demand", async () => {
     auth.resolveSession.mockResolvedValue({ config });
-    render(<App />);
-    await waitFor(() => expect(auth.signIn).toHaveBeenCalledWith(config));
+    render(<App splashMs={0} />);
+
+    const button = await screen.findByRole("button", { name: /Iniciar sesión/ });
+    expect(screen.getByText("Empresa Inteligente S.A.")).toBeInTheDocument();
+    expect(screen.getByLabelText("INsight")).toBeInTheDocument();
+    expect(screen.getByText("Insight desde adentro de su facturación.")).toBeInTheDocument();
+    expect(auth.signIn).not.toHaveBeenCalled();
+
+    await userEvent.click(button);
+    expect(auth.signIn).toHaveBeenCalledWith(config);
     expect(api.getEmbedUrl).not.toHaveBeenCalled();
+  });
+
+  it("keeps the splash up for the minimum time even when the session is ready", async () => {
+    vi.useFakeTimers();
+    try {
+      signedIn();
+      render(<App splashMs={1400} />);
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(800);
+      });
+      expect(screen.getByRole("main")).toHaveAttribute("aria-busy", "true");
+      expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(700);
+      });
+      expect(
+        screen.getByRole("heading", { level: 1, name: "Analista de Ventas" }),
+      ).toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("shows the sign-in error with a retry button", async () => {
@@ -82,7 +112,7 @@ describe("App (unauthenticated)", () => {
       config,
       error: "La respuesta de inicio de sesión no es válida.",
     });
-    render(<App />);
+    render(<App splashMs={0} />);
     expect(await screen.findByRole("alert")).toHaveTextContent("no es válida");
     await userEvent.click(screen.getByRole("button", { name: "Volver a intentar" }));
     expect(auth.signIn).toHaveBeenCalledTimes(1);
@@ -92,9 +122,9 @@ describe("App (unauthenticated)", () => {
     auth.resolveSession.mockRejectedValue(
       new Error("No se encontró la configuración de la aplicación (config.json)."),
     );
-    render(<App />);
+    render(<App splashMs={0} />);
     expect(await screen.findByRole("alert")).toHaveTextContent("config.json");
-    expect(screen.getByRole("button", { name: "Recargar" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Volver a intentar/ })).toBeInTheDocument();
   });
 });
 
@@ -102,7 +132,7 @@ describe("App (authenticated)", () => {
   beforeEach(signedIn);
 
   it("opens the chat first with suggested questions and the no-history notice", async () => {
-    render(<App />);
+    render(<App splashMs={0} />);
 
     expect(
       await screen.findByRole("heading", { level: 1, name: "Analista de Ventas" }),
@@ -127,7 +157,7 @@ describe("App (authenticated)", () => {
   });
 
   it("collapses the suggestions once a question is sent and reopens them for a new conversation", async () => {
-    render(<App />);
+    render(<App splashMs={0} />);
     await waitFor(() =>
       expect(screen.getByTestId("frame")).toHaveAttribute("data-url", `${EMBED}chat-1`),
     );
@@ -153,7 +183,7 @@ describe("App (authenticated)", () => {
   });
 
   it("switches to the dashboard and back without reloading the active view", async () => {
-    render(<App />);
+    render(<App splashMs={0} />);
     await waitFor(() =>
       expect(screen.getByTestId("frame")).toHaveAttribute("data-url", `${EMBED}chat-1`),
     );
@@ -173,7 +203,7 @@ describe("App (authenticated)", () => {
   });
 
   it("sends a suggested question to a fresh chat", async () => {
-    render(<App />);
+    render(<App splashMs={0} />);
     await waitFor(() =>
       expect(screen.getByTestId("frame")).toHaveAttribute("data-url", `${EMBED}chat-1`),
     );
@@ -187,7 +217,7 @@ describe("App (authenticated)", () => {
   });
 
   it("starts a new conversation on demand", async () => {
-    render(<App />);
+    render(<App splashMs={0} />);
     await waitFor(() =>
       expect(screen.getByTestId("frame")).toHaveAttribute("data-url", `${EMBED}chat-1`),
     );
@@ -202,7 +232,7 @@ describe("App (authenticated)", () => {
   it("ends the session when the API says the token expired", async () => {
     const { SessionExpiredError } = await import("./api");
     api.getEmbedUrl.mockRejectedValue(new SessionExpiredError());
-    render(<App />);
+    render(<App splashMs={0} />);
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Tu sesión expiró");
     expect(auth.clearToken).toHaveBeenCalled();
@@ -212,7 +242,7 @@ describe("App (authenticated)", () => {
     api.getEmbedUrl.mockRejectedValue(
       new Error("No fue posible iniciar la experiencia de análisis."),
     );
-    render(<App />);
+    render(<App splashMs={0} />);
 
     expect(await screen.findAllByText("Servicio no disponible")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Nueva conversación" })).toBeDisabled();
@@ -222,7 +252,7 @@ describe("App (authenticated)", () => {
   });
 
   it("signs out from the sidebar", async () => {
-    render(<App />);
+    render(<App splashMs={0} />);
     await screen.findByRole("heading", { level: 1 });
     await userEvent.click(screen.getAllByRole("button", { name: "Cerrar sesión" })[0]!);
     expect(auth.signOut).toHaveBeenCalledWith(config);

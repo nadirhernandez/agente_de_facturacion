@@ -16,9 +16,10 @@ import {
   type Session,
   type Tokens,
 } from "./auth";
-import { ClientIdentity, PRODUCT_NAME, TAGLINE, Wordmark } from "./Brand";
+import { ClientIdentity, PRODUCT_NAME, Wordmark } from "./Brand";
 import { EmbeddingFrame } from "./EmbeddingFrame";
 import { Icon, type IconName } from "./Icon";
+import { Landing, Splash, SPLASH_MS } from "./Splash";
 import { useSessionKeepAlive } from "./useSessionKeepAlive";
 
 type View = "overview" | "chat";
@@ -103,19 +104,6 @@ const exactTime = (iso: string) =>
     hour12: false,
   });
 
-/** Big product mark for the screens that have nothing else on them (login, boot). */
-function ProductHero() {
-  return (
-    <div className="product-hero">
-      <span className="brand-mark large">
-        <Icon name="trending-up" size={22} />
-      </span>
-      <Wordmark size="lg" />
-      <p className="tagline">{TAGLINE}</p>
-    </div>
-  );
-}
-
 function NavButtons({
   activeView,
   onSelect,
@@ -139,38 +127,15 @@ function NavButtons({
   ));
 }
 
-function AuthRedirect() {
-  return (
-    <main className="auth-redirect" aria-live="polite">
-      <ProductHero />
-      <span className="loading-mark small" />
-      <span className="sr-only">Abriendo inicio de sesión…</span>
-    </main>
-  );
-}
-
-function GateCard({
-  message,
-  action,
-  onAction,
-}: {
-  message: string;
-  action: string;
-  onAction: () => void;
-}) {
-  return (
-    <main className="gate">
-      <div className="gate-card">
-        <ProductHero />
-        <p className="gate-error" role="alert">
-          {message}
-        </p>
-        <button className="primary-button" onClick={onAction} type="button">
-          {action}
-        </button>
-      </div>
-    </main>
-  );
+/** Keeps the splash on screen for at least `ms` after mount. */
+function useMinimumSplash(ms: number): boolean {
+  const [done, setDone] = useState(ms <= 0);
+  useEffect(() => {
+    if (ms <= 0) return;
+    const timer = window.setTimeout(() => setDone(true), ms);
+    return () => window.clearTimeout(timer);
+  }, [ms]);
+  return done;
 }
 
 interface StatusInfo {
@@ -192,7 +157,8 @@ function statusFrom(
   };
 }
 
-export default function App() {
+export default function App({ splashMs = SPLASH_MS }: { splashMs?: number } = {}) {
+  const splashDone = useMinimumSplash(splashMs);
   const [session, setSession] = useState<Session>();
   const [activeView, setActiveView] = useState<View>("chat");
   const [embed, setEmbed] = useState<EmbedState>();
@@ -201,7 +167,6 @@ export default function App() {
   const [pendingPrompt, setPendingPrompt] = useState<string>();
   const [suggestionsOpen, setSuggestionsOpen] = useState(true);
   const requestSeq = useRef(0);
-  const loginRedirectStarted = useRef(false);
 
   const endSession = useCallback((reason: string) => {
     clearToken();
@@ -264,17 +229,6 @@ export default function App() {
       );
   }, [loadExperience]);
 
-  // No application-specific landing page before authentication: as soon as
-  // config/session resolution proves there is no valid token, open Cognito's
-  // Managed Login. Its own screen also contains the corporate sign-up link.
-  useEffect(() => {
-    if (!session || session.idToken || session.error || bootError || loginRedirectStarted.current) {
-      return;
-    }
-    loginRedirectStarted.current = true;
-    void signIn(session.config);
-  }, [session, bootError]);
-
   const idToken = session?.idToken;
   const config = session?.config;
 
@@ -315,21 +269,21 @@ export default function App() {
     void loadExperience(view, session);
   };
 
-  if (!session) {
-    return bootError ? (
-      <GateCard action="Recargar" message={bootError} onAction={() => window.location.reload()} />
-    ) : (
-      <AuthRedirect />
-    );
+  // Boot: the splash stays up until the brand has been on screen for SPLASH_MS
+  // and the session (or the failure to load it) is known.
+  if (bootError) {
+    return <Landing error={bootError} onSignIn={() => window.location.reload()} />;
   }
-  if (!session.idToken && !session.error && !bootError) return <AuthRedirect />;
+  if (!splashDone || !session) return <Splash busy clientName={session?.config.clientName} />;
 
+  // Branded entry point. The button opens Cognito Managed Login, which also
+  // carries the corporate sign-up link.
   if (!session.idToken) {
     return (
-      <GateCard
-        action="Volver a intentar"
-        message={session.error ?? bootError ?? "No fue posible iniciar sesión."}
-        onAction={() => void signIn(session.config)}
+      <Landing
+        clientName={session.config.clientName}
+        error={session.error}
+        onSignIn={() => void signIn(session.config)}
       />
     );
   }
