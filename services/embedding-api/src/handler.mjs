@@ -4,14 +4,17 @@ import {
   ListUsersCommand,
   QuickSightClient,
 } from "@aws-sdk/client-quicksight";
+import { DeleteObjectCommand, GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 
 import { createHash } from "node:crypto";
 
 // ListUsers has a low TPS quota; adaptive retries back off under throttling.
 const client = new QuickSightClient({ maxAttempts: 5, retryMode: "adaptive" });
+const s3 = new S3Client({});
 
 const SESSION_MINUTES = 60;
 const CACHE_TTL_MS = 5 * 60 * 1000;
+const GUEST_CODE_RE = /^[a-f0-9]{32}$/;
 
 const errorInfo = (error) => ({
   name: error?.name,
@@ -217,6 +220,30 @@ async function datasetFreshness() {
   };
 }
 
+/**
+ * Guest code exchange: a one-time 32-hex token stored in S3 under
+ * guest-tokens/<code>.json. The object is deleted immediately after reading
+ * so the link works only once. The calling browser never needs a Cognito JWT.
+ */
+async function exchangeGuestCode(code) {
+  const bucket = required("DATA_BUCKET");
+  const key = `guest-tokens/${code}.json`;
+
+  let body;
+  try {
+    const obj = await s3.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
+    body = await obj.Body.transformToString();
+  } catch (error) {
+    if (error.name === "NoSuchKey") return null; // expired or already used
+    throw error;
+  }
+
+  // Delete immediately: one-time use regardless of what the caller does next.
+  await s3.send(new DeleteObjectCommand({ Bucket: bucket, Key: key })).catch(() => undefined);
+
+  return JSON.parse(body);
+}
+
 export const handler = async (event) => {
   if (event.requestContext?.http?.method === "OPTIONS") {
     return response(204, {});
@@ -231,6 +258,28 @@ export const handler = async (event) => {
         JSON.stringify({ message: "Failed to read dataset freshness", error: errorInfo(error) }),
       );
       return response(500, { message: "No fue posible consultar la actualización de datos." });
+    }
+  }
+
+  // Guest code exchange: public endpoint, no JWT required.
+  // Returns {idToken, refreshToken} and deletes the one-time code.
+  if (path.endsWith("/guest")) {
+    const code = event.queryStringParameters?.c ?? "";
+    if (!GUEST_CODE_RE.test(code)) {
+      return response(400, { message: "Código de invitado inválido." });
+    }
+    try {
+      const tokens = await exchangeGuestCode(code);
+      if (!tokens) {
+        return response(404, { message: "El link de invitado ya fue utilizado o expiró." });
+      }
+      console.log(JSON.stringify({ message: "Guest code exchanged" }));
+      return response(200, tokens);
+    } catch (error) {
+      console.error(
+        JSON.stringify({ message: "Failed to exchange guest code", error: errorInfo(error) }),
+      );
+      return response(500, { message: "No fue posible procesar el link de invitado." });
     }
   }
 

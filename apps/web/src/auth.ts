@@ -213,12 +213,34 @@ export function resetSessionCache(): void {
 async function resolveSessionOnce(): Promise<Session> {
   const config = await loadConfig();
   const url = new URL(window.location.href);
-
-  // Guest magic link: the fragment may carry pre-authenticated tokens so a
-  // demo invitee can enter without going through Managed Login.
-  // Format: https://app/#_gt=<base64url({idToken,refreshToken})>
-  // The fragment is never sent to any server, so tokens never appear in logs.
   const fragment = new URLSearchParams(window.location.hash.slice(1));
+
+  // Guest code exchange: #_gc=<32-hex> → call /guest?c=<code> → get tokens.
+  // The code is one-time use and never transmitted through a server (fragment).
+  const gcCode = fragment.get("_gc");
+  if (gcCode) {
+    window.history.replaceState({}, "", url.pathname);
+    if (/^[a-f0-9]{32}$/.test(gcCode)) {
+      try {
+        const res = await fetch(`${config.apiBaseUrl}/guest?c=${gcCode}`, { cache: "no-store" });
+        if (res.ok) {
+          const tokens = (await res.json()) as { idToken?: string; refreshToken?: string };
+          if (tokens.idToken && msUntilExpiry(tokens.idToken) > 0) {
+            storeTokens({ idToken: tokens.idToken, refreshToken: tokens.refreshToken });
+            return { config, idToken: tokens.idToken, refreshToken: tokens.refreshToken };
+          }
+        } else if (res.status === 404) {
+          return { config, error: "El link de invitado ya fue utilizado o expiró." };
+        }
+      } catch {
+        // Fall through to normal sign-in.
+      }
+    }
+    return { config, error: "El link de invitado no es válido." };
+  }
+
+  // Legacy direct-token link (#_gt=<base64url>) — kept for backwards compat;
+  // new links use the shorter #_gc= exchange flow above.
   const guestPayload = fragment.get("_gt");
   if (guestPayload) {
     // Clean the fragment from the URL immediately so it is not re-used.

@@ -75,21 +75,33 @@ TOKENS=$(aws cognito-idp admin-initiate-auth \
 ID_TOKEN=$(echo "$TOKENS" | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).IdToken")
 REFRESH_TOKEN=$(echo "$TOKENS" | node -pe "JSON.parse(require('fs').readFileSync(0,'utf8')).RefreshToken")
 
-# By default the link only carries the id_token (~850 chars, 60-min session).
-# Set INCLUDE_REFRESH=1 to add the refresh token (~1,800 chars extra) for a 24-h session.
-if [ "${INCLUDE_REFRESH:-0}" = "1" ]; then
-  PAYLOAD_JSON="{\"idToken\":\"${ID_TOKEN}\",\"refreshToken\":\"${REFRESH_TOKEN}\"}"
+# Default: short link via Lambda exchange (~100 chars).
+# The tokens are stored in S3 and exchanged on first click (one-time use).
+# Set DIRECT=1 to embed the id_token directly in the URL (~1,500 chars, no exchange needed).
+DATA_BUCKET="dashboards-dinamicos-dev-503561412084"
+
+if [ "${DIRECT:-0}" = "1" ]; then
+  # Legacy direct-token mode — kept for compatibility.
+  if [ "${INCLUDE_REFRESH:-0}" = "1" ]; then
+    PAYLOAD_JSON="{\"idToken\":\"${ID_TOKEN}\",\"refreshToken\":\"${REFRESH_TOKEN}\"}"
+  else
+    PAYLOAD_JSON="{\"idToken\":\"${ID_TOKEN}\"}"
+  fi
+  PAYLOAD=$(node -e "
+    const p=process.argv[1];
+    const b=Buffer.from(p).toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    console.log(b);
+  " -- "$PAYLOAD_JSON")
+  MAGIC_LINK="${APP_URL}/#_gt=${PAYLOAD}"
 else
-  PAYLOAD_JSON="{\"idToken\":\"${ID_TOKEN}\"}"
+  CODE=$(openssl rand -hex 16)
+  TOKENS_JSON="{\"idToken\":\"${ID_TOKEN}\",\"refreshToken\":\"${REFRESH_TOKEN}\"}"
+  echo "$TOKENS_JSON" | aws s3 cp - "s3://${DATA_BUCKET}/guest-tokens/${CODE}.json" \
+    --content-type application/json \
+    --region "$REGION" \
+    --only-show-errors
+  MAGIC_LINK="${APP_URL}/#_gc=${CODE}"
 fi
-
-PAYLOAD=$(node -e "
-  const p=process.argv[1];
-  const b=Buffer.from(p).toString('base64').replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-  console.log(b);
-" -- "$PAYLOAD_JSON")
-
-MAGIC_LINK="${APP_URL}/#_gt=${PAYLOAD}"
 
 echo
 echo "======================================================================"
@@ -99,7 +111,7 @@ echo
 echo "  URL:"
 echo "  ${MAGIC_LINK}"
 echo
-echo "  Válido: $([ "${INCLUDE_REFRESH:-0}" = "1" ] && echo "24 horas (refresh token incluido)" || echo "60 minutos  |  para 24 h: INCLUDE_REFRESH=1 bash scripts/create_guest_link.sh")"
+echo "  Válido: 24 horas (tokens en S3, se borran al usarse)"
 echo "  Usuario Cognito: ${GUEST_EMAIL}"
 echo
 echo "  Para revocar el acceso antes:"
