@@ -26,7 +26,7 @@ import subprocess
 import sys
 import tempfile
 import time
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -51,7 +51,7 @@ GLUE_WAIT_TIMEOUT_SECONDS = 60 * 60
 # no retroceda. Los números resultantes (~10^11) quedan muy por encima de los que
 # ya existen en el piloto (1 + 1000 * archivos) y del rango 900001-900200 que
 # reserva verify_tenant.sh.
-NUMBERING_EPOCH = datetime(2025, 1, 1, tzinfo=timezone.utc)
+NUMBERING_EPOCH = datetime(2025, 1, 1, tzinfo=UTC)
 RUN_CAPACITY = 10_000
 
 # create_invoice deriva la serie con chr(65 + (numero - 1) // 300): pasado 7800
@@ -74,7 +74,7 @@ def aws(*arguments: str, capture: bool = True) -> str:
 
 def next_invoice_number() -> int:
     """Primer número de un bloque que no choca con ejecuciones anteriores."""
-    elapsed = int((datetime.now(timezone.utc) - NUMBERING_EPOCH).total_seconds())
+    elapsed = int((datetime.now(UTC) - NUMBERING_EPOCH).total_seconds())
     return max(1, elapsed) * RUN_CAPACITY + 1
 
 
@@ -82,13 +82,15 @@ def create_numbered_invoice(number: int, issue_date: date) -> dict:
     cycle_number = (number - 1) % SERIES_CYCLE + 1
     invoice, _lines, _document = factory.create_invoice(cycle_number, issue_date)
     if cycle_number != number:
-        invoice.update({
-            "doc_id": f"GT-DEMO-{number:06d}",
-            "dte_id": f"DTE-{number:08d}",
-            "datos_emision_id": f"EMI-{number:08d}",
-            "numero_acceso": number,
-            "numero": number,
-        })
+        invoice.update(
+            {
+                "doc_id": f"GT-DEMO-{number:06d}",
+                "dte_id": f"DTE-{number:08d}",
+                "datos_emision_id": f"EMI-{number:08d}",
+                "numero_acceso": number,
+                "numero": number,
+            }
+        )
     return invoice
 
 
@@ -124,8 +126,16 @@ def upload_batch(invoices: list[dict], batch_id: str, ingest_date: str) -> str:
 def active_glue_run() -> str | None:
     states = ",".join(f"'{state}'" for state in GLUE_ACTIVE_STATES)
     output = aws(
-        "glue", "get-job-runs", "--job-name", GLUE_JOB, "--max-results", "5",
-        "--query", f"JobRuns[?contains([{states}], JobRunState)].Id", "--output", "text",
+        "glue",
+        "get-job-runs",
+        "--job-name",
+        GLUE_JOB,
+        "--max-results",
+        "5",
+        "--query",
+        f"JobRuns[?contains([{states}], JobRunState)].Id",
+        "--output",
+        "text",
     )
     return output.split()[0] if output else None
 
@@ -135,8 +145,16 @@ def wait_for_run(run_id: str, timeout: int = GLUE_WAIT_TIMEOUT_SECONDS) -> str:
     while True:
         time.sleep(GLUE_POLL_SECONDS)
         state = aws(
-            "glue", "get-job-run", "--job-name", GLUE_JOB, "--run-id", run_id,
-            "--query", "JobRun.JobRunState", "--output", "text",
+            "glue",
+            "get-job-run",
+            "--job-name",
+            GLUE_JOB,
+            "--run-id",
+            run_id,
+            "--query",
+            "JobRun.JobRunState",
+            "--output",
+            "text",
         )
         print(f"  glue {run_id[-8:]}: {state}")
         if state in GLUE_TERMINAL_STATES:
@@ -164,9 +182,16 @@ def run_glue_job() -> None:
     for attempt in range(1, 6):
         try:
             run_id = aws(
-                "glue", "start-job-run", "--job-name", GLUE_JOB,
-                "--arguments", '{"--REPROCESS_ALL":"false"}',
-                "--query", "JobRunId", "--output", "text",
+                "glue",
+                "start-job-run",
+                "--job-name",
+                GLUE_JOB,
+                "--arguments",
+                '{"--REPROCESS_ALL":"false"}',
+                "--query",
+                "JobRunId",
+                "--output",
+                "text",
             )
             break
         except subprocess.CalledProcessError as error:
@@ -187,7 +212,9 @@ def run_glue_job() -> None:
 def main() -> None:
     global BUCKET, GLUE_JOB, PROFILE, REGION
 
-    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     parser.add_argument("--count", type=int, default=10_000, help="Total de facturas a generar")
     parser.add_argument("--batch-size", type=int, default=500, help="Facturas por archivo")
     parser.add_argument("--span-days", type=int, default=540, help="Ventana de fechas hacia atrás")

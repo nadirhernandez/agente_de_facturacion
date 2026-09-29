@@ -254,10 +254,31 @@ def main() -> None:
         writer.writerows(documents)
 
     line_fields = [
-        "doc_id", "fecha_emision", "fecha", "anio", "mes", "estado", "codigo_moneda",
-        "serie", "nit_receptor", "cliente", "establecimiento_codigo", "establecimiento",
-        "departamento", "municipio", "canal", "gran_total", "linea", "codigo_producto", "producto",
-        "categoria", "cantidad", "precio_unitario", "monto_linea", "monto_gravable", "iva",
+        "doc_id",
+        "fecha_emision",
+        "fecha",
+        "anio",
+        "mes",
+        "estado",
+        "codigo_moneda",
+        "serie",
+        "nit_receptor",
+        "cliente",
+        "establecimiento_codigo",
+        "establecimiento",
+        "departamento",
+        "municipio",
+        "canal",
+        "gran_total",
+        "linea",
+        "codigo_producto",
+        "producto",
+        "categoria",
+        "cantidad",
+        "precio_unitario",
+        "monto_linea",
+        "monto_gravable",
+        "iva",
     ]
     with LINES_PATH.open("w", encoding="utf-8", newline="") as output:
         writer = csv.DictWriter(output, fieldnames=line_fields)
@@ -265,7 +286,9 @@ def main() -> None:
         writer.writerows(all_lines)
 
     active_documents = [row for row in documents if row["estado"] == "emitido"]
-    print(f"Generated {len(invoices)} invoices, {len(all_lines)} sales lines and {len(active_documents)} emitted invoices.")
+    print(
+        f"Generated {len(invoices)} invoices, {len(all_lines)} sales lines and {len(active_documents)} emitted invoices."
+    )
     print(f"Raw JSONL: {RAW_PATH.relative_to(ROOT)}")
     print(f"Curated documents CSV: {DOCUMENTS_PATH.relative_to(ROOT)}")
     print(f"Curated sales lines CSV: {LINES_PATH.relative_to(ROOT)}")

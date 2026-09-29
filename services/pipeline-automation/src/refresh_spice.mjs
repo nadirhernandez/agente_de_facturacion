@@ -30,7 +30,8 @@ export const businessDate = (now = new Date()) =>
 
 function lookbackDays() {
   const days = Number(required("LOOKBACK_DAYS"));
-  if (!Number.isInteger(days) || days < 3) throw new Error(`LOOKBACK_DAYS must be an integer >= 3, got ${days}`);
+  if (!Number.isInteger(days) || days < 3)
+    throw new Error(`LOOKBACK_DAYS must be an integer >= 3, got ${days}`);
   return days;
 }
 
@@ -61,7 +62,9 @@ async function oldestDateLoaded(jobRunId) {
   let state;
   for (let attempt = 0; Date.now() < deadline; attempt += 1) {
     await sleep(Math.min(250 * 2 ** attempt, 4000));
-    const { QueryExecution } = await athena.send(new GetQueryExecutionCommand({ QueryExecutionId: id }));
+    const { QueryExecution } = await athena.send(
+      new GetQueryExecutionCommand({ QueryExecutionId: id }),
+    );
     state = QueryExecution?.Status?.State;
     if (state === "SUCCEEDED") break;
     if (state === "FAILED" || state === "CANCELLED") {
@@ -70,7 +73,9 @@ async function oldestDateLoaded(jobRunId) {
   }
 
   if (state !== "SUCCEEDED") {
-    await athena.send(new StopQueryExecutionCommand({ QueryExecutionId: id })).catch(() => undefined);
+    await athena
+      .send(new StopQueryExecutionCommand({ QueryExecutionId: id }))
+      .catch(() => undefined);
     throw new Error(`Athena query ${id} timed out after ${QUERY_TIMEOUT_MS} ms`);
   }
 
@@ -97,7 +102,11 @@ export async function chooseRefreshType(jobRunId, now = new Date(), readOldest =
   const cutoff = businessDate(new Date(now.getTime() - safeDays * DAY_MS));
 
   return oldest >= cutoff
-    ? { type: "INCREMENTAL_REFRESH", reason: `oldest date ${oldest} within ${safeDays} days`, oldest }
+    ? {
+        type: "INCREMENTAL_REFRESH",
+        reason: `oldest date ${oldest} within ${safeDays} days`,
+        oldest,
+      }
     : { type: "FULL_REFRESH", reason: `oldest date ${oldest} older than ${cutoff}`, oldest };
 }
 
@@ -130,7 +139,12 @@ async function ingest(dataSetId, type, origin) {
     // Keep going with the other dataset, then fail the invocation (below) so
     // the async retry asks again; the id makes the retry safe.
     console.error(
-      JSON.stringify({ message: "Refresh failed", dataSetId, type, error: { name: error.name, message: error.message } }),
+      JSON.stringify({
+        message: "Refresh failed",
+        dataSetId,
+        type,
+        error: { name: error.name, message: error.message },
+      }),
     );
     return { dataSetId, type, ingestionId, error: `${error.name}: ${error.message}` };
   }
@@ -145,7 +159,8 @@ async function ingest(dataSetId, type, origin) {
  */
 export const handler = async (event = {}) => {
   const jobRunId = event.jobRunId ?? event.detail?.jobRunId;
-  if (jobRunId && !JOB_RUN_ID_PATTERN.test(jobRunId)) throw new Error(`Unexpected job run id: ${jobRunId}`);
+  if (jobRunId && !JOB_RUN_ID_PATTERN.test(jobRunId))
+    throw new Error(`Unexpected job run id: ${jobRunId}`);
 
   const decision = await chooseRefreshType(jobRunId);
   const origin = jobRunId ?? `manual-${Date.now()}`;
@@ -158,7 +173,9 @@ export const handler = async (event = {}) => {
 
   const failed = results.filter((result) => result.error);
   if (failed.length > 0) {
-    throw new Error(`SPICE refresh failed for ${failed.map((result) => result.dataSetId).join(", ")}`);
+    throw new Error(
+      `SPICE refresh failed for ${failed.map((result) => result.dataSetId).join(", ")}`,
+    );
   }
   return { decision, results };
 };

@@ -47,7 +47,7 @@ const LOCAL_BUDGET_MS = 15 * 60 * 1000;
 const SAFETY_MS = 15_000;
 
 const DATABASE_PATTERN = /^[a-z0-9_]{1,255}$/;
-const WAREHOUSE_PATTERN = /^s3:\/\/[a-z0-9][a-z0-9.-]{1,61}[a-z0-9](\/[A-Za-z0-9_.=\/-]*)?$/;
+const WAREHOUSE_PATTERN = /^s3:\/\/[a-z0-9][a-z0-9.-]{1,61}[a-z0-9](\/[A-Za-z0-9_.=/-]*)?$/;
 
 /**
  * Operator-supplied values go straight into DDL, so they are checked before
@@ -143,7 +143,10 @@ async function tableExists(database, name) {
  * statement are real problems: hiding them would leave SPICE refreshing
  * yesterday's model without anyone noticing.
  */
-export async function deployModel({ tablesOnly = false, deadline = Date.now() + LOCAL_BUDGET_MS } = {}) {
+export async function deployModel({
+  tablesOnly = false,
+  deadline = Date.now() + LOCAL_BUDGET_MS,
+} = {}) {
   const variables = modelVariables();
   const database = variables.db;
   const workGroup = required("ATHENA_WORKGROUP");

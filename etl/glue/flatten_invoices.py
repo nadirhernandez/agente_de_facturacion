@@ -45,7 +45,8 @@ from urllib.parse import urlparse
 
 import boto3
 from awsglue.utils import getResolvedOptions
-from pyspark.sql import SparkSession, Window, functions as F
+from pyspark.sql import SparkSession, Window
+from pyspark.sql import functions as F
 from pyspark.sql.types import (
     ArrayType,
     DecimalType,
@@ -73,39 +74,45 @@ MONEY = DecimalType(12, 2)
 
 # Only the fields the model uses. Amounts are read as decimals straight from the
 # JSON text, so no binary floating point rounding ever touches a quetzal.
-TAX_SCHEMA = StructType([
-    StructField("nombre_corto", StringType()),
-    StructField("monto_gravable", MONEY),
-    StructField("monto_impuesto", MONEY),
-])
+TAX_SCHEMA = StructType(
+    [
+        StructField("nombre_corto", StringType()),
+        StructField("monto_gravable", MONEY),
+        StructField("monto_impuesto", MONEY),
+    ]
+)
 
-ITEM_SCHEMA = StructType([
-    StructField("linea", IntegerType()),
-    StructField("codigo_producto", StringType()),
-    StructField("descripcion", StringType()),
-    StructField("cantidad", IntegerType()),
-    StructField("precio_unitario", MONEY),
-    StructField("monto", MONEY),
-    StructField("impuestos", ArrayType(TAX_SCHEMA)),
-])
+ITEM_SCHEMA = StructType(
+    [
+        StructField("linea", IntegerType()),
+        StructField("codigo_producto", StringType()),
+        StructField("descripcion", StringType()),
+        StructField("cantidad", IntegerType()),
+        StructField("precio_unitario", MONEY),
+        StructField("monto", MONEY),
+        StructField("impuestos", ArrayType(TAX_SCHEMA)),
+    ]
+)
 
-RAW_SCHEMA = StructType([
-    StructField("doc_id", StringType()),
-    StructField("country", StringType()),
-    StructField("fecha_emision", StringType()),
-    StructField("estado", StringType()),
-    StructField("codigo_moneda", StringType()),
-    StructField("serie", StringType()),
-    StructField("nit_receptor", StringType()),
-    StructField("nombre_receptor", StringType()),
-    StructField("establecimiento_codigo", StringType()),
-    StructField("establecimiento_nombre", StringType()),
-    StructField("departamento", StringType()),
-    StructField("municipio", StringType()),
-    StructField("gran_total", MONEY),
-    StructField("items", ArrayType(ITEM_SCHEMA)),
-    StructField("_corrupt_record", StringType()),
-])
+RAW_SCHEMA = StructType(
+    [
+        StructField("doc_id", StringType()),
+        StructField("country", StringType()),
+        StructField("fecha_emision", StringType()),
+        StructField("estado", StringType()),
+        StructField("codigo_moneda", StringType()),
+        StructField("serie", StringType()),
+        StructField("nit_receptor", StringType()),
+        StructField("nombre_receptor", StringType()),
+        StructField("establecimiento_codigo", StringType()),
+        StructField("establecimiento_nombre", StringType()),
+        StructField("departamento", StringType()),
+        StructField("municipio", StringType()),
+        StructField("gran_total", MONEY),
+        StructField("items", ArrayType(ITEM_SCHEMA)),
+        StructField("_corrupt_record", StringType()),
+    ]
+)
 
 # Column order and types of fct_lineas_factura (sql/model/tables/10_*.sql).
 # MERGE ... UPDATE SET * / INSERT * matches by name, so the batch is cast to
@@ -218,8 +225,7 @@ def with_business_dates(invoices):
     """
     emitted = F.to_timestamp("fecha_emision")
     return (
-        invoices
-        .withColumn("_emitido_en", emitted)
+        invoices.withColumn("_emitido_en", emitted)
         .withColumn("fecha", F.to_date(emitted))
         .withColumn("fecha_emision_local", emitted.cast("timestamp_ntz"))
     )
@@ -309,9 +315,8 @@ def build_sales_lines(invoices):
 
 def split_valid_lines(lines):
     """A line without number or amount cannot be merged or summed."""
-    reason = (
-        F.when(F.col("linea").isNull(), F.lit("linea_sin_numero"))
-        .when(F.col("facturacion_total_linea").isNull(), F.lit("linea_sin_monto"))
+    reason = F.when(F.col("linea").isNull(), F.lit("linea_sin_numero")).when(
+        F.col("facturacion_total_linea").isNull(), F.lit("linea_sin_monto")
     )
     tagged = lines.withColumn("_rechazo", reason)
     return (
@@ -350,30 +355,39 @@ def load_files(spark, pending, *, run_id, fct, ctl, agg, reprocess_all, quaranti
     latest = Window.partitionBy("doc_id", "linea").orderBy(
         F.col("ingest_date").desc_nulls_last(), F.col("source_file").desc_nulls_last()
     )
-    batch = (
-        lines.withColumn("_rank", F.row_number().over(latest)).filter("_rank = 1").drop("_rank").cache()
-    )
+    batch = lines.withColumn("_rank", F.row_number().over(latest)).filter("_rank = 1").drop("_rank").cache()
 
     # --- Quarantine ------------------------------------------------------------
-    rejected = rejected_docs.select(
-        "source_file",
-        "_rechazo",
-        "doc_id",
-        F.coalesce("_corrupt_record", F.to_json(F.struct("doc_id", "fecha_emision", "estado"))).alias("registro"),
-    ).unionByName(
-        rejected_lines.select(
+    rejected = (
+        rejected_docs.select(
             "source_file",
             "_rechazo",
             "doc_id",
-            F.to_json(F.struct("doc_id", "linea", "codigo_producto")).alias("registro"),
+            F.coalesce("_corrupt_record", F.to_json(F.struct("doc_id", "fecha_emision", "estado"))).alias(
+                "registro"
+            ),
         )
-    ).cache()
+        .unionByName(
+            rejected_lines.select(
+                "source_file",
+                "_rechazo",
+                "doc_id",
+                F.to_json(F.struct("doc_id", "linea", "codigo_producto")).alias("registro"),
+            )
+        )
+        .cache()
+    )
     rejected_count = rejected.count()
     if rejected_count:
         target = f"{quarantine_path}/run={run_id}/"
         rejected.coalesce(1).write.mode("append").json(target)
-        reasons = {row["_rechazo"]: row["n"] for row in rejected.groupBy("_rechazo").agg(F.count("*").alias("n")).collect()}
-        bad_files = sorted({row["source_file"] for row in rejected.select("source_file").distinct().collect()})
+        reasons = {
+            row["_rechazo"]: row["n"]
+            for row in rejected.groupBy("_rechazo").agg(F.count("*").alias("n")).collect()
+        }
+        bad_files = sorted(
+            {row["source_file"] for row in rejected.select("source_file").distinct().collect()}
+        )
         log("records_quarantined", run=run_id, count=rejected_count, reasons=reasons, path=target)
         publish_quarantine_notice(quarantine_path, run_id, rejected_count, reasons, bad_files, target)
 
@@ -416,7 +430,9 @@ def load_files(spark, pending, *, run_id, fct, ctl, agg, reprocess_all, quaranti
 
     # --- Daily aggregate -----------------------------------------------------
     if touched_dates:
-        spark.createDataFrame([(day,) for day in touched_dates], "fecha date").createOrReplaceTempView("dias_lote")
+        spark.createDataFrame([(day,) for day in touched_dates], "fecha date").createOrReplaceTempView(
+            "dias_lote"
+        )
         spark.sql(f"""
             MERGE INTO {agg} a
             USING (
@@ -518,8 +534,9 @@ def main() -> None:
     quarantine_path = optional_arg("QUARANTINE_PATH", f"s3://{source.netloc}/quarantine/").rstrip("/")
 
     spark = (
-        SparkSession.builder
-        .config("spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions")
+        SparkSession.builder.config(
+            "spark.sql.extensions", "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+        )
         .config(f"spark.sql.catalog.{CATALOG}", "org.apache.iceberg.spark.SparkCatalog")
         .config(f"spark.sql.catalog.{CATALOG}.type", "glue")
         .config(f"spark.sql.catalog.{CATALOG}.warehouse", args["WAREHOUSE"])

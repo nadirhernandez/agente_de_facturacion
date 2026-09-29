@@ -8,8 +8,8 @@
 #
 # Uso: START=120001 BLOCKS=10 BLOCK=100000 scripts/bulk_load_invoices.sh
 set -uo pipefail
-cd "$(dirname "${BASH_SOURCE[0]}")/.."
-export AWS_PROFILE=dashboards-dev-infile AWS_REGION=us-east-1
+cd "$(dirname "${BASH_SOURCE[0]}")/.." || exit 1
+export AWS_PROFILE="${AWS_PROFILE:-dashboards-dev-infile}" AWS_REGION="${AWS_REGION:-us-east-1}"
 
 RULE=dashboards-dinamicos-raw-object-created-dev
 START="${START:?START: primer número de factura (debe ser mayor al máximo cargado)}"

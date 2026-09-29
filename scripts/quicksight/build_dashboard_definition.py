@@ -3,10 +3,9 @@
 
 from __future__ import annotations
 
-import copy
 import json
 import subprocess
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 ACCOUNT_ID = "503561412084"
@@ -230,14 +229,50 @@ def dashboard_definition() -> dict:
                 "Name": "Pulso de Facturación",
                 "ContentType": "INTERACTIVE",
                 "Visuals": [
-                    kpi("kpi-facturacion-total", "Facturación total", numeric_measure("facturacion_total_linea", "kpi-total-value")),
-                    kpi("kpi-ventas-sin-iva", "Ventas sin IVA", numeric_measure("ventas_sin_iva_linea", "kpi-neto-value")),
-                    kpi("kpi-facturas", "Facturas emitidas", count_distinct_measure("factura_id", "kpi-facturas-value")),
-                    kpi("kpi-unidades", "Unidades vendidas", numeric_measure("unidades_vendidas", "kpi-unidades-value")),
-                    line_chart("linea-tendencia-mensual", "Tendencia mensual de facturación", date_dimension("fecha", "tendencia-fecha"), numeric_measure("facturacion_total_linea", "tendencia-total")),
-                    bar_chart("barras-region", "Regiones líderes por facturación", categorical_dimension("region", "region-category"), numeric_measure("facturacion_total_linea", "region-total")),
-                    bar_chart("barras-categoria", "Categorías líderes por ventas sin IVA", categorical_dimension("categoria", "categoria-category"), numeric_measure("ventas_sin_iva_linea", "categoria-neto")),
-                    bar_chart("barras-producto", "Productos líderes por facturación", categorical_dimension("producto", "producto-category"), numeric_measure("facturacion_total_linea", "producto-total")),
+                    kpi(
+                        "kpi-facturacion-total",
+                        "Facturación total",
+                        numeric_measure("facturacion_total_linea", "kpi-total-value"),
+                    ),
+                    kpi(
+                        "kpi-ventas-sin-iva",
+                        "Ventas sin IVA",
+                        numeric_measure("ventas_sin_iva_linea", "kpi-neto-value"),
+                    ),
+                    kpi(
+                        "kpi-facturas",
+                        "Facturas emitidas",
+                        count_distinct_measure("factura_id", "kpi-facturas-value"),
+                    ),
+                    kpi(
+                        "kpi-unidades",
+                        "Unidades vendidas",
+                        numeric_measure("unidades_vendidas", "kpi-unidades-value"),
+                    ),
+                    line_chart(
+                        "linea-tendencia-mensual",
+                        "Tendencia mensual de facturación",
+                        date_dimension("fecha", "tendencia-fecha"),
+                        numeric_measure("facturacion_total_linea", "tendencia-total"),
+                    ),
+                    bar_chart(
+                        "barras-region",
+                        "Regiones líderes por facturación",
+                        categorical_dimension("region", "region-category"),
+                        numeric_measure("facturacion_total_linea", "region-total"),
+                    ),
+                    bar_chart(
+                        "barras-categoria",
+                        "Categorías líderes por ventas sin IVA",
+                        categorical_dimension("categoria", "categoria-category"),
+                        numeric_measure("ventas_sin_iva_linea", "categoria-neto"),
+                    ),
+                    bar_chart(
+                        "barras-producto",
+                        "Productos líderes por facturación",
+                        categorical_dimension("producto", "producto-category"),
+                        numeric_measure("facturacion_total_linea", "producto-total"),
+                    ),
                 ],
                 "Layouts": [
                     {
@@ -304,7 +339,7 @@ def main() -> None:
     )
     # Un respaldo por ejecución: sobrescribirlo perdería la versión anterior a
     # la primera reconstrucción.
-    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     backup = OUTPUT_DIR / f"analysis-definition-before-rebuild-{stamp}.json"
     backup.write_text(json.dumps(current.get("Definition", {}), indent=2), encoding="utf-8")
     print(f"respaldo: {backup}")
@@ -315,9 +350,7 @@ def main() -> None:
         "Name": ANALYSIS_NAME,
         "Definition": dashboard_definition(),
     }
-    (OUTPUT_DIR / "update-analysis.json").write_text(
-        json.dumps(request, indent=2), encoding="utf-8"
-    )
+    (OUTPUT_DIR / "update-analysis.json").write_text(json.dumps(request, indent=2), encoding="utf-8")
     print(OUTPUT_DIR / "update-analysis.json")
 
 

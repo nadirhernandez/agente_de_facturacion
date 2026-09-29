@@ -158,8 +158,13 @@ def validate_limits() -> None:
     for prompt in STARTER_PROMPTS:
         if len(prompt) > 100:
             problems.append(f"prompt de {len(prompt)} caracteres, máximo 100: {prompt}")
-    for name, value in [("IDENTITY", IDENTITY), ("TONE", TONE), ("OUTPUT_STYLE", OUTPUT_STYLE),
-                        ("RESPONSE_LENGTH", RESPONSE_LENGTH), ("CUSTOM_INSTRUCTIONS", CUSTOM_INSTRUCTIONS)]:
+    for name, value in [
+        ("IDENTITY", IDENTITY),
+        ("TONE", TONE),
+        ("OUTPUT_STYLE", OUTPUT_STYLE),
+        ("RESPONSE_LENGTH", RESPONSE_LENGTH),
+        ("CUSTOM_INSTRUCTIONS", CUSTOM_INSTRUCTIONS),
+    ]:
         if len(value) < 5:
             problems.append(f"{name} necesita al menos 5 caracteres")
     if problems:
@@ -186,16 +191,16 @@ def ensure_space(qs) -> str:
     except ClientError as error:
         if not not_found(error):
             raise
-        qs.create_space(AwsAccountId=ACCOUNT_ID, SpaceId=SPACE_ID,
-                        Name=SPACE_NAME, Description=SPACE_DESCRIPTION)
+        qs.create_space(
+            AwsAccountId=ACCOUNT_ID, SpaceId=SPACE_ID, Name=SPACE_NAME, Description=SPACE_DESCRIPTION
+        )
         print(f"space {SPACE_ID}: creado")
         space = qs.describe_space(AwsAccountId=ACCOUNT_ID, SpaceId=SPACE_ID)
 
     arn = space["spaceArn"]
 
     current = {
-        (item["ResourceType"], item["ResourceDetails"]["resourceArn"])
-        for item in list_space_resources(qs)
+        (item["ResourceType"], item["ResourceDetails"]["resourceArn"]) for item in list_space_resources(qs)
     }
     missing = [resource for resource in SPACE_RESOURCES if resource not in current]
 
@@ -320,16 +325,20 @@ def ensure_grant(describe, grant, label: str, actions: list[str]) -> None:
 
 def ensure_permissions(qs) -> None:
     ensure_grant(
-        lambda: qs.describe_space_permissions(AwsAccountId=ACCOUNT_ID, SpaceId=SPACE_ID).get("Permissions") or [],
-        lambda grants: qs.update_space_permissions(AwsAccountId=ACCOUNT_ID, SpaceId=SPACE_ID,
-                                                   GrantPermissions=grants),
+        lambda: qs.describe_space_permissions(AwsAccountId=ACCOUNT_ID, SpaceId=SPACE_ID).get("Permissions")
+        or [],
+        lambda grants: qs.update_space_permissions(
+            AwsAccountId=ACCOUNT_ID, SpaceId=SPACE_ID, GrantPermissions=grants
+        ),
         f"space {SPACE_ID}",
         SPACE_OWNER_ACTIONS,
     )
     ensure_grant(
-        lambda: qs.describe_agent_permissions(AwsAccountId=ACCOUNT_ID, AgentId=AGENT_ID).get("Permissions") or [],
-        lambda grants: qs.update_agent_permissions(AwsAccountId=ACCOUNT_ID, AgentId=AGENT_ID,
-                                                   GrantPermissions=grants),
+        lambda: qs.describe_agent_permissions(AwsAccountId=ACCOUNT_ID, AgentId=AGENT_ID).get("Permissions")
+        or [],
+        lambda grants: qs.update_agent_permissions(
+            AwsAccountId=ACCOUNT_ID, AgentId=AGENT_ID, GrantPermissions=grants
+        ),
         f"agente {AGENT_ID}",
         AGENT_OWNER_ACTIONS,
     )
@@ -361,25 +370,34 @@ def main() -> None:
     parser.add_argument("--account-id", default=ACCOUNT_ID, help="Cuenta de QuickSight")
     parser.add_argument("--region", default=REGION, help="Región de QuickSight")
     parser.add_argument("--profile", default=PROFILE, help="Perfil de AWS")
-    parser.add_argument("--app-user-arn", default=None,
-                        help="Usuario de QuickSight de la app (por defecto, el del piloto en esa cuenta)")
+    parser.add_argument(
+        "--app-user-arn",
+        default=None,
+        help="Usuario de QuickSight de la app (por defecto, el del piloto en esa cuenta)",
+    )
     args = parser.parse_args()
 
     configure(args.account_id, args.region, args.profile, args.app_user_arn)
     validate_limits()
 
     if args.show:
-        print(json.dumps({
-            "space": {"SpaceId": SPACE_ID, "Name": SPACE_NAME, "Resources": SPACE_RESOURCES},
-            "agent": {
-                "AgentId": AGENT_ID,
-                "Name": AGENT_NAME,
-                "WelcomeMessage": WELCOME_MESSAGE,
-                "StarterPrompts": STARTER_PROMPTS,
-                "CustomPromptInput": prompt_input(),
-            },
-            "grantTo": APP_USER_ARN,
-        }, indent=2, ensure_ascii=False))
+        print(
+            json.dumps(
+                {
+                    "space": {"SpaceId": SPACE_ID, "Name": SPACE_NAME, "Resources": SPACE_RESOURCES},
+                    "agent": {
+                        "AgentId": AGENT_ID,
+                        "Name": AGENT_NAME,
+                        "WelcomeMessage": WELCOME_MESSAGE,
+                        "StarterPrompts": STARTER_PROMPTS,
+                        "CustomPromptInput": prompt_input(),
+                    },
+                    "grantTo": APP_USER_ARN,
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
         return
 
     qs = client()

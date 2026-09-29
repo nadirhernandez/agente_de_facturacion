@@ -30,8 +30,15 @@ export class GlueBusyError extends Error {
  * harmless.
  */
 export const handler = async (event = {}) => {
-  const trigger = event.source === "aws.s3" ? "raw-object" : event.source === "aws.events" ? "schedule" : "manual";
-  console.log(JSON.stringify({ message: "Ingestion requested", trigger, key: event.detail?.object?.key }));
+  const trigger =
+    event.source === "aws.s3"
+      ? "raw-object"
+      : event.source === "aws.events"
+        ? "schedule"
+        : "manual";
+  console.log(
+    JSON.stringify({ message: "Ingestion requested", trigger, key: event.detail?.object?.key }),
+  );
 
   try {
     const result = await client.send(

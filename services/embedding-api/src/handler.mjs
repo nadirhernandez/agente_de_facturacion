@@ -127,7 +127,10 @@ async function resolveQuickSightUserArn(email) {
   userArnCache.set(email, { arn, expiresAt: Date.now() + CACHE_TTL_MS });
   if (!arn) {
     console.warn(
-      JSON.stringify({ message: "No QuickSight user matched the caller", caller: callerRef(email) }),
+      JSON.stringify({
+        message: "No QuickSight user matched the caller",
+        caller: callerRef(email),
+      }),
     );
   }
   return arn ?? undefined;
@@ -161,13 +164,20 @@ function experienceConfigurationFor(experience, { shared }) {
  */
 async function datasetFreshness() {
   const accountId = required("QUICKSIGHT_ACCOUNT_ID");
-  const datasetIds = required("DATA_SET_IDS").split(",").map((id) => id.trim()).filter(Boolean);
+  const datasetIds = required("DATA_SET_IDS")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
 
   const datasets = await Promise.all(
     datasetIds.map(async (dataSetId) => {
       try {
         const page = await client.send(
-          new ListIngestionsCommand({ AwsAccountId: accountId, DataSetId: dataSetId, MaxResults: 20 }),
+          new ListIngestionsCommand({
+            AwsAccountId: accountId,
+            DataSetId: dataSetId,
+            MaxResults: 20,
+          }),
         );
 
         const completed = page.Ingestions?.find(
@@ -176,20 +186,28 @@ async function datasetFreshness() {
 
         return {
           dataSetId,
-          lastRefreshAt: completed?.CreatedTime ? new Date(completed.CreatedTime).toISOString() : null,
+          lastRefreshAt: completed?.CreatedTime
+            ? new Date(completed.CreatedTime).toISOString()
+            : null,
           rows: completed?.RowInfo?.RowsIngested ?? null,
-          running: page.Ingestions?.some((ingestion) =>
-            ["INITIALIZED", "QUEUED", "RUNNING"].includes(ingestion.IngestionStatus),
-          ) ?? false,
+          running:
+            page.Ingestions?.some((ingestion) =>
+              ["INITIALIZED", "QUEUED", "RUNNING"].includes(ingestion.IngestionStatus),
+            ) ?? false,
         };
       } catch (error) {
-        console.warn(JSON.stringify({ message: "Could not read ingestions", dataSetId, error: String(error) }));
+        console.warn(
+          JSON.stringify({ message: "Could not read ingestions", dataSetId, error: String(error) }),
+        );
         return { dataSetId, lastRefreshAt: null, rows: null, running: false };
       }
     }),
   );
 
-  const timestamps = datasets.map((item) => item.lastRefreshAt).filter(Boolean).sort();
+  const timestamps = datasets
+    .map((item) => item.lastRefreshAt)
+    .filter(Boolean)
+    .sort();
 
   return {
     // The dashboard is only as fresh as its stalest dataset.
@@ -209,14 +227,18 @@ export const handler = async (event) => {
     try {
       return response(200, await datasetFreshness());
     } catch (error) {
-      console.error(JSON.stringify({ message: "Failed to read dataset freshness", error: errorInfo(error) }));
+      console.error(
+        JSON.stringify({ message: "Failed to read dataset freshness", error: errorInfo(error) }),
+      );
       return response(500, { message: "No fue posible consultar la actualización de datos." });
     }
   }
 
   const shared = sharedIdentityArn();
   const experience = event.queryStringParameters?.experience;
-  const experienceConfiguration = experienceConfigurationFor(experience, { shared: Boolean(shared) });
+  const experienceConfiguration = experienceConfigurationFor(experience, {
+    shared: Boolean(shared),
+  });
 
   if (!experienceConfiguration) {
     return response(400, { message: "experience must be dashboard or chat" });
@@ -227,7 +249,13 @@ export const handler = async (event) => {
   const caller = claims.sub ?? "unknown";
 
   if (!isAllowedEmail(email)) {
-    console.warn(JSON.stringify({ message: "Caller rejected", caller, reason: email ? "domain" : "unverified-email" }));
+    console.warn(
+      JSON.stringify({
+        message: "Caller rejected",
+        caller,
+        reason: email ? "domain" : "unverified-email",
+      }),
+    );
     return response(403, {
       message: "Tu cuenta no está habilitada para esta aplicación. Contacta al administrador.",
     });

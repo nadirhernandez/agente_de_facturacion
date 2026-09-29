@@ -25,7 +25,9 @@ const QUERY_TIMEOUT_MS = 90_000;
 function dropThreshold() {
   const value = Number(process.env.DROP_THRESHOLD_PCT ?? "10");
   if (!Number.isFinite(value) || value <= 0 || value > 100) {
-    throw new Error(`DROP_THRESHOLD_PCT must be in (0, 100], got ${process.env.DROP_THRESHOLD_PCT}`);
+    throw new Error(
+      `DROP_THRESHOLD_PCT must be in (0, 100], got ${process.env.DROP_THRESHOLD_PCT}`,
+    );
   }
   return value;
 }
@@ -149,7 +151,9 @@ export const handler = async (_event, _context, now = new Date()) => {
   const drops = rows.filter((row) => row.variacion !== null && row.variacion <= -threshold);
 
   if (drops.length === 0) {
-    console.log(JSON.stringify({ message: "No regions below threshold", mes, reviewed: rows.length }));
+    console.log(
+      JSON.stringify({ message: "No regions below threshold", mes, reviewed: rows.length }),
+    );
     return { alerted: false, reviewed: rows.length, mes };
   }
 

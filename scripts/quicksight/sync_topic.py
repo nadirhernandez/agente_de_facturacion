@@ -165,7 +165,9 @@ def build_topic() -> dict:
         measure("facturacion_total", "Facturación del período", ["facturación", "ingresos"]),
         measure("ventas_sin_iva", "Ventas sin IVA del período", ["venta neta"]),
         measure("iva", "IVA del período"),
-        measure("facturas", "Facturas emitidas", ["documentos", "cantidad de facturas"], DefaultFormatting=None),
+        measure(
+            "facturas", "Facturas emitidas", ["documentos", "cantidad de facturas"], DefaultFormatting=None
+        ),
         measure("unidades", "Unidades del período", DefaultFormatting=None),
         measure("facturacion_total_anterior", "Facturación del período anterior"),
         measure("ventas_sin_iva_anterior", "Ventas sin IVA del período anterior"),
@@ -255,8 +257,9 @@ def topic_exists() -> bool:
     propaga: interpretarlo como "no existe" llevaría a un create-topic a ciegas.
     """
     try:
-        aws("quicksight", "describe-topic", "--aws-account-id", ACCOUNT_ID, "--topic-id", TOPIC_ID,
-            quiet=True)
+        aws(
+            "quicksight", "describe-topic", "--aws-account-id", ACCOUNT_ID, "--topic-id", TOPIC_ID, quiet=True
+        )
         return True
     except subprocess.CalledProcessError as error:
         if "ResourceNotFoundException" in (error.stderr or ""):
@@ -279,10 +282,12 @@ def main() -> None:
     parser.add_argument("--region", default=REGION, help="Región de QuickSight")
     parser.add_argument("--profile", default=PROFILE, help="Perfil de AWS CLI")
     parser.add_argument("--topic-id", default=TOPIC_ID, help="Id del topic")
-    parser.add_argument("--sales-dataset-id", default="ventas-comerciales-dev",
-                        help="Dataset de ventas comerciales")
-    parser.add_argument("--period-dataset-id", default="ventas-comparativo-dev",
-                        help="Dataset de ventas por periodo")
+    parser.add_argument(
+        "--sales-dataset-id", default="ventas-comerciales-dev", help="Dataset de ventas comerciales"
+    )
+    parser.add_argument(
+        "--period-dataset-id", default="ventas-comparativo-dev", help="Dataset de ventas por periodo"
+    )
     args = parser.parse_args()
     configure(args)
 
@@ -307,19 +312,51 @@ def sync(payload: dict, path: str) -> None:
     if topic_exists():
         print(f"Actualizando topic {TOPIC_ID}…")
         # UpdateTopic takes the definition and the custom instructions together.
-        print(aws("quicksight", "update-topic", "--cli-input-json", f"file://{path}",
-                  "--query", "TopicId", "--output", "text"))
-        current = json.loads(aws("quicksight", "describe-topic", "--aws-account-id", ACCOUNT_ID,
-                                 "--topic-id", TOPIC_ID, "--output", "json"))
+        print(
+            aws(
+                "quicksight",
+                "update-topic",
+                "--cli-input-json",
+                f"file://{path}",
+                "--query",
+                "TopicId",
+                "--output",
+                "text",
+            )
+        )
+        current = json.loads(
+            aws(
+                "quicksight",
+                "describe-topic",
+                "--aws-account-id",
+                ACCOUNT_ID,
+                "--topic-id",
+                TOPIC_ID,
+                "--output",
+                "json",
+            )
+        )
         applied = (current.get("CustomInstructions") or {}).get("CustomInstructionsString", "")
         if applied.strip() == CUSTOM_INSTRUCTIONS:
             print("instrucciones actualizadas")
         else:
-            print("aviso: las instrucciones del topic no coinciden con las del código; revísalas en la consola")
+            print(
+                "aviso: las instrucciones del topic no coinciden con las del código; revísalas en la consola"
+            )
     else:
         print(f"Creando topic {TOPIC_ID}…")
-        print(aws("quicksight", "create-topic", "--cli-input-json", f"file://{path}",
-                  "--query", "TopicId", "--output", "text"))
+        print(
+            aws(
+                "quicksight",
+                "create-topic",
+                "--cli-input-json",
+                f"file://{path}",
+                "--query",
+                "TopicId",
+                "--output",
+                "text",
+            )
+        )
 
 
 if __name__ == "__main__":
