@@ -112,10 +112,39 @@ describe("App (authenticated)", () => {
     );
     expect(screen.getByText(/Las conversaciones no se guardan/)).toBeInTheDocument();
     for (const suggestion of suggestedPrompts) {
-      expect(screen.getByRole("button", { name: suggestion.short })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: suggestion.short })).toBeEnabled();
     }
     expect(screen.getByRole("button", { name: "Nueva conversación" })).toBeEnabled();
-    expect(await screen.findByText("actualizado hace 5 min")).toBeInTheDocument();
+    // Data status appears in the sidebar (desktop) and the topbar badge (mobile).
+    expect(await screen.findAllByText("actualizado hace 5 min")).toHaveLength(2);
+    // Signed-in identity comes from the ID token claims.
+    expect(screen.getByText("ana@example.com")).toBeInTheDocument();
+  });
+
+  it("collapses the suggestions once a question is sent and reopens them for a new conversation", async () => {
+    render(<App />);
+    await waitFor(() =>
+      expect(screen.getByTestId("frame")).toHaveAttribute("data-url", `${EMBED}chat-1`),
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: suggestedPrompts[1]!.short }));
+    expect(
+      screen.queryByRole("button", { name: suggestedPrompts[1]!.short }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Sugerencias/ })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+
+    await userEvent.click(screen.getByRole("button", { name: /Sugerencias/ }));
+    expect(screen.getByRole("button", { name: suggestedPrompts[1]!.short })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /Ocultar/ }));
+    expect(
+      screen.queryByRole("button", { name: suggestedPrompts[1]!.short }),
+    ).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Nueva conversación" }));
+    expect(screen.getByRole("button", { name: suggestedPrompts[1]!.short })).toBeInTheDocument();
   });
 
   it("switches to the dashboard and back without reloading the active view", async () => {
@@ -144,12 +173,12 @@ describe("App (authenticated)", () => {
       expect(screen.getByTestId("frame")).toHaveAttribute("data-url", `${EMBED}chat-1`),
     );
 
-    await userEvent.click(screen.getByRole("button", { name: suggestedPrompts[0].short }));
+    await userEvent.click(screen.getByRole("button", { name: suggestedPrompts[0]!.short }));
 
     await waitFor(() =>
       expect(screen.getByTestId("frame")).toHaveAttribute("data-url", `${EMBED}chat-2`),
     );
-    expect(screen.getByTestId("frame")).toHaveAttribute("data-prompt", suggestedPrompts[0].prompt);
+    expect(screen.getByTestId("frame")).toHaveAttribute("data-prompt", suggestedPrompts[0]!.prompt);
   });
 
   it("starts a new conversation on demand", async () => {
@@ -180,8 +209,11 @@ describe("App (authenticated)", () => {
     );
     render(<App />);
 
-    expect(await screen.findByText("Servicio no disponible")).toBeInTheDocument();
+    expect(await screen.findAllByText("Servicio no disponible")).toHaveLength(2);
     expect(screen.getByRole("button", { name: "Nueva conversación" })).toBeDisabled();
+    for (const suggestion of suggestedPrompts) {
+      expect(screen.getByRole("button", { name: suggestion.short })).toBeDisabled();
+    }
   });
 
   it("signs out from the sidebar", async () => {

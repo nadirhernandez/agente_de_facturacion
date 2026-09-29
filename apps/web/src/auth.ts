@@ -145,12 +145,30 @@ export async function refreshTokens(config: RuntimeConfig, refreshToken: string)
   return renewed;
 }
 
+interface IdTokenClaims {
+  exp?: number;
+  email?: string;
+}
+
 /** JWTs are base64url without padding; atob only accepts standard base64. */
-function decodeJwtPayload(token: string): { exp?: number } {
+function decodeJwtPayload(token: string): IdTokenClaims {
   const part = token.split(".")[1] ?? "";
   const base64 = part.replace(/-/g, "+").replace(/_/g, "/");
   const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
-  return JSON.parse(atob(padded)) as { exp?: number };
+  return JSON.parse(atob(padded)) as IdTokenClaims;
+}
+
+/**
+ * Email claim for display only. Authorization never happens here: the API
+ * re-reads the verified claim from the token that API Gateway validated.
+ */
+export function tokenEmail(idToken: string): string | undefined {
+  try {
+    const { email } = decodeJwtPayload(idToken);
+    return typeof email === "string" && email ? email : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 /** Milliseconds until the token should be considered expired (30 s of margin). */

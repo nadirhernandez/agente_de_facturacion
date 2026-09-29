@@ -28,7 +28,7 @@ describe("EmbeddingFrame", () => {
 
   it("shows a loading state while there is no URL", () => {
     render(<EmbeddingFrame {...base} />);
-    expect(screen.getByText("Cargando pulso de facturación…")).toBeInTheDocument();
+    expect(screen.getByText("Cargando Pulso de Facturación…")).toBeInTheDocument();
     expect(screen.queryByTitle("Pulso de Facturación")).not.toBeInTheDocument();
   });
 

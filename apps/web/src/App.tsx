@@ -7,8 +7,17 @@ import {
   type EmbedExperience,
   type FreshnessResponse,
 } from "./api";
-import { clearToken, resolveSession, signIn, signOut, type Session, type Tokens } from "./auth";
+import {
+  clearToken,
+  resolveSession,
+  signIn,
+  signOut,
+  tokenEmail,
+  type Session,
+  type Tokens,
+} from "./auth";
 import { EmbeddingFrame } from "./EmbeddingFrame";
+import { Icon, type IconName } from "./Icon";
 import { useSessionKeepAlive } from "./useSessionKeepAlive";
 
 type View = "overview" | "chat";
@@ -18,9 +27,9 @@ const viewToExperience: Record<View, EmbedExperience> = {
   chat: "chat",
 };
 
-const navItems: Array<{ id: View; label: string; mobileLabel: string; icon: string }> = [
-  { id: "chat", label: "Nueva consulta", mobileLabel: "Consulta", icon: "✦" },
-  { id: "overview", label: "Pulso comercial", mobileLabel: "Pulso", icon: "▦" },
+const navItems: Array<{ id: View; label: string; mobileLabel: string; icon: IconName }> = [
+  { id: "chat", label: "Nueva consulta", mobileLabel: "Consulta", icon: "sparkles" },
+  { id: "overview", label: "Pulso comercial", mobileLabel: "Pulso", icon: "dashboard" },
 ];
 
 const viewCopy: Record<View, { title: string; description: string }> = {
@@ -35,17 +44,23 @@ const viewCopy: Record<View, { title: string; description: string }> = {
   },
 };
 
-export const suggestedPrompts = [
+export const suggestedPrompts: ReadonlyArray<{
+  icon: IconName;
+  eyebrow: string;
+  title: string;
+  short: string;
+  prompt: string;
+}> = [
   {
-    icon: "↗",
+    icon: "trending-up",
     eyebrow: "TENDENCIA",
     title: "Comparar períodos",
-    short: "¿Cómo vamos frente al mes pasado?",
+    short: "¿Cómo vamos vs. el mes pasado?",
     prompt:
       "Compara la facturación del último mes completo con el mes anterior. Incluye ambos valores y la variación porcentual.",
   },
   {
-    icon: "◎",
+    icon: "map-pin",
     eyebrow: "REGIONES",
     title: "Ver líderes",
     short: "¿Qué regiones lideran?",
@@ -53,7 +68,7 @@ export const suggestedPrompts = [
       "¿Cuáles fueron las 5 regiones con mayor facturación en los últimos 30 días? Muéstralo como barras ordenadas.",
   },
   {
-    icon: "◇",
+    icon: "package",
     eyebrow: "PRODUCTOS",
     title: "Encontrar el top 5",
     short: "¿Qué productos venden más?",
@@ -61,20 +76,41 @@ export const suggestedPrompts = [
       "¿Cuáles fueron los 5 productos con mayor facturación en el último mes completo? Incluye el monto en quetzales.",
   },
   {
-    icon: "◷",
+    icon: "users",
     eyebrow: "CLIENTES",
     title: "Analizar clientes",
-    short: "¿Quiénes son los mejores clientes?",
+    short: "¿Quiénes compran más?",
     prompt:
       "¿Quiénes fueron los 5 clientes con mayor facturación en el último mes completo? Incluye el total en quetzales.",
   },
-] as const;
+];
 
 /** What the embed area is showing for the current view. */
 interface EmbedState {
   view: View;
   url?: string;
   error?: string;
+}
+
+const exactTime = (iso: string) =>
+  new Date(iso).toLocaleString("es-GT", {
+    timeZone: "America/Guatemala",
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+function Brand() {
+  return (
+    <div className="brand">
+      <span className="brand-mark">
+        <Icon name="trending-up" size={16} />
+      </span>
+      <span>Ventas Inteligentes</span>
+    </div>
+  );
 }
 
 function NavButtons({
@@ -94,7 +130,7 @@ function NavButtons({
       onClick={() => onSelect(item.id)}
       type="button"
     >
-      <span aria-hidden="true">{item.icon}</span>
+      <Icon name={item.icon} />
       {compact ? item.mobileLabel : item.label}
     </button>
   ));
@@ -103,13 +139,59 @@ function NavButtons({
 function AuthRedirect() {
   return (
     <main className="auth-redirect" aria-live="polite">
-      <span aria-hidden="true" className="brand-mark">
-        ↗
+      <span className="brand-mark">
+        <Icon name="trending-up" size={16} />
       </span>
       <span className="loading-mark small" />
       <span className="sr-only">Abriendo inicio de sesión…</span>
     </main>
   );
+}
+
+function GateCard({
+  message,
+  action,
+  onAction,
+}: {
+  message: string;
+  action: string;
+  onAction: () => void;
+}) {
+  return (
+    <main className="gate">
+      <div className="gate-card">
+        <span className="brand-mark">
+          <Icon name="trending-up" size={16} />
+        </span>
+        <h1>Ventas Inteligentes</h1>
+        <p className="gate-error" role="alert">
+          {message}
+        </p>
+        <button className="primary-button" onClick={onAction} type="button">
+          {action}
+        </button>
+      </div>
+    </main>
+  );
+}
+
+interface StatusInfo {
+  tone: "ok" | "refreshing" | "error";
+  text: string;
+  detail?: string;
+}
+
+function statusFrom(
+  freshness: FreshnessResponse | undefined,
+  error: string | undefined,
+): StatusInfo {
+  if (error) return { tone: "error", text: "Servicio no disponible" };
+  if (freshness?.refreshing) return { tone: "refreshing", text: "Actualizando datos…" };
+  return {
+    tone: "ok",
+    text: describeAge(freshness?.lastRefreshAt ?? null),
+    detail: freshness?.lastRefreshAt ? exactTime(freshness.lastRefreshAt) : undefined,
+  };
 }
 
 export default function App() {
@@ -119,6 +201,7 @@ export default function App() {
   const [bootError, setBootError] = useState<string>();
   const [freshness, setFreshness] = useState<FreshnessResponse>();
   const [pendingPrompt, setPendingPrompt] = useState<string>();
+  const [suggestionsOpen, setSuggestionsOpen] = useState(true);
   const requestSeq = useRef(0);
   const loginRedirectStarted = useRef(false);
 
@@ -212,7 +295,16 @@ export default function App() {
     return () => window.clearInterval(timer);
   }, [config, idToken, endSession]);
 
-  const askSuggestedPrompt = (prompt: string) => void loadExperience("chat", session, prompt);
+  const askSuggestedPrompt = (prompt: string) => {
+    // The person has started a conversation: get the banner out of the way.
+    setSuggestionsOpen(false);
+    void loadExperience("chat", session, prompt);
+  };
+
+  const startNewConversation = () => {
+    setSuggestionsOpen(true);
+    void loadExperience("chat", session);
+  };
 
   const selectView = (view: View) => {
     // The active destination is already on screen; nothing to reload.
@@ -220,27 +312,22 @@ export default function App() {
     void loadExperience(view, session);
   };
 
-  if (!session) return bootError ? <BootError message={bootError} /> : <AuthRedirect />;
+  if (!session) {
+    return bootError ? (
+      <GateCard action="Recargar" message={bootError} onAction={() => window.location.reload()} />
+    ) : (
+      <AuthRedirect />
+    );
+  }
   if (!session.idToken && !session.error && !bootError) return <AuthRedirect />;
 
   if (!session.idToken) {
     return (
-      <main className="gate">
-        <div className="gate-card">
-          <span className="brand-mark">↗</span>
-          <h1>Ventas Inteligentes</h1>
-          <p className="gate-error" role="alert">
-            {session.error ?? bootError ?? "No fue posible iniciar sesión."}
-          </p>
-          <button
-            className="primary-button"
-            onClick={() => void signIn(session.config)}
-            type="button"
-          >
-            Volver a intentar
-          </button>
-        </div>
-      </main>
+      <GateCard
+        action="Volver a intentar"
+        message={session.error ?? bootError ?? "No fue posible iniciar sesión."}
+        onAction={() => void signIn(session.config)}
+      />
     );
   }
 
@@ -248,41 +335,46 @@ export default function App() {
   const current = embed?.view === activeView ? embed : undefined;
   const embedUrl = current?.url;
   const embedError = current?.error;
-
-  const statusBadge = embedError
-    ? { className: "status-badge error", text: "Servicio no disponible", title: undefined }
-    : freshness?.refreshing
-      ? { className: "status-badge refreshing", text: "Actualizando datos…", title: undefined }
-      : {
-          className: "status-badge",
-          text: describeAge(freshness?.lastRefreshAt ?? null),
-          title: freshness?.lastRefreshAt ?? undefined,
-        };
+  const status = statusFrom(freshness, embedError);
+  const userEmail = tokenEmail(session.idToken);
 
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <div className="brand">
-          <span className="brand-mark">↗</span>
-          <span>Ventas Inteligentes</span>
-        </div>
+        <Brand />
         <p className="workspace-label">Espacio de trabajo</p>
         <nav aria-label="Navegación principal">
           <NavButtons activeView={activeView} onSelect={selectView} />
         </nav>
+
         <div className="sidebar-footer">
-          <small>Guatemala · GTQ · UTC-06:00</small>
-          <button className="link-button" onClick={() => signOut(session.config)} type="button">
+          <div className={`sidebar-status ${status.tone}`} aria-live="polite">
+            <Icon name="database" size={15} />
+            <div>
+              <span>{status.text}</span>
+              {status.detail && <small>{status.detail} · hora GT</small>}
+            </div>
+          </div>
+
+          <div className="sidebar-user">
+            <span className="avatar">
+              <Icon name="user" size={15} />
+            </span>
+            <div>
+              <span title={userEmail}>{userEmail ?? "Sesión activa"}</span>
+              <small>GTQ · UTC-06:00</small>
+            </div>
+          </div>
+
+          <button className="signout-button" onClick={() => signOut(session.config)} type="button">
+            <Icon name="log-out" size={15} />
             Cerrar sesión
           </button>
         </div>
       </aside>
 
       <header className="mobile-header">
-        <div className="brand">
-          <span className="brand-mark">↗</span>
-          <span>Ventas Inteligentes</span>
-        </div>
+        <Brand />
         <button
           aria-label="Cerrar sesión"
           className="mobile-signout"
@@ -296,7 +388,7 @@ export default function App() {
       <main className="main-content">
         {sessionWarning && (
           <div className="session-warning" role="status">
-            <i aria-hidden="true" className="status-dot refreshing" />
+            <Icon name="clock" size={15} />
             {sessionWarning}
           </div>
         )}
@@ -308,17 +400,19 @@ export default function App() {
             <p className="subtitle">{pageDescription}</p>
           </div>
           <div className="context-badges">
-            <div aria-live="polite" className={statusBadge.className} title={statusBadge.title}>
+            <div aria-live="polite" className={`status-badge ${status.tone}`} title={status.detail}>
               <i aria-hidden="true" className="status-dot" />
-              {statusBadge.text}
+              {status.text}
             </div>
             {activeView === "chat" && (
               <button
                 className="secondary-button compact"
                 disabled={!embedUrl}
-                onClick={() => void loadExperience("chat", session)}
+                onClick={startNewConversation}
+                title="Las conversaciones no se guardan; cada una empieza en blanco."
                 type="button"
               >
+                <Icon name="message-plus" size={15} />
                 Nueva conversación
               </button>
             )}
@@ -326,32 +420,46 @@ export default function App() {
         </header>
 
         {activeView === "chat" && (
-          <section aria-labelledby="chat-invitation-title" className="chat-invitation">
-            <span aria-hidden="true" className="chat-invitation-icon">
-              ✦
+          <section
+            aria-labelledby="chat-invitation-title"
+            className={suggestionsOpen ? "chat-invitation" : "chat-invitation collapsed"}
+          >
+            <span className="chat-invitation-icon">
+              <Icon name="sparkles" size={18} />
             </span>
             <div className="chat-invitation-copy">
-              <p className="eyebrow">SUS DATOS TIENEN MUCHO QUE CONTAR</p>
               <h2 id="chat-invitation-title">Converse con sus ventas</h2>
-              <p className="chat-invitation-lead">
-                Pregunte en lenguaje natural o empiece con una de estas preguntas.
-              </p>
-              <p className="chat-invitation-note">
-                Las conversaciones no se guardan: cada visita empieza en blanco.
-              </p>
+              {suggestionsOpen && (
+                <p>
+                  Pregunte en lenguaje natural o elija una sugerencia. Las conversaciones no se
+                  guardan.
+                </p>
+              )}
             </div>
-            <div className="chat-question-examples">
-              {suggestedPrompts.map((suggestion) => (
-                <button
-                  className="chat-chip"
-                  key={suggestion.prompt}
-                  onClick={() => askSuggestedPrompt(suggestion.prompt)}
-                  type="button"
-                >
-                  {suggestion.short}
-                </button>
-              ))}
-            </div>
+            {suggestionsOpen && (
+              <div className="chat-question-examples">
+                {suggestedPrompts.map((suggestion) => (
+                  <button
+                    className="chat-chip"
+                    disabled={Boolean(embedError)}
+                    key={suggestion.prompt}
+                    onClick={() => askSuggestedPrompt(suggestion.prompt)}
+                    type="button"
+                  >
+                    {suggestion.short}
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              aria-expanded={suggestionsOpen}
+              className="chat-invitation-toggle"
+              onClick={() => setSuggestionsOpen((open) => !open)}
+              type="button"
+            >
+              {suggestionsOpen ? "Ocultar" : "Sugerencias"}
+              <Icon name={suggestionsOpen ? "chevron-up" : "chevron-down"} size={15} />
+            </button>
           </section>
         )}
 
@@ -363,7 +471,7 @@ export default function App() {
                 <h2 id="quick-questions-title">Explora tus resultados</h2>
               </div>
               <button className="text-action" onClick={() => selectView("chat")} type="button">
-                Abrir chat <span aria-hidden="true">→</span>
+                Abrir chat <Icon name="arrow-right" size={14} />
               </button>
             </div>
             <div className="prompt-grid">
@@ -374,15 +482,15 @@ export default function App() {
                   onClick={() => askSuggestedPrompt(suggestion.prompt)}
                   type="button"
                 >
-                  <span aria-hidden="true" className="prompt-icon">
-                    {suggestion.icon}
+                  <span className="prompt-icon">
+                    <Icon name={suggestion.icon} />
                   </span>
                   <span>
                     <small>{suggestion.eyebrow}</small>
                     <strong>{suggestion.title}</strong>
                   </span>
-                  <span aria-hidden="true" className="prompt-arrow">
-                    →
+                  <span className="prompt-arrow">
+                    <Icon name="arrow-right" size={16} />
                   </span>
                 </button>
               ))}
@@ -416,22 +524,5 @@ export default function App() {
         <NavButtons activeView={activeView} compact onSelect={selectView} />
       </nav>
     </div>
-  );
-}
-
-function BootError({ message }: { message: string }) {
-  return (
-    <main className="gate">
-      <div className="gate-card">
-        <span className="brand-mark">↗</span>
-        <h1>Ventas Inteligentes</h1>
-        <p className="gate-error" role="alert">
-          {message}
-        </p>
-        <button className="primary-button" onClick={() => window.location.reload()} type="button">
-          Recargar
-        </button>
-      </div>
-    </main>
   );
 }

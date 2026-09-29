@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createEmbeddingContext, type EmbeddingContext } from "amazon-quicksight-embedding-sdk";
 import type { EmbedExperience } from "./api";
+import { Icon } from "./Icon";
 
 interface EmbeddingFrameProps {
   title: string;
@@ -33,10 +34,10 @@ export function EmbeddingFrame({
   if (shownError) {
     return (
       <section className="embed-state" role="alert">
-        <div aria-hidden="true" className="state-icon">
-          !
+        <div className="state-icon">
+          <Icon name="alert-circle" size={20} />
         </div>
-        <h2>No se pudo abrir {title.toLowerCase()}</h2>
+        <h2>{title} no está disponible</h2>
         <p>{shownError}</p>
         <button className="secondary-button" onClick={onRetry} type="button">
           Reintentar
@@ -53,7 +54,7 @@ export function EmbeddingFrame({
           <span className="skeleton-bar" />
           <span className="skeleton-panel" />
         </div>
-        <p>Cargando {title.toLowerCase()}…</p>
+        <p>Cargando {title}…</p>
       </section>
     );
   }
@@ -61,10 +62,10 @@ export function EmbeddingFrame({
   if (!isQuickSightUrl(url)) {
     return (
       <section className="embed-state" role="alert">
-        <div aria-hidden="true" className="state-icon">
-          !
+        <div className="state-icon">
+          <Icon name="alert-circle" size={20} />
         </div>
-        <h2>No se pudo abrir {title.toLowerCase()}</h2>
+        <h2>{title} no está disponible</h2>
         <p>La dirección recibida no es de Amazon Quick.</p>
       </section>
     );

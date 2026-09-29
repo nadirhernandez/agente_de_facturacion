@@ -7,6 +7,7 @@ import {
   resolveSession,
   signIn,
   signOut,
+  tokenEmail,
 } from "./auth";
 import { config, fakeJwt, jsonResponse, tokenExpiringIn } from "./test/fixtures";
 
@@ -189,5 +190,17 @@ describe("refreshTokens / clearToken", () => {
     await expect(refreshTokens(config, "rt-1")).rejects.toThrow(
       "No fue posible renovar la sesión.",
     );
+  });
+});
+
+describe("tokenEmail", () => {
+  it("reads the email claim for display", () => {
+    expect(tokenEmail(fakeJwt({ email: "ana@example.com" }))).toBe("ana@example.com");
+  });
+
+  it("returns undefined for tokens without a usable claim", () => {
+    expect(tokenEmail(fakeJwt({}))).toBeUndefined();
+    expect(tokenEmail(fakeJwt({ email: 42 }))).toBeUndefined();
+    expect(tokenEmail("garbage")).toBeUndefined();
   });
 });
