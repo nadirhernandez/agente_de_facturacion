@@ -12,7 +12,7 @@ piloto como producto. Cada punto dice qué falta, por qué se pospuso y qué des
 | 5 | Despliegue depende de una sesión SSO personal | CI valida pero no despliega | Media |
 | 6 | Aviso de `npm audit` en `uuid` (transitiva del SDK de embedding) | Sin corrección disponible sin romper el SDK | Baja |
 | 7 | Sin tope de tiempo en splash ni en el montaje del chat | Un arranque lento se ve como cuelgue | Baja |
-| 8 | Cambios de formato Python/Terraform sin commitear | Residuo de `ruff format` y `terraform fmt` | Baja |
+| 8 | Cambios de formato Python/Terraform sin commitear | **Resuelto** en el commit `eae4f28` (2026-09-28) | — |
 | 9 | El módulo tenant crea el bucket de datos en vez de recibirlo | Contradice el principio "los JSON ya están en el bucket" | Alta |
 | 10 | Estado y credenciales de los tenants acoplados a la cuenta piloto | Backend, perfil y `assume_role` apuntan a INFILE | Alta |
 | 11 | Dashboard, Topic y agente de Quick no son reproducibles por cliente | Solo existen en el piloto; scripts con defaults fijos | Alta |
@@ -94,12 +94,12 @@ con aviso, y 20 s en el chat para mostrar el estado de error con "Reintentar". O
 2026-09-28 en el primer login tras publicar; los logs del servidor mostraron el login completo, así
 que fue percepción de cuelgue, no fallo.
 
-## 8. Cambios de formato sin commitear
+## 8. Cambios de formato sin commitear (resuelto)
 
-`ruff format` y `terraform fmt -recursive` reformatearon archivos que no eran parte de ningún cambio
-funcional (`etl/glue/flatten_invoices.py`, `scripts/*.py`, `quicksight*.tf`, `.terraform.lock.hcl`).
-Quedaron en el árbol de trabajo sin commit para no mezclarlos. Revisar el diff, confirmar que es solo
-formato y commitearlos en un commit `style:` propio.
+Los reformateos de `ruff format` y `terraform fmt` entraron en el commit `eae4f28` ("update"), junto
+con cambios funcionales en `sql/model` (nueva tabla `31_agg_ventas_diario_moneda.sql`, vistas
+`10`, `20`, `30`, `40`) y `sales_alerts.mjs` que no pasaron por revisión ni por el CI antes de
+llegar a `main`. Conviene una revisión posterior de ese commit.
 
 ## 9. El módulo tenant debe recibir el bucket de datos, no crearlo
 
