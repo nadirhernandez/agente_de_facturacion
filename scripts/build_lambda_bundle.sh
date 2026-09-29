@@ -35,6 +35,10 @@ bundle() {
   if [ "${service}" = "views-bootstrap" ]; then
     mkdir -p "${build_dir}/sql"
     cp -R "${ROOT}/sql/model/tables" "${ROOT}/sql/model/views" "${build_dir}/sql/"
+    # Data migrations are optional; idempotent statements run on every deploy.
+    if [ -d "${ROOT}/sql/model/migrations" ]; then
+      cp -R "${ROOT}/sql/model/migrations" "${build_dir}/sql/"
+    fi
   fi
 
   (cd "${build_dir}" && "${NPM_BIN}" install "${NPM_FLAGS[@]}")

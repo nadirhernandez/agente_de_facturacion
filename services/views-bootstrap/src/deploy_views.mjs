@@ -80,11 +80,24 @@ export function render(sql, variables) {
     .replace(/;\s*$/, "");
 }
 
-/** Reads <dir>/<kind>/*.sql in name order. Table name comes from the file name. */
-export async function loadStatements(sqlDir, kind, variables) {
+/**
+ * Reads <dir>/<kind>/*.sql in name order. Object name comes from the file name.
+ * With `optional`, a missing folder (or an empty one) yields no statements
+ * instead of failing: migrations exist only when the model needs them.
+ */
+export async function loadStatements(sqlDir, kind, variables, { optional = false } = {}) {
   const folder = path.join(sqlDir, kind);
-  const files = (await readdir(folder)).filter((file) => file.endsWith(".sql")).sort();
-  if (files.length === 0) throw new Error(`No SQL files in ${folder}`);
+  let files;
+  try {
+    files = (await readdir(folder)).filter((file) => file.endsWith(".sql")).sort();
+  } catch (error) {
+    if (optional && error?.code === "ENOENT") return [];
+    throw error;
+  }
+  if (files.length === 0) {
+    if (optional) return [];
+    throw new Error(`No SQL files in ${folder}`);
+  }
 
   return Promise.all(
     files.map(async (file) => {
@@ -152,7 +165,7 @@ export async function deployModel({
   const workGroup = required("ATHENA_WORKGROUP");
   const sqlDir = process.env.SQL_DIR ?? path.join(here, "sql");
 
-  const summary = { tablesCreated: [], tablesExisting: [], views: [] };
+  const summary = { tablesCreated: [], tablesExisting: [], migrations: [], views: [] };
 
   for (const table of await loadStatements(sqlDir, "tables", variables)) {
     if (await tableExists(database, table.name)) {
@@ -161,6 +174,16 @@ export async function deployModel({
     }
     await execute(table.sql, database, workGroup, deadline);
     summary.tablesCreated.push(table.name);
+  }
+
+  // Data migrations run on every deploy, after the tables exist and before the
+  // views are replaced, so a view never points at a table that is still empty.
+  // Each statement must be idempotent (a no-op once the data is in place).
+  for (const migration of await loadStatements(sqlDir, "migrations", variables, {
+    optional: true,
+  })) {
+    await execute(migration.sql, database, workGroup, deadline);
+    summary.migrations.push(migration.name);
   }
 
   if (!tablesOnly) {

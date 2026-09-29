@@ -239,8 +239,7 @@ def split_valid(invoices):
         .when(F.col("_emitido_en").isNull(), F.lit("fecha_emision_invalida"))
         .when(~F.lower("estado").isin(*VALID_ESTADOS) | F.col("estado").isNull(), F.lit("estado_desconocido"))
         .when(
-            F.col("codigo_moneda").isNull()
-            | ~F.upper(F.trim("codigo_moneda")).isin("GTQ", "USD"),
+            F.col("codigo_moneda").isNull() | ~F.upper(F.trim("codigo_moneda")).isin("GTQ", "USD"),
             F.lit("moneda_desconocida"),
         )
         .when(F.col("items").isNull() | (F.size("items") == 0), F.lit("sin_lineas"))
@@ -438,9 +437,9 @@ def load_files(spark, pending, *, run_id, fct, ctl, agg, reprocess_all, quaranti
 
     # --- Daily aggregate by currency ---------------------------------------
     if touched_keys:
-        spark.createDataFrame(
-            touched_keys, "fecha date, codigo_moneda string"
-        ).createOrReplaceTempView("claves_lote")
+        spark.createDataFrame(touched_keys, "fecha date, codigo_moneda string").createOrReplaceTempView(
+            "claves_lote"
+        )
         spark.sql(f"""
             MERGE INTO {agg} a
             USING (

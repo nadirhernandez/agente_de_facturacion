@@ -101,12 +101,34 @@ describe("loadStatements", () => {
       bucket: "s3://bucket",
     };
     const tables = await loadStatements(REPO_SQL_MODEL, "tables", variables);
+    const migrations = await loadStatements(REPO_SQL_MODEL, "migrations", variables, {
+      optional: true,
+    });
     const views = await loadStatements(REPO_SQL_MODEL, "views", variables);
     expect(tables.length).toBeGreaterThan(0);
     expect(views.length).toBeGreaterThan(0);
-    for (const { sql } of [...tables, ...views]) {
+    for (const { sql } of [...tables, ...migrations, ...views]) {
       expect(sql).not.toMatch(/\$\{/);
       expect(sql.endsWith(";")).toBe(false);
     }
+  });
+
+  it("treats the migrations folder as optional", async () => {
+    await expect(loadStatements(dir, "migrations", {}, { optional: true })).resolves.toEqual([]);
+    await expect(loadStatements(dir, "empty", {}, { optional: true })).resolves.toEqual([]);
+    await expect(loadStatements(dir, "migrations", {})).rejects.toThrow(/ENOENT/);
+  });
+
+  it("ships the multi-currency backfill as an idempotent migration", async () => {
+    const variables = { db: "ventas_dev", warehouse: "s3://b/w", bucket: "s3://b" };
+    const migrations = await loadStatements(REPO_SQL_MODEL, "migrations", variables, {
+      optional: true,
+    });
+    const backfill = migrations.find((m) => m.name === "backfill_agg_ventas_diario_moneda");
+    expect(backfill).toBeDefined();
+    expect(backfill.sql).toMatch(/^INSERT INTO ventas_dev\.agg_ventas_diario_moneda/);
+    expect(backfill.sql).toContain("NOT EXISTS");
+    expect(backfill.sql).toContain("IN ('GTQ', 'USD')");
+    expect(backfill.sql).not.toMatch(/\b(DELETE|DROP|TRUNCATE)\b/i);
   });
 });

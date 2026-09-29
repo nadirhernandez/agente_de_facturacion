@@ -282,15 +282,11 @@ def main() -> None:
     parser.add_argument("--start-date", type=iso_date, help="Inicio inclusivo (YYYY-MM-DD)")
     parser.add_argument("--end-date", type=iso_date, help="Fin inclusivo (YYYY-MM-DD)")
     parser.add_argument("--currency", choices=["GTQ", "USD"], default="GTQ", help="Moneda de la carga")
-    parser.add_argument(
-        "--cancel-rate", type=float, default=0.025, help="Proporción anulada entre 0 y 1"
-    )
+    parser.add_argument("--cancel-rate", type=float, default=0.025, help="Proporción anulada entre 0 y 1")
     parser.add_argument(
         "--doc-prefix", type=safe_segment, default="GT-DEMO", help="Prefijo global de documentos"
     )
-    parser.add_argument(
-        "--load-id", type=safe_segment, default=None, help="Identificador único de la carga"
-    )
+    parser.add_argument("--load-id", type=safe_segment, default=None, help="Identificador único de la carga")
     parser.add_argument("--pause", type=float, default=1.0, help="Segundos entre lotes")
     parser.add_argument("--seed", type=int, default=None, help="Semilla para datos reproducibles")
     parser.add_argument("--start-number", type=int, default=None, help="Número inicial de factura")

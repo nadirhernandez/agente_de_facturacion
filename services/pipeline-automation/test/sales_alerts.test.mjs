@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildQuery, comparisonMonths } from "../src/sales_alerts.mjs";
+import { buildQuery, comparisonMonths, CURRENCY_PREFIX, money } from "../src/sales_alerts.mjs";
 
 describe("comparisonMonths", () => {
   it("compares the last two complete months by Guatemala date", () => {
@@ -49,5 +49,25 @@ describe("buildQuery", () => {
     expect(() => buildQuery("ventas", { ...months, hasta: "2026-10-01' OR 1=1 --" })).toThrow(
       "Invalid date bound",
     );
+  });
+});
+
+describe("currency handling", () => {
+  it("groups the comparison by currency so GTQ and USD are never added", () => {
+    const sql = buildQuery("ventas", {
+      mesActual: "2026-09-01",
+      mesPrevio: "2026-08-01",
+      hasta: "2026-10-01",
+    });
+    expect(sql).toContain("GROUP BY codigo_moneda, region");
+    expect(sql).toMatch(/SELECT\s+codigo_moneda,\s+region,/);
+    expect(sql).not.toContain("codigo_moneda = 'GTQ'");
+  });
+
+  it("formats each currency with its own prefix and never a bare $", () => {
+    expect(money(1234.5, "GTQ")).toBe("Q 1,234.50");
+    expect(money(1234.5, "USD")).toBe("US$ 1,234.50");
+    expect(money(10)).toBe("Q 10.00");
+    expect(CURRENCY_PREFIX).toEqual({ GTQ: "Q", USD: "US$" });
   });
 });
