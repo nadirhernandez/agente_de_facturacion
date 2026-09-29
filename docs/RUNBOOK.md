@@ -12,6 +12,46 @@
 
 Cognito envía la contraseña temporal por correo. En el primer ingreso pide cambiarla.
 
+## Fecha de negocio: UTC-06:00
+
+Todas las fechas del modelo son fechas civiles de Guatemala (UTC-06:00, sin horario de verano):
+Glue corre su sesión en `-06:00`, `fecha_emision` guarda la hora local y `fecha` el día local. Una
+factura emitida a las 19:30 pertenece a ese día. Las vistas usan `current_timestamp AT TIME ZONE
+'-06:00'` para saber qué período está en curso.
+
+Después de desplegar este cambio hay que **reprocesar una vez** el histórico, porque las cargas
+anteriores usaban UTC y movían al día siguiente lo emitido desde las 18:00:
+
+```bash
+aws glue start-job-run --job-name dashboards-dinamicos-flatten-invoices-dev \
+  --arguments '{"--REPROCESS_ALL":"true"}' --profile dashboards-dev-infile --region us-east-1
+```
+
+El reproceso empareja líneas por `(doc_id, linea)` en toda la tabla, así que una línea que cambia
+de día se mueve (no se duplica) y se recalculan los totales del día que deja y del que recibe. Al
+terminar, la cadena normal despliega vistas y refresca SPICE completo.
+
+Registros que no se pueden confiar (JSON inválido, sin `doc_id`, fecha ilegible, estado desconocido,
+línea sin número o monto) no entran al modelo: van a `quarantine/run=<id>/` y llega un correo con el
+detalle (`quarantine/_avisos/`).
+
+## Entrega interna: autoregistro @infile.com e identidad compartida
+
+- Cualquier persona con correo `@infile.com` crea su cuenta desde **Crear cuenta** en la app.
+  Cognito le envía un código al correo y, al confirmarlo, ya puede entrar. Otros dominios se
+  rechazan en el registro (Lambda `dashboards-dinamicos-cognito-pre-signup-dev`) y de nuevo en la
+  API (`ALLOWED_EMAIL_DOMAINS`).
+- Todos abren el dashboard y el chat **como el mismo usuario de QuickSight** (el dueño del
+  dashboard y del agente), vía `SHARED_QUICKSIGHT_USER_ARN` en la Lambda de embedding. Comparten sus
+  permisos y su historial de chat. La persistencia de filtros del dashboard se desactiva en este
+  modo para que los filtros de uno no aparezcan en la sesión de otro.
+- Quién abrió qué queda en el log de la Lambda de embedding (`Embed URL issued`, campo `caller` =
+  `sub` de Cognito).
+- El correo de Cognito sale del remitente por defecto (`no-reply@verificationemail.com`, límite de
+  50 correos al día). Si no llega, revisar spam.
+- Para volver a una identidad por persona: quitar `SHARED_QUICKSIGHT_USER_ARN` de
+  `application.tf`, crear un usuario de QuickSight por correo y aplicar.
+
 ## Primer uso
 
 1. Abrir la aplicación.
@@ -30,10 +70,14 @@ aws sts get-caller-identity --profile dashboards-dev-infile
 # 1. Empaquetar la Lambda (incluye su dependencia del SDK)
 NPM_BIN=/opt/homebrew/bin/npm ./scripts/build_lambda_bundle.sh
 
-# 2. Infraestructura
-terraform -chdir=infrastructure/terraform init
-terraform -chdir=infrastructure/terraform plan -out=app.tfplan
-terraform -chdir=infrastructure/terraform apply app.tfplan
+# 2. Infraestructura. Usar el binario arm64 (/opt/homebrew/bin/terraform): el caché
+#    de providers de .terraform es darwin_arm64. terraform.tfvars (no versionado)
+#    lleva app_admin_email y alerts_email; ver terraform.tfvars.example.
+TF=/opt/homebrew/bin/terraform
+$TF -chdir=infrastructure/terraform init
+$TF -chdir=infrastructure/terraform plan -out=app.tfplan
+$TF -chdir=infrastructure/terraform apply app.tfplan
+rm infrastructure/terraform/app.tfplan   # el plan guarda valores del state en claro
 
 # 3. Frontend (config.json lo gestiona Terraform: excluirlo del sync)
 npm run build --workspace @ventas-inteligentes/web
@@ -101,6 +145,12 @@ aws quicksight update-analysis \
   --cli-input-json file://infrastructure/quicksight/generated/update-analysis.json \
   --profile dashboards-dev-infile --region us-east-1
 ```
+
+Eso actualiza el análisis. Para que la app (que embebe el dashboard `pulso-facturacion-dev`) lo
+vea, se publica la misma definición en el dashboard, sin `QueryExecutionOptions` (solo válido en
+análisis): `update-dashboard` con esa `Definition` y luego `update-dashboard-published-version`
+con la versión nueva. Los montos llevan formato con prefijo `Q` y dos decimales; las unidades,
+enteros; nunca `$`.
 
 Notas aprendidas de la API: `ColumnName` usa el nombre físico del dataset, el identificador lógico va en `DataSetIdentifier`, y todo campo de fecha exige `HierarchyId` con una `DateTimeHierarchy` declarada.
 

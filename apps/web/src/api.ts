@@ -7,6 +7,23 @@ interface EmbedResponse {
   expiresAt: string;
 }
 
+/** The API rejected the token (expired or revoked): the user must sign in again. */
+export class SessionExpiredError extends Error {
+  constructor() {
+    super("Tu sesión expiró. Inicia sesión de nuevo.");
+    this.name = "SessionExpiredError";
+  }
+}
+
+async function messageFrom(response: Response, fallback: string): Promise<string> {
+  try {
+    const body = (await response.json()) as { message?: unknown };
+    return typeof body.message === "string" && body.message ? body.message : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 /**
  * Requests a short-lived QuickSight embed URL. The Cognito ID token is
  * mandatory: API Gateway rejects unauthenticated requests.
@@ -20,8 +37,10 @@ export async function getEmbedUrl(
     headers: { authorization: `Bearer ${idToken}` },
   });
 
-  if (response.status === 401 || response.status === 403) {
-    throw new Error("Tu sesión no tiene acceso a esta información. Inicia sesión de nuevo.");
+  if (response.status === 401) throw new SessionExpiredError();
+
+  if (response.status === 403) {
+    throw new Error(await messageFrom(response, "Tu cuenta no tiene acceso a esta información."));
   }
 
   if (!response.ok) {
@@ -45,6 +64,8 @@ export async function getFreshness(
   const response = await fetch(`${config.apiBaseUrl}/status`, {
     headers: { authorization: `Bearer ${idToken}` },
   });
+
+  if (response.status === 401) throw new SessionExpiredError();
 
   if (!response.ok) {
     throw new Error("No fue posible consultar la actualización de datos.");

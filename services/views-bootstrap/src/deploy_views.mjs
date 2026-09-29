@@ -5,6 +5,7 @@ import {
   AthenaClient,
   GetQueryExecutionCommand,
   StartQueryExecutionCommand,
+  StopQueryExecutionCommand,
 } from "@aws-sdk/client-athena";
 import { GetTableCommand, GlueClient } from "@aws-sdk/client-glue";
 import { InvokeCommand, LambdaClient } from "@aws-sdk/client-lambda";
@@ -40,6 +41,28 @@ const required = (name) => {
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Outside Lambda (local runs) there is no remaining-time budget.
+const LOCAL_BUDGET_MS = 15 * 60 * 1000;
+// Time kept in reserve to stop a query and hand off before Lambda kills us.
+const SAFETY_MS = 15_000;
+
+const DATABASE_PATTERN = /^[a-z0-9_]{1,255}$/;
+const WAREHOUSE_PATTERN = /^s3:\/\/[a-z0-9][a-z0-9.-]{1,61}[a-z0-9](\/[A-Za-z0-9_.=/-]*)?$/;
+
+/**
+ * Operator-supplied values go straight into DDL, so they are checked before
+ * any statement is rendered: a stray quote must fail here, not in Athena.
+ */
+export function modelVariables(env = process.env) {
+  const db = env.GLUE_DATABASE;
+  if (!db || !DATABASE_PATTERN.test(db)) throw new Error(`Invalid GLUE_DATABASE: ${db}`);
+
+  const warehouse = (env.WAREHOUSE_PATH ?? "").replace(/\/+$/, "");
+  if (!WAREHOUSE_PATTERN.test(warehouse)) throw new Error(`Invalid WAREHOUSE_PATH: ${warehouse}`);
+
+  const bucket = `s3://${new URL(warehouse).hostname}`;
+  return { db, warehouse, bucket };
+}
 /** Replaces ${name} markers and refuses to run SQL with an unknown one left. */
 export function render(sql, variables) {
   const rendered = sql.replace(/\$\{([a-z_]+)\}/g, (marker, name) => {
@@ -73,7 +96,12 @@ export async function loadStatements(sqlDir, kind, variables) {
   );
 }
 
-async function execute(statement, database, workGroup) {
+/**
+ * Runs one statement and waits for it with exponential backoff, never past the
+ * deadline: a statement still running then is stopped, so a timeout never
+ * leaves a half-replaced model behind a silently killed Lambda.
+ */
+async function execute(statement, database, workGroup, deadline) {
   const started = await athena.send(
     new StartQueryExecutionCommand({
       QueryString: statement,
@@ -81,12 +109,11 @@ async function execute(statement, database, workGroup) {
       QueryExecutionContext: { Database: database },
     }),
   );
+  const id = started.QueryExecutionId;
 
-  for (let attempt = 0; attempt < 60; attempt += 1) {
-    await sleep(2000);
-    const execution = await athena.send(
-      new GetQueryExecutionCommand({ QueryExecutionId: started.QueryExecutionId }),
-    );
+  for (let attempt = 0; Date.now() < deadline; attempt += 1) {
+    await sleep(Math.min(500 * 2 ** attempt, 5000));
+    const execution = await athena.send(new GetQueryExecutionCommand({ QueryExecutionId: id }));
     const state = execution.QueryExecution?.Status?.State;
 
     if (state === "SUCCEEDED") return;
@@ -97,7 +124,8 @@ async function execute(statement, database, workGroup) {
     }
   }
 
-  throw new Error("Athena statement timed out");
+  await athena.send(new StopQueryExecutionCommand({ QueryExecutionId: id })).catch(() => undefined);
+  throw new Error(`Athena statement ${id} did not finish before the deadline and was stopped`);
 }
 
 async function tableExists(database, name) {
@@ -115,14 +143,14 @@ async function tableExists(database, name) {
  * statement are real problems: hiding them would leave SPICE refreshing
  * yesterday's model without anyone noticing.
  */
-export async function deployModel({ tablesOnly = false } = {}) {
-  const database = required("GLUE_DATABASE");
+export async function deployModel({
+  tablesOnly = false,
+  deadline = Date.now() + LOCAL_BUDGET_MS,
+} = {}) {
+  const variables = modelVariables();
+  const database = variables.db;
   const workGroup = required("ATHENA_WORKGROUP");
   const sqlDir = process.env.SQL_DIR ?? path.join(here, "sql");
-  const variables = {
-    db: database,
-    warehouse: required("WAREHOUSE_PATH").replace(/\/+$/, ""),
-  };
 
   const summary = { tablesCreated: [], tablesExisting: [], views: [] };
 
@@ -131,13 +159,13 @@ export async function deployModel({ tablesOnly = false } = {}) {
       summary.tablesExisting.push(table.name);
       continue;
     }
-    await execute(table.sql, database, workGroup);
+    await execute(table.sql, database, workGroup, deadline);
     summary.tablesCreated.push(table.name);
   }
 
   if (!tablesOnly) {
     for (const view of await loadStatements(sqlDir, "views", variables)) {
-      await execute(view.sql, database, workGroup);
+      await execute(view.sql, database, workGroup, deadline);
       summary.views.push(view.name);
     }
   }
@@ -145,12 +173,15 @@ export async function deployModel({ tablesOnly = false } = {}) {
   return summary;
 }
 
-export const handler = async (event = {}) => {
-  const summary = await deployModel();
+export const handler = async (event = {}, context) => {
+  const remaining = context?.getRemainingTimeInMillis?.() ?? LOCAL_BUDGET_MS;
+  const summary = await deployModel({ deadline: Date.now() + remaining - SAFETY_MS });
   console.log(JSON.stringify({ message: "Model deployed", ...summary }));
 
-  // After a Glue load, refresh SPICE only once the views are in place.
-  const jobRunId = event?.detail?.jobRunId;
+  // After a successful Glue load, refresh SPICE only once the views are in
+  // place. The rule already filters SUCCEEDED; checking again costs nothing.
+  const loadSucceeded = event?.detail?.state === undefined || event.detail.state === "SUCCEEDED";
+  const jobRunId = loadSucceeded ? event?.detail?.jobRunId : undefined;
   const refreshFunction = process.env.REFRESH_FUNCTION_NAME;
   if (jobRunId && refreshFunction) {
     await lambda.send(

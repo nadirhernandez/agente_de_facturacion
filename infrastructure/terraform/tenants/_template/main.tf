@@ -93,6 +93,18 @@ variable "app_branding" {
   default = null
 }
 
+variable "quick_chat_agent_id" {
+  description = "Agente de Quick del chat (sync_agent.py). Publícalo solo cuando el agente ya exista."
+  type        = string
+  default     = null
+}
+
+variable "content_security_policy_enforced" {
+  description = "false = CSP en modo report-only. Pásalo a true tras validar dashboard y chat."
+  type        = bool
+  default     = false
+}
+
 /**
  * Terraform assumes a role inside the tenant account. The role is created by the
  * organization when the account is vended, so no credentials are ever stored.
@@ -136,6 +148,9 @@ module "tenant" {
   app_domain_aliases  = var.app_domain_aliases
   app_certificate_arn = var.app_certificate_arn
   app_branding        = var.app_branding
+
+  quick_chat_agent_id              = var.quick_chat_agent_id
+  content_security_policy_enforced = var.content_security_policy_enforced
 }
 
 output "raw_delivery_uri" {

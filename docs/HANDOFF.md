@@ -68,7 +68,7 @@ por la consola de QuickSight.
 
 Dos diferencias deliberadas contra el piloto:
 
-- **No existe `FALLBACK_QUICKSIGHT_USER_ARN`.** En el piloto, quien iniciaba sesión sin usuario
+- **No existe `SHARED_QUICKSIGHT_USER_ARN`.** En el piloto, quien iniciaba sesión sin usuario
   propio de QuickSight heredaba la identidad del administrador. Aquí cada usuario de la app tiene su
   `aws_quicksight_user`, y un desconocido recibe 403. `verify_tenant.sh` comprueba que la variable no
   exista.
@@ -162,7 +162,7 @@ Terraform y al módulo tenant.
 ## Otros pendientes
 
 1. **Aplicar el módulo en una cuenta real.** Valida, pero validar no es desplegar.
-2. **Quitar `FALLBACK_QUICKSIGHT_USER_ARN` del piloto.** El módulo ya no lo tiene, pero
+2. **Quitar `SHARED_QUICKSIGHT_USER_ARN` del piloto.** El módulo ya no lo tiene, pero
    `infrastructure/terraform/application.tf` sigue apuntando al administrador. Hay que quitarlo antes
    de dar acceso a usuarios reales en `dev-infile`.
 3. **Row-Level Security.** No aplica en el modelo de cuenta por cliente (el aislamiento es la cuenta),

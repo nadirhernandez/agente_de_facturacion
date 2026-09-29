@@ -7,11 +7,33 @@
     "services/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
+    "build": "npm run build --workspaces --if-present",
     "build:web": "npm run build --workspace @ventas-inteligentes/web",
-    "dev:web": "npm run dev --workspace @ventas-inteligentes/web"
+    "dev:web": "npm run dev --workspace @ventas-inteligentes/web",
+    "lint": "oxlint apps services scripts",
+    "typecheck": "tsc --noEmit -p apps/web/tsconfig.json",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "lint:py": "uvx ruff@0.14.0 check . && uvx ruff@0.14.0 format --check .",
+    "lint:sh": "shellcheck -S warning scripts/*.sh",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test"
   },
   "engines": {
-    "node": ">=21.0.0"
+    "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
+    "@vitest/coverage-v8": "5.0.2",
+    "aws-sdk-client-mock": "4.1.0",
+    "jsdom": "30.1.1",
+    "oxlint": "1.86.0",
+    "prettier": "3.9.9",
+    "vitest": "5.0.2"
   }
 }

@@ -6,6 +6,9 @@
 --   IVA:               SUM(iva_linea)
 --   Facturas emitidas: COUNT(DISTINCT factura_id)
 --   Ticket promedio:   SUM(facturacion_total_linea) / COUNT(DISTINCT factura_id)
+--
+-- (factura_id, linea) identifica una línea: es la llave para unir otras fuentes
+-- por línea (por ejemplo costos) sin duplicar filas.
 CREATE OR REPLACE VIEW ${db}.vw_ventas_comerciales AS
 SELECT
   fecha,
@@ -21,6 +24,7 @@ SELECT
   producto,
   codigo_producto,
   doc_id AS factura_id,
+  linea,
   cantidad AS unidades_vendidas,
   facturacion_total_linea,
   ventas_sin_iva_linea,

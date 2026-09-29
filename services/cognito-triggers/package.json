@@ -1,0 +1,10 @@
+{
+  "name": "@ventas-inteligentes/cognito-triggers",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Cognito pre sign-up trigger. Packaged by Terraform straight from src/; no runtime dependencies.",
+  "scripts": {
+    "check": "node --check src/pre_signup.mjs"
+  }
+}

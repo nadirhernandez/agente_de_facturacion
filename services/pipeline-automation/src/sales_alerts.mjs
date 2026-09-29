@@ -3,6 +3,7 @@ import {
   GetQueryExecutionCommand,
   GetQueryResultsCommand,
   StartQueryExecutionCommand,
+  StopQueryExecutionCommand,
 } from "@aws-sdk/client-athena";
 import { PublishCommand, SNSClient } from "@aws-sdk/client-sns";
 
@@ -15,57 +16,90 @@ const required = (name) => {
   return value;
 };
 
-const DROP_THRESHOLD_PCT = Number(process.env.DROP_THRESHOLD_PCT ?? "10");
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Guatemala: UTC-06:00 all year. Invoice dates in the model are local dates.
+const BUSINESS_OFFSET_MS = -6 * 60 * 60 * 1000;
+const QUERY_TIMEOUT_MS = 90_000;
+
+function dropThreshold() {
+  const value = Number(process.env.DROP_THRESHOLD_PCT ?? "10");
+  if (!Number.isFinite(value) || value <= 0 || value > 100) {
+    throw new Error(
+      `DROP_THRESHOLD_PCT must be in (0, 100], got ${process.env.DROP_THRESHOLD_PCT}`,
+    );
+  }
+  return value;
+}
+
+const isoDate = (date) => date.toISOString().slice(0, 10);
 
 /**
- * Compares the last full month against the previous one, per region, using the
- * certified view. Reporting on the last *complete* month avoids false alarms
- * from a partially loaded current month.
+ * The last complete month and the one before it, by the civil date in
+ * Guatemala. Run on the 2nd of October: current = September, previous = August.
+ * A month in progress is never compared: half a month always looks like a drop.
  */
-const QUERY = `
-WITH periodos AS (
+export function comparisonMonths(now = new Date()) {
+  const local = new Date(now.getTime() + BUSINESS_OFFSET_MS);
+  const year = local.getUTCFullYear();
+  const month = local.getUTCMonth(); // 0-based: the month in progress
+
+  const currentStart = new Date(Date.UTC(year, month - 1, 1));
+  const previousStart = new Date(Date.UTC(year, month - 2, 1));
+  const end = new Date(Date.UTC(year, month, 1)); // exclusive
+
+  return {
+    mes: isoDate(currentStart).slice(0, 7),
+    mesActual: isoDate(currentStart),
+    mesPrevio: isoDate(previousStart),
+    hasta: isoDate(end),
+  };
+}
+
+/**
+ * Month totals per region. The date bounds are literals on fecha, the fact
+ * table's partition column, so Athena reads only those two months.
+ */
+export function buildQuery(database, { mesActual, mesPrevio, hasta }) {
+  if (!/^[a-z0-9_]+$/.test(database)) throw new Error(`Invalid ATHENA_DATABASE: ${database}`);
+  for (const value of [mesActual, mesPrevio, hasta]) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new Error(`Invalid date bound: ${value}`);
+  }
+
+  return `
+WITH agregado AS (
   SELECT
-    date_trunc('month', max(fecha)) AS mes_actual,
-    date_add('month', -1, date_trunc('month', max(fecha))) AS mes_previo
-  FROM sales_demo.vw_ventas_comerciales
-),
-agregado AS (
-  SELECT
-    v.region,
-    sum(CASE WHEN date_trunc('month', v.fecha) = p.mes_actual
-             THEN v.facturacion_total_linea ELSE 0 END) AS actual,
-    sum(CASE WHEN date_trunc('month', v.fecha) = p.mes_previo
-             THEN v.facturacion_total_linea ELSE 0 END) AS previo
-  FROM sales_demo.vw_ventas_comerciales v
-  CROSS JOIN periodos p
-  WHERE date_trunc('month', v.fecha) IN (p.mes_actual, p.mes_previo)
-  GROUP BY v.region
+    region,
+    sum(CASE WHEN fecha >= DATE '${mesActual}' THEN facturacion_total_linea ELSE 0 END) AS actual,
+    sum(CASE WHEN fecha <  DATE '${mesActual}' THEN facturacion_total_linea ELSE 0 END) AS previo
+  FROM ${database}.vw_ventas_comerciales
+  WHERE fecha >= DATE '${mesPrevio}' AND fecha < DATE '${hasta}'
+  GROUP BY region
 )
 SELECT
   region,
-  round(actual, 2)  AS facturacion_actual,
-  round(previo, 2)  AS facturacion_previa,
-  round(CASE WHEN previo = 0 THEN 0 ELSE (actual - previo) / previo * 100 END, 1) AS variacion_pct,
-  (SELECT format_datetime(mes_actual, 'yyyy-MM') FROM periodos) AS mes
+  round(actual, 2) AS facturacion_actual,
+  round(previo, 2) AS facturacion_previa,
+  CASE WHEN previo = 0 THEN NULL ELSE round((actual - previo) / previo * 100, 1) END AS variacion_pct
 FROM agregado
-ORDER BY variacion_pct ASC
+ORDER BY variacion_pct ASC NULLS LAST
 `;
+}
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-async function runQuery() {
+async function runQuery(query) {
+  const database = required("ATHENA_DATABASE");
   const started = await athena.send(
     new StartQueryExecutionCommand({
-      QueryString: QUERY,
+      QueryString: query,
       WorkGroup: required("ATHENA_WORKGROUP"),
-      QueryExecutionContext: { Database: required("ATHENA_DATABASE") },
+      QueryExecutionContext: { Database: database },
     }),
   );
-
   const id = started.QueryExecutionId;
+  const deadline = Date.now() + QUERY_TIMEOUT_MS;
 
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    await sleep(2000);
+  for (let attempt = 0; Date.now() < deadline; attempt += 1) {
+    await sleep(Math.min(500 * 2 ** attempt, 5000));
     const execution = await athena.send(new GetQueryExecutionCommand({ QueryExecutionId: id }));
     const state = execution.QueryExecution?.Status?.State;
 
@@ -73,13 +107,13 @@ async function runQuery() {
       const results = await athena.send(new GetQueryResultsCommand({ QueryExecutionId: id }));
       const [, ...rows] = results.ResultSet?.Rows ?? [];
       return rows.map((row) => {
-        const [region, actual, previo, variacion, mes] = row.Data.map((cell) => cell.VarCharValue);
+        const [region, actual, previo, variacion] = row.Data.map((cell) => cell.VarCharValue);
         return {
-          region,
-          actual: Number(actual),
-          previo: Number(previo),
-          variacion: Number(variacion),
-          mes,
+          region: region ?? "Sin región",
+          actual: Number(actual ?? 0),
+          previo: Number(previo ?? 0),
+          // null: no sales in the previous month, so no percentage exists.
+          variacion: variacion === undefined || variacion === null ? null : Number(variacion),
         };
       });
     }
@@ -91,27 +125,36 @@ async function runQuery() {
     }
   }
 
-  throw new Error("Athena query timed out");
+  await athena.send(new StopQueryExecutionCommand({ QueryExecutionId: id })).catch(() => undefined);
+  throw new Error(`Athena query ${id} timed out`);
 }
 
 const money = (value) =>
   `Q ${value.toLocaleString("es-GT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-/** Scheduled by EventBridge. Only notifies when something actually needs attention. */
-export const handler = async () => {
-  const rows = await runQuery();
+/**
+ * Monthly review, scheduled by EventBridge on the 2nd of each month (the extra
+ * day lets late loads of the last day arrive). Only notifies when something
+ * actually needs attention.
+ */
+export const handler = async (_event, _context, now = new Date()) => {
+  const threshold = dropThreshold();
+  const months = comparisonMonths(now);
+  const rows = await runQuery(buildQuery(required("ATHENA_DATABASE"), months));
+  const { mes } = months;
 
   if (rows.length === 0) {
-    console.log(JSON.stringify({ message: "No data available for comparison" }));
-    return { alerted: false, reason: "no-data" };
+    console.log(JSON.stringify({ message: "No data available for comparison", mes }));
+    return { alerted: false, reason: "no-data", mes };
   }
 
-  const drops = rows.filter((row) => row.variacion <= -DROP_THRESHOLD_PCT);
-  const mes = rows[0].mes;
+  const drops = rows.filter((row) => row.variacion !== null && row.variacion <= -threshold);
 
   if (drops.length === 0) {
-    console.log(JSON.stringify({ message: "No regions below threshold", mes, reviewed: rows.length }));
-    return { alerted: false, reviewed: rows.length };
+    console.log(
+      JSON.stringify({ message: "No regions below threshold", mes, reviewed: rows.length }),
+    );
+    return { alerted: false, reviewed: rows.length, mes };
   }
 
   const lines = drops.map(
@@ -120,31 +163,31 @@ export const handler = async () => {
   );
 
   const growth = rows
-    .filter((row) => row.variacion > 0)
-    .slice(-2)
-    .reverse()
+    .filter((row) => row.variacion !== null && row.variacion > 0)
+    .sort((a, b) => b.variacion - a.variacion)
+    .slice(0, 2)
     .map((row) => `• ${row.region}: +${row.variacion}%`);
 
   const body = [
     `Caídas de facturación detectadas en ${mes}`,
     "",
-    `Regiones por debajo de -${DROP_THRESHOLD_PCT}% frente al mes anterior:`,
+    `Regiones por debajo de -${threshold}% frente al mes anterior:`,
     ...lines,
     "",
     ...(growth.length > 0 ? ["En crecimiento:", ...growth, ""] : []),
     `Revisa el detalle: ${process.env.APP_URL ?? ""}`,
     "",
-    "Métrica: facturación total con IVA, solo documentos emitidos.",
+    "Métrica: facturación total con IVA, solo documentos emitidos, mes calendario completo (hora de Guatemala).",
   ].join("\n");
 
   await sns.send(
     new PublishCommand({
       TopicArn: required("ALERTS_TOPIC_ARN"),
-      Subject: `Ventas Inteligentes: ${drops.length} región(es) con caída en ${mes}`,
+      Subject: `Ventas Inteligentes: ${drops.length} región(es) con caída en ${mes}`.slice(0, 99),
       Message: body,
     }),
   );
 
   console.log(JSON.stringify({ message: "Alert published", mes, drops: drops.length }));
-  return { alerted: true, drops: drops.length };
+  return { alerted: true, drops: drops.length, mes };
 };

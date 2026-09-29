@@ -3,9 +3,9 @@
 
 from __future__ import annotations
 
-import copy
 import json
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 
 ACCOUNT_ID = "503561412084"
@@ -41,12 +41,54 @@ def title(text: str) -> dict:
     }
 
 
+def subtitle(text: str) -> dict:
+    return {
+        "Visibility": "VISIBLE",
+        "FormatText": {"RichText": f"<visual-subtitle>{text}</visual-subtitle>"},
+    }
+
+
+# Todos los montos son quetzales (codigo_moneda = GTQ). Sin formato explícito
+# Quick muestra "$"; con prefijo "Q" nunca aparece otra moneda.
+QUETZALES = {
+    "FormatConfiguration": {
+        "NumberDisplayFormatConfiguration": {
+            "Prefix": "Q",
+            "DecimalPlacesConfiguration": {"DecimalPlaces": 2},
+            "NumberScale": "NONE",
+            "SeparatorConfiguration": {
+                "DecimalSeparator": "DOT",
+                "ThousandsSeparator": {"Symbol": "COMMA", "Visibility": "VISIBLE"},
+            },
+            "NegativeValueConfiguration": {"DisplayMode": "NEGATIVE"},
+        }
+    }
+}
+
+ENTEROS = {
+    "FormatConfiguration": {
+        "NumberDisplayFormatConfiguration": {
+            "DecimalPlacesConfiguration": {"DecimalPlaces": 0},
+            "NumberScale": "NONE",
+            "SeparatorConfiguration": {
+                "DecimalSeparator": "DOT",
+                "ThousandsSeparator": {"Symbol": "COMMA", "Visibility": "VISIBLE"},
+            },
+        }
+    }
+}
+
+# Columnas que son cantidades, no dinero.
+QUANTITY_COLUMNS = {"unidades_vendidas"}
+
+
 def numeric_measure(column_name: str, field_id: str) -> dict:
     return {
         "NumericalMeasureField": {
             "FieldId": field_id,
             "Column": field_reference(column_name),
             "AggregationFunction": {"SimpleNumericalAggregation": "SUM"},
+            "FormatConfiguration": ENTEROS if column_name in QUANTITY_COLUMNS else QUETZALES,
         }
     }
 
@@ -86,7 +128,7 @@ def kpi(visual_id: str, visual_title: str, measure: dict) -> dict:
         "KPIVisual": {
             "VisualId": visual_id,
             "Title": title(visual_title),
-            "Subtitle": {"Visibility": "HIDDEN"},
+            "Subtitle": subtitle("Acumulado del período visible"),
             "ChartConfiguration": {
                 "FieldWells": {"Values": [measure], "TargetValues": [], "TrendGroups": []},
                 "SortConfiguration": {},
@@ -134,11 +176,12 @@ def line_chart(visual_id: str, visual_title: str, category: dict, measure: dict)
 
 
 def bar_chart(visual_id: str, visual_title: str, category: dict, measure: dict) -> dict:
+    measure_id = measure["NumericalMeasureField"]["FieldId"]
     return {
         "BarChartVisual": {
             "VisualId": visual_id,
             "Title": title(visual_title),
-            "Subtitle": {"Visibility": "HIDDEN"},
+            "Subtitle": subtitle("Top 10 · ordenado de mayor a menor"),
             "ChartConfiguration": {
                 "FieldWells": {
                     "BarChartAggregatedFieldWells": {
@@ -148,8 +191,12 @@ def bar_chart(visual_id: str, visual_title: str, category: dict, measure: dict) 
                         "SmallMultiples": [],
                     }
                 },
-                "SortConfiguration": {},
-                "Orientation": "VERTICAL",
+                "SortConfiguration": {
+                    "CategorySort": [{"FieldSort": {"FieldId": measure_id, "Direction": "DESC"}}],
+                    "CategoryItemsLimit": {"ItemsLimit": 10, "OtherCategories": "EXCLUDE"},
+                },
+                # Horizontal bars leave room for long region/product names.
+                "Orientation": "HORIZONTAL",
             },
             "Actions": [],
             "ColumnHierarchies": [],
@@ -182,14 +229,50 @@ def dashboard_definition() -> dict:
                 "Name": "Pulso de Facturación",
                 "ContentType": "INTERACTIVE",
                 "Visuals": [
-                    kpi("kpi-facturacion-total", "Facturación total", numeric_measure("facturacion_total_linea", "kpi-total-value")),
-                    kpi("kpi-ventas-sin-iva", "Ventas sin IVA", numeric_measure("ventas_sin_iva_linea", "kpi-neto-value")),
-                    kpi("kpi-facturas", "Facturas emitidas", count_distinct_measure("factura_id", "kpi-facturas-value")),
-                    kpi("kpi-unidades", "Unidades vendidas", numeric_measure("unidades_vendidas", "kpi-unidades-value")),
-                    line_chart("linea-tendencia-mensual", "Tendencia mensual de facturación", date_dimension("fecha", "tendencia-fecha"), numeric_measure("facturacion_total_linea", "tendencia-total")),
-                    bar_chart("barras-region", "Facturación por región", categorical_dimension("region", "region-category"), numeric_measure("facturacion_total_linea", "region-total")),
-                    bar_chart("barras-categoria", "Ventas sin IVA por categoría", categorical_dimension("categoria", "categoria-category"), numeric_measure("ventas_sin_iva_linea", "categoria-neto")),
-                    bar_chart("barras-producto", "Facturación por producto", categorical_dimension("producto", "producto-category"), numeric_measure("facturacion_total_linea", "producto-total")),
+                    kpi(
+                        "kpi-facturacion-total",
+                        "Facturación total",
+                        numeric_measure("facturacion_total_linea", "kpi-total-value"),
+                    ),
+                    kpi(
+                        "kpi-ventas-sin-iva",
+                        "Ventas sin IVA",
+                        numeric_measure("ventas_sin_iva_linea", "kpi-neto-value"),
+                    ),
+                    kpi(
+                        "kpi-facturas",
+                        "Facturas emitidas",
+                        count_distinct_measure("factura_id", "kpi-facturas-value"),
+                    ),
+                    kpi(
+                        "kpi-unidades",
+                        "Unidades vendidas",
+                        numeric_measure("unidades_vendidas", "kpi-unidades-value"),
+                    ),
+                    line_chart(
+                        "linea-tendencia-mensual",
+                        "Tendencia mensual de facturación",
+                        date_dimension("fecha", "tendencia-fecha"),
+                        numeric_measure("facturacion_total_linea", "tendencia-total"),
+                    ),
+                    bar_chart(
+                        "barras-region",
+                        "Regiones líderes por facturación",
+                        categorical_dimension("region", "region-category"),
+                        numeric_measure("facturacion_total_linea", "region-total"),
+                    ),
+                    bar_chart(
+                        "barras-categoria",
+                        "Categorías líderes por ventas sin IVA",
+                        categorical_dimension("categoria", "categoria-category"),
+                        numeric_measure("ventas_sin_iva_linea", "categoria-neto"),
+                    ),
+                    bar_chart(
+                        "barras-producto",
+                        "Productos líderes por facturación",
+                        categorical_dimension("producto", "producto-category"),
+                        numeric_measure("facturacion_total_linea", "producto-total"),
+                    ),
                 ],
                 "Layouts": [
                     {
@@ -207,8 +290,7 @@ def dashboard_definition() -> dict:
                                 ],
                                 "CanvasSizeOptions": {
                                     "ScreenCanvasSizeOptions": {
-                                        "ResizeOption": "FIXED",
-                                        "OptimizedViewPortWidth": "1600px",
+                                        "ResizeOption": "RESPONSIVE",
                                     }
                                 },
                             }
@@ -226,8 +308,7 @@ def dashboard_definition() -> dict:
                     "Grid": {
                         "CanvasSizeOptions": {
                             "ScreenCanvasSizeOptions": {
-                                "ResizeOption": "FIXED",
-                                "OptimizedViewPortWidth": "1600px",
+                                "ResizeOption": "RESPONSIVE",
                             }
                         }
                     }
@@ -236,7 +317,8 @@ def dashboard_definition() -> dict:
             }
         },
         "Options": {
-            "WeekStart": "SUNDAY",
+            # Igual que el Topic, el agente y el modelo SQL: semana de lunes a domingo.
+            "WeekStart": "MONDAY",
             "QBusinessInsightsStatus": "DISABLED",
             "ExcludedDataSetArns": [],
             "CustomActionDefaults": {"highlightOperation": {"Trigger": "DATA_POINT_CLICK"}},
@@ -255,9 +337,12 @@ def main() -> None:
         "--analysis-id",
         ANALYSIS_ID,
     )
-    (OUTPUT_DIR / "analysis-definition-before-rebuild.json").write_text(
-        json.dumps(current.get("Definition", {}), indent=2), encoding="utf-8"
-    )
+    # Un respaldo por ejecución: sobrescribirlo perdería la versión anterior a
+    # la primera reconstrucción.
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    backup = OUTPUT_DIR / f"analysis-definition-before-rebuild-{stamp}.json"
+    backup.write_text(json.dumps(current.get("Definition", {}), indent=2), encoding="utf-8")
+    print(f"respaldo: {backup}")
 
     request = {
         "AwsAccountId": ACCOUNT_ID,
@@ -265,9 +350,7 @@ def main() -> None:
         "Name": ANALYSIS_NAME,
         "Definition": dashboard_definition(),
     }
-    (OUTPUT_DIR / "update-analysis.json").write_text(
-        json.dumps(request, indent=2), encoding="utf-8"
-    )
+    (OUTPUT_DIR / "update-analysis.json").write_text(json.dumps(request, indent=2), encoding="utf-8")
     print(OUTPUT_DIR / "update-analysis.json")
 
 

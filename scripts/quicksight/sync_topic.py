@@ -31,8 +31,10 @@ TOPIC_NAME = "Ventas Inteligentes"
 SALES_DATASET_ARN = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dataset/ventas-comerciales-dev"
 PERIOD_DATASET_ARN = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dataset/ventas-comparativo-dev"
 
+# NUMBER with a "Q" prefix instead of CURRENCY: CURRENCY without a symbol makes
+# Quick render dollars. Every amount in the model is GTQ.
 CURRENCY = {
-    "DisplayFormat": "CURRENCY",
+    "DisplayFormat": "NUMBER",
     "DisplayFormatOptions": {
         "Prefix": "Q",
         "DecimalSeparator": "DOT",
@@ -48,7 +50,7 @@ PERCENT = {
 }
 
 CUSTOM_INSTRUCTIONS = """
-Responde siempre en español y muestra los montos en quetzales (Q) con dos decimales. Indica el período, los filtros y la métrica usada. Si no hay datos suficientes, dilo y no inventes resultados.
+Responde siempre en español y muestra los montos en quetzales (Q) con dos decimales. Todos los montos están en quetzales guatemaltecos (GTQ): nunca uses el símbolo $ ni hables de dólares, tampoco en títulos, ejes ni etiquetas de los visuales. Indica el período, los filtros y la métrica usada. Si no hay datos suficientes, dilo y no inventes resultados.
 
 Usa únicamente documentos emitidos; los anulados ya están excluidos.
 
@@ -59,7 +61,7 @@ Elige el dataset según la pregunta:
 
 En "Ventas por periodo" filtra por granularidad: dia, semana, mes o anio. La columna periodo es la fecha de inicio del período.
 
-La semana va de lunes a domingo.
+La semana va de lunes a domingo. Todas las fechas y horas están en hora de Guatemala (UTC-06:00): una factura emitida a las 19:30 pertenece a ese día.
 
 El comparativo por defecto es contra el período anterior inmediato, no contra el año anterior. Usa las columnas *_anterior y variacion_*_pct en lugar de recalcular.
 
@@ -163,7 +165,9 @@ def build_topic() -> dict:
         measure("facturacion_total", "Facturación del período", ["facturación", "ingresos"]),
         measure("ventas_sin_iva", "Ventas sin IVA del período", ["venta neta"]),
         measure("iva", "IVA del período"),
-        measure("facturas", "Facturas emitidas", ["documentos", "cantidad de facturas"], DefaultFormatting=None),
+        measure(
+            "facturas", "Facturas emitidas", ["documentos", "cantidad de facturas"], DefaultFormatting=None
+        ),
         measure("unidades", "Unidades del período", DefaultFormatting=None),
         measure("facturacion_total_anterior", "Facturación del período anterior"),
         measure("ventas_sin_iva_anterior", "Ventas sin IVA del período anterior"),
@@ -240,23 +244,52 @@ def aws(*arguments: str, quiet: bool = False) -> str:
     if result.returncode != 0:
         if not quiet:
             print(result.stderr.strip())
-        raise subprocess.CalledProcessError(result.returncode, result.args)
+        raise subprocess.CalledProcessError(
+            result.returncode, result.args, output=result.stdout, stderr=result.stderr
+        )
     return (result.stdout or "").strip()
 
 
 def topic_exists() -> bool:
+    """False solo si QuickSight dice que el topic no existe.
+
+    Cualquier otro error (credenciales vencidas, permisos, región equivocada) se
+    propaga: interpretarlo como "no existe" llevaría a un create-topic a ciegas.
+    """
     try:
-        aws("quicksight", "describe-topic", "--aws-account-id", ACCOUNT_ID, "--topic-id", TOPIC_ID,
-            quiet=True)
+        aws(
+            "quicksight", "describe-topic", "--aws-account-id", ACCOUNT_ID, "--topic-id", TOPIC_ID, quiet=True
+        )
         return True
-    except subprocess.CalledProcessError:
-        return False
+    except subprocess.CalledProcessError as error:
+        if "ResourceNotFoundException" in (error.stderr or ""):
+            return False
+        print((error.stderr or "").strip() or f"describe-topic falló con código {error.returncode}")
+        raise
+
+
+def configure(args: argparse.Namespace) -> None:
+    global ACCOUNT_ID, REGION, PROFILE, TOPIC_ID, SALES_DATASET_ARN, PERIOD_DATASET_ARN
+    ACCOUNT_ID, REGION, PROFILE, TOPIC_ID = args.account_id, args.region, args.profile, args.topic_id
+    SALES_DATASET_ARN = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dataset/{args.sales_dataset_id}"
+    PERIOD_DATASET_ARN = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dataset/{args.period_dataset_id}"
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--show", action="store_true", help="Solo imprimir la definición")
+    parser.add_argument("--account-id", default=ACCOUNT_ID, help="Cuenta de QuickSight")
+    parser.add_argument("--region", default=REGION, help="Región de QuickSight")
+    parser.add_argument("--profile", default=PROFILE, help="Perfil de AWS CLI")
+    parser.add_argument("--topic-id", default=TOPIC_ID, help="Id del topic")
+    parser.add_argument(
+        "--sales-dataset-id", default="ventas-comerciales-dev", help="Dataset de ventas comerciales"
+    )
+    parser.add_argument(
+        "--period-dataset-id", default="ventas-comparativo-dev", help="Dataset de ventas por periodo"
+    )
     args = parser.parse_args()
+    configure(args)
 
     payload = build_topic()
 
@@ -264,42 +297,66 @@ def main() -> None:
         print(json.dumps(payload, indent=2, ensure_ascii=False))
         return
 
-    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as handle:
-        json.dump(payload, handle, ensure_ascii=False)
-        path = handle.name
+    handle = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
+    path = handle.name
+    try:
+        with handle:
+            json.dump(payload, handle, ensure_ascii=False)
+        sync(payload, path)
+    finally:
+        Path(path).unlink(missing_ok=True)
+    print("Listo. Revisa el selector de datos en Amazon Quick chat.")
 
+
+def sync(payload: dict, path: str) -> None:
     if topic_exists():
         print(f"Actualizando topic {TOPIC_ID}…")
-        # UpdateTopic does not take CustomInstructions; it has its own API.
-        update_payload = {k: v for k, v in payload.items() if k != "CustomInstructions"}
-        with open(path, "w", encoding="utf-8") as handle:
-            json.dump(update_payload, handle, ensure_ascii=False)
-        print(aws("quicksight", "update-topic", "--cli-input-json", f"file://{path}",
-                  "--query", "TopicId", "--output", "text"))
-        # Custom instructions have their own API; UpdateTopic ignores them.
-        with open(path, "w", encoding="utf-8") as handle:
-            json.dump(
-                {
-                    "AwsAccountId": ACCOUNT_ID,
-                    "TopicId": TOPIC_ID,
-                    "CustomInstructions": payload["CustomInstructions"],
-                },
-                handle,
-                ensure_ascii=False,
+        # UpdateTopic takes the definition and the custom instructions together.
+        print(
+            aws(
+                "quicksight",
+                "update-topic",
+                "--cli-input-json",
+                f"file://{path}",
+                "--query",
+                "TopicId",
+                "--output",
+                "text",
             )
-        try:
-            aws("quicksight", "update-topic-custom-instructions",
-                "--cli-input-json", f"file://{path}", quiet=True)
+        )
+        current = json.loads(
+            aws(
+                "quicksight",
+                "describe-topic",
+                "--aws-account-id",
+                ACCOUNT_ID,
+                "--topic-id",
+                TOPIC_ID,
+                "--output",
+                "json",
+            )
+        )
+        applied = (current.get("CustomInstructions") or {}).get("CustomInstructionsString", "")
+        if applied.strip() == CUSTOM_INSTRUCTIONS:
             print("instrucciones actualizadas")
-        except subprocess.CalledProcessError:
-            print("aviso: no se pudieron actualizar las instrucciones por API; revísalas en la consola")
+        else:
+            print(
+                "aviso: las instrucciones del topic no coinciden con las del código; revísalas en la consola"
+            )
     else:
         print(f"Creando topic {TOPIC_ID}…")
-        print(aws("quicksight", "create-topic", "--cli-input-json", f"file://{path}",
-                  "--query", "TopicId", "--output", "text"))
-
-    Path(path).unlink(missing_ok=True)
-    print("Listo. Revisa el selector de datos en Amazon Quick chat.")
+        print(
+            aws(
+                "quicksight",
+                "create-topic",
+                "--cli-input-json",
+                f"file://{path}",
+                "--query",
+                "TopicId",
+                "--output",
+                "text",
+            )
+        )
 
 
 if __name__ == "__main__":

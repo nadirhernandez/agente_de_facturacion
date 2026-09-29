@@ -25,7 +25,10 @@
                 }
               },
               "Subtitle": {
-                "Visibility": "HIDDEN"
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-subtitle>Acumulado del per\u00edodo visible</visual-subtitle>"
+                }
               },
               "ChartConfiguration": {
                 "FieldWells": {
@@ -39,6 +42,27 @@
                         },
                         "AggregationFunction": {
                           "SimpleNumericalAggregation": "SUM"
+                        },
+                        "FormatConfiguration": {
+                          "FormatConfiguration": {
+                            "NumberDisplayFormatConfiguration": {
+                              "Prefix": "Q",
+                              "DecimalPlacesConfiguration": {
+                                "DecimalPlaces": 2
+                              },
+                              "NumberScale": "NONE",
+                              "SeparatorConfiguration": {
+                                "DecimalSeparator": "DOT",
+                                "ThousandsSeparator": {
+                                  "Symbol": "COMMA",
+                                  "Visibility": "VISIBLE"
+                                }
+                              },
+                              "NegativeValueConfiguration": {
+                                "DisplayMode": "NEGATIVE"
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -74,7 +98,10 @@
                 }
               },
               "Subtitle": {
-                "Visibility": "HIDDEN"
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-subtitle>Acumulado del per\u00edodo visible</visual-subtitle>"
+                }
               },
               "ChartConfiguration": {
                 "FieldWells": {
@@ -88,6 +115,27 @@
                         },
                         "AggregationFunction": {
                           "SimpleNumericalAggregation": "SUM"
+                        },
+                        "FormatConfiguration": {
+                          "FormatConfiguration": {
+                            "NumberDisplayFormatConfiguration": {
+                              "Prefix": "Q",
+                              "DecimalPlacesConfiguration": {
+                                "DecimalPlaces": 2
+                              },
+                              "NumberScale": "NONE",
+                              "SeparatorConfiguration": {
+                                "DecimalSeparator": "DOT",
+                                "ThousandsSeparator": {
+                                  "Symbol": "COMMA",
+                                  "Visibility": "VISIBLE"
+                                }
+                              },
+                              "NegativeValueConfiguration": {
+                                "DisplayMode": "NEGATIVE"
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -123,7 +171,10 @@
                 }
               },
               "Subtitle": {
-                "Visibility": "HIDDEN"
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-subtitle>Acumulado del per\u00edodo visible</visual-subtitle>"
+                }
               },
               "ChartConfiguration": {
                 "FieldWells": {
@@ -170,7 +221,10 @@
                 }
               },
               "Subtitle": {
-                "Visibility": "HIDDEN"
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-subtitle>Acumulado del per\u00edodo visible</visual-subtitle>"
+                }
               },
               "ChartConfiguration": {
                 "FieldWells": {
@@ -184,6 +238,23 @@
                         },
                         "AggregationFunction": {
                           "SimpleNumericalAggregation": "SUM"
+                        },
+                        "FormatConfiguration": {
+                          "FormatConfiguration": {
+                            "NumberDisplayFormatConfiguration": {
+                              "DecimalPlacesConfiguration": {
+                                "DecimalPlaces": 0
+                              },
+                              "NumberScale": "NONE",
+                              "SeparatorConfiguration": {
+                                "DecimalSeparator": "DOT",
+                                "ThousandsSeparator": {
+                                  "Symbol": "COMMA",
+                                  "Visibility": "VISIBLE"
+                                }
+                              }
+                            }
+                          }
                         }
                       }
                     }
@@ -247,6 +318,27 @@
                           },
                           "AggregationFunction": {
                             "SimpleNumericalAggregation": "SUM"
+                          },
+                          "FormatConfiguration": {
+                            "FormatConfiguration": {
+                              "NumberDisplayFormatConfiguration": {
+                                "Prefix": "Q",
+                                "DecimalPlacesConfiguration": {
+                                  "DecimalPlaces": 2
+                                },
+                                "NumberScale": "NONE",
+                                "SeparatorConfiguration": {
+                                  "DecimalSeparator": "DOT",
+                                  "ThousandsSeparator": {
+                                    "Symbol": "COMMA",
+                                    "Visibility": "VISIBLE"
+                                  }
+                                },
+                                "NegativeValueConfiguration": {
+                                  "DisplayMode": "NEGATIVE"
+                                }
+                              }
+                            }
                           }
                         }
                       }
@@ -275,11 +367,14 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Facturaci\u00f3n por regi\u00f3n</visual-title>"
+                  "RichText": "<visual-title>Regiones l\u00edderes por facturaci\u00f3n</visual-title>"
                 }
               },
               "Subtitle": {
-                "Visibility": "HIDDEN"
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-subtitle>Top 10 \u00b7 ordenado de mayor a menor</visual-subtitle>"
+                }
               },
               "ChartConfiguration": {
                 "FieldWells": {
@@ -305,6 +400,27 @@
                           },
                           "AggregationFunction": {
                             "SimpleNumericalAggregation": "SUM"
+                          },
+                          "FormatConfiguration": {
+                            "FormatConfiguration": {
+                              "NumberDisplayFormatConfiguration": {
+                                "Prefix": "Q",
+                                "DecimalPlacesConfiguration": {
+                                  "DecimalPlaces": 2
+                                },
+                                "NumberScale": "NONE",
+                                "SeparatorConfiguration": {
+                                  "DecimalSeparator": "DOT",
+                                  "ThousandsSeparator": {
+                                    "Symbol": "COMMA",
+                                    "Visibility": "VISIBLE"
+                                  }
+                                },
+                                "NegativeValueConfiguration": {
+                                  "DisplayMode": "NEGATIVE"
+                                }
+                              }
+                            }
                           }
                         }
                       }
@@ -313,8 +429,21 @@
                     "SmallMultiples": []
                   }
                 },
-                "SortConfiguration": {},
-                "Orientation": "VERTICAL"
+                "SortConfiguration": {
+                  "CategorySort": [
+                    {
+                      "FieldSort": {
+                        "FieldId": "region-total",
+                        "Direction": "DESC"
+                      }
+                    }
+                  ],
+                  "CategoryItemsLimit": {
+                    "ItemsLimit": 10,
+                    "OtherCategories": "EXCLUDE"
+                  }
+                },
+                "Orientation": "HORIZONTAL"
               },
               "Actions": [],
               "ColumnHierarchies": []
@@ -326,11 +455,14 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Ventas sin IVA por categor\u00eda</visual-title>"
+                  "RichText": "<visual-title>Categor\u00edas l\u00edderes por ventas sin IVA</visual-title>"
                 }
               },
               "Subtitle": {
-                "Visibility": "HIDDEN"
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-subtitle>Top 10 \u00b7 ordenado de mayor a menor</visual-subtitle>"
+                }
               },
               "ChartConfiguration": {
                 "FieldWells": {
@@ -356,6 +488,27 @@
                           },
                           "AggregationFunction": {
                             "SimpleNumericalAggregation": "SUM"
+                          },
+                          "FormatConfiguration": {
+                            "FormatConfiguration": {
+                              "NumberDisplayFormatConfiguration": {
+                                "Prefix": "Q",
+                                "DecimalPlacesConfiguration": {
+                                  "DecimalPlaces": 2
+                                },
+                                "NumberScale": "NONE",
+                                "SeparatorConfiguration": {
+                                  "DecimalSeparator": "DOT",
+                                  "ThousandsSeparator": {
+                                    "Symbol": "COMMA",
+                                    "Visibility": "VISIBLE"
+                                  }
+                                },
+                                "NegativeValueConfiguration": {
+                                  "DisplayMode": "NEGATIVE"
+                                }
+                              }
+                            }
                           }
                         }
                       }
@@ -364,8 +517,21 @@
                     "SmallMultiples": []
                   }
                 },
-                "SortConfiguration": {},
-                "Orientation": "VERTICAL"
+                "SortConfiguration": {
+                  "CategorySort": [
+                    {
+                      "FieldSort": {
+                        "FieldId": "categoria-neto",
+                        "Direction": "DESC"
+                      }
+                    }
+                  ],
+                  "CategoryItemsLimit": {
+                    "ItemsLimit": 10,
+                    "OtherCategories": "EXCLUDE"
+                  }
+                },
+                "Orientation": "HORIZONTAL"
               },
               "Actions": [],
               "ColumnHierarchies": []
@@ -377,11 +543,14 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Facturaci\u00f3n por producto</visual-title>"
+                  "RichText": "<visual-title>Productos l\u00edderes por facturaci\u00f3n</visual-title>"
                 }
               },
               "Subtitle": {
-                "Visibility": "HIDDEN"
+                "Visibility": "VISIBLE",
+                "FormatText": {
+                  "RichText": "<visual-subtitle>Top 10 \u00b7 ordenado de mayor a menor</visual-subtitle>"
+                }
               },
               "ChartConfiguration": {
                 "FieldWells": {
@@ -407,6 +576,27 @@
                           },
                           "AggregationFunction": {
                             "SimpleNumericalAggregation": "SUM"
+                          },
+                          "FormatConfiguration": {
+                            "FormatConfiguration": {
+                              "NumberDisplayFormatConfiguration": {
+                                "Prefix": "Q",
+                                "DecimalPlacesConfiguration": {
+                                  "DecimalPlaces": 2
+                                },
+                                "NumberScale": "NONE",
+                                "SeparatorConfiguration": {
+                                  "DecimalSeparator": "DOT",
+                                  "ThousandsSeparator": {
+                                    "Symbol": "COMMA",
+                                    "Visibility": "VISIBLE"
+                                  }
+                                },
+                                "NegativeValueConfiguration": {
+                                  "DisplayMode": "NEGATIVE"
+                                }
+                              }
+                            }
                           }
                         }
                       }
@@ -415,8 +605,21 @@
                     "SmallMultiples": []
                   }
                 },
-                "SortConfiguration": {},
-                "Orientation": "VERTICAL"
+                "SortConfiguration": {
+                  "CategorySort": [
+                    {
+                      "FieldSort": {
+                        "FieldId": "producto-total",
+                        "Direction": "DESC"
+                      }
+                    }
+                  ],
+                  "CategoryItemsLimit": {
+                    "ItemsLimit": 10,
+                    "OtherCategories": "EXCLUDE"
+                  }
+                },
+                "Orientation": "HORIZONTAL"
               },
               "Actions": [],
               "ColumnHierarchies": []
@@ -495,8 +698,7 @@
                 ],
                 "CanvasSizeOptions": {
                   "ScreenCanvasSizeOptions": {
-                    "ResizeOption": "FIXED",
-                    "OptimizedViewPortWidth": "1600px"
+                    "ResizeOption": "RESPONSIVE"
                   }
                 }
               }
@@ -514,8 +716,7 @@
           "Grid": {
             "CanvasSizeOptions": {
               "ScreenCanvasSizeOptions": {
-                "ResizeOption": "FIXED",
-                "OptimizedViewPortWidth": "1600px"
+                "ResizeOption": "RESPONSIVE"
               }
             }
           }
@@ -524,7 +725,7 @@
       }
     },
     "Options": {
-      "WeekStart": "SUNDAY",
+      "WeekStart": "MONDAY",
       "QBusinessInsightsStatus": "DISABLED",
       "ExcludedDataSetArns": [],
       "CustomActionDefaults": {

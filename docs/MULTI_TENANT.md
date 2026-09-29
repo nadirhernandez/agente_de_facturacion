@@ -114,7 +114,7 @@ viaje completo: sube 200 facturas de prueba, espera la transformación, consulta
 y confirma que SPICE se refrescó.
 
 Dos comprobaciones de la app valen la pena por sí solas: que la API devuelva 401 sin token y que la
-Lambda de embedding **no** tenga `FALLBACK_QUICKSIGHT_USER_ARN`. Esa variable existía en el piloto y
+Lambda de embedding **no** tenga `SHARED_QUICKSIGHT_USER_ARN`. Esa variable existía en el piloto y
 le daba identidad de administrador a cualquiera que iniciara sesión sin usuario propio.
 
 Lo primero que valida es que la sesión apunte a la cuenta correcta, y aborta si no. Verificar un

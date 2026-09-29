@@ -37,6 +37,7 @@ resource "aws_iam_role" "quicksight" {
       Effect    = "Allow"
       Action    = "sts:AssumeRole"
       Principal = { Service = "quicksight.amazonaws.com" }
+      Condition = { StringEquals = { "aws:SourceAccount" = var.account_id } }
     }]
   })
 }
@@ -49,10 +50,26 @@ resource "aws_iam_role_policy" "quicksight" {
     Version = "2012-10-17"
     Statement = [
       {
-        Sid      = "RunAthenaQueries"
-        Effect   = "Allow"
-        Action   = ["athena:*"]
+        # What QuickSight's Athena connector calls, on this workgroup only.
+        Sid    = "RunAthenaQueries"
+        Effect = "Allow"
+        Action = [
+          "athena:StartQueryExecution", "athena:StopQueryExecution",
+          "athena:GetQueryExecution", "athena:GetQueryResults", "athena:GetQueryResultsStream",
+          "athena:BatchGetQueryExecution", "athena:ListQueryExecutions",
+          "athena:GetWorkGroup",
+        ]
         Resource = aws_athena_workgroup.sales.arn
+      },
+      {
+        # Catalog browsing in the data source; read-only metadata.
+        Sid    = "BrowseAthenaCatalog"
+        Effect = "Allow"
+        Action = [
+          "athena:ListWorkGroups", "athena:ListDataCatalogs", "athena:GetDataCatalog",
+          "athena:ListDatabases", "athena:GetDatabase", "athena:ListTableMetadata", "athena:GetTableMetadata",
+        ]
+        Resource = "*"
       },
       {
         Sid    = "ReadCatalog"

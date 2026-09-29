@@ -5,8 +5,13 @@
 -- El conteo de facturas se puede sumar entre días porque una factura pertenece
 -- a un solo día. Si eso cambiara, habría que recontar por período.
 --
--- es_periodo_completo marca los períodos en curso: comparar uno a medias contra
--- uno completo exagera la caída, así que el chat los excluye de comparativos.
+-- es_periodo_completo marca los períodos que no se pueden comparar tal cual,
+-- porque comparar uno a medias contra uno completo exagera la variación:
+--   - el período en curso: termina hoy o después (hoy en Guatemala, UTC-06:00)
+--     o después del último día cargado;
+--   - el primer período del histórico cuando los datos empiezan a media semana,
+--     mes o año.
+-- El dataset se refresca cada hora, así "hoy" no se queda atrasado en SPICE.
 CREATE OR REPLACE VIEW ${db}.vw_ventas_comparativo AS
 WITH por_dia AS (
   SELECT
@@ -62,48 +67,58 @@ unificado AS (
   UNION ALL SELECT * FROM por_anio
 ),
 limite AS (
-  SELECT max(fecha) AS ultimo_dia FROM ${db}.vw_ventas_diario
+  SELECT
+    min(fecha) AS primer_dia,
+    max(fecha) AS ultimo_dia,
+    CAST(current_timestamp AT TIME ZONE '-06:00' AS date) AS hoy
+  FROM ${db}.vw_ventas_diario
+),
+con_limites AS (
+  SELECT
+    u.*,
+    CASE u.granularidad
+      WHEN 'dia'    THEN u.periodo
+      WHEN 'semana' THEN date_add('day', 6, u.periodo)
+      WHEN 'mes'    THEN date_add('day', -1, date_add('month', 1, u.periodo))
+      ELSE date_add('day', -1, date_add('year', 1, u.periodo))
+    END AS fin_periodo,
+    l.primer_dia,
+    l.ultimo_dia,
+    l.hoy
+  FROM unificado u
+  CROSS JOIN limite l
+),
+con_anterior AS (
+  SELECT
+    c.*,
+    lag(facturacion_total) OVER (PARTITION BY granularidad ORDER BY periodo) AS facturacion_total_anterior,
+    lag(ventas_sin_iva)    OVER (PARTITION BY granularidad ORDER BY periodo) AS ventas_sin_iva_anterior,
+    lag(facturas)          OVER (PARTITION BY granularidad ORDER BY periodo) AS facturas_anterior,
+    lag(unidades)          OVER (PARTITION BY granularidad ORDER BY periodo) AS unidades_anterior
+  FROM con_limites c
 )
 SELECT
   granularidad,
   periodo,
   year(periodo)  AS anio,
   month(periodo) AS mes,
-  CASE granularidad
-    WHEN 'dia'    THEN periodo
-    WHEN 'semana' THEN date_add('day', 6, periodo)
-    WHEN 'mes'    THEN date_add('day', -1, date_add('month', 1, periodo))
-    ELSE date_add('day', -1, date_add('year', 1, periodo))
-  END AS fin_periodo,
-  CASE granularidad
-    WHEN 'dia'    THEN periodo
-    WHEN 'semana' THEN date_add('day', 6, periodo)
-    WHEN 'mes'    THEN date_add('day', -1, date_add('month', 1, periodo))
-    ELSE date_add('day', -1, date_add('year', 1, periodo))
-  END <= (SELECT ultimo_dia FROM limite) AS es_periodo_completo,
+  fin_periodo,
+  (periodo >= primer_dia AND fin_periodo <= ultimo_dia AND fin_periodo < hoy) AS es_periodo_completo,
   facturacion_total,
   ventas_sin_iva,
   iva,
   facturas,
   unidades,
-  lag(facturacion_total) OVER (PARTITION BY granularidad ORDER BY periodo) AS facturacion_total_anterior,
-  lag(ventas_sin_iva)    OVER (PARTITION BY granularidad ORDER BY periodo) AS ventas_sin_iva_anterior,
-  lag(facturas)          OVER (PARTITION BY granularidad ORDER BY periodo) AS facturas_anterior,
-  lag(unidades)          OVER (PARTITION BY granularidad ORDER BY periodo) AS unidades_anterior,
+  facturacion_total_anterior,
+  ventas_sin_iva_anterior,
+  facturas_anterior,
+  unidades_anterior,
   CASE
-    WHEN lag(facturacion_total) OVER (PARTITION BY granularidad ORDER BY periodo) IS NULL
-      OR lag(facturacion_total) OVER (PARTITION BY granularidad ORDER BY periodo) = 0
-    THEN NULL
-    ELSE round(
-      (facturacion_total - lag(facturacion_total) OVER (PARTITION BY granularidad ORDER BY periodo))
-      / lag(facturacion_total) OVER (PARTITION BY granularidad ORDER BY periodo) * 100, 1)
+    WHEN facturacion_total_anterior IS NULL OR facturacion_total_anterior = 0 THEN NULL
+    ELSE round((facturacion_total - facturacion_total_anterior) / facturacion_total_anterior * 100, 1)
   END AS variacion_facturacion_pct,
   CASE
-    WHEN lag(facturas) OVER (PARTITION BY granularidad ORDER BY periodo) IS NULL
-      OR lag(facturas) OVER (PARTITION BY granularidad ORDER BY periodo) = 0
-    THEN NULL
-    ELSE round(
-      (CAST(facturas AS double) - lag(facturas) OVER (PARTITION BY granularidad ORDER BY periodo))
-      / lag(facturas) OVER (PARTITION BY granularidad ORDER BY periodo) * 100, 1)
+    WHEN facturas_anterior IS NULL OR facturas_anterior = 0 THEN NULL
+    ELSE round((CAST(facturas AS double) - facturas_anterior) / facturas_anterior * 100, 1)
   END AS variacion_facturas_pct
-FROM unificado
+FROM con_anterior

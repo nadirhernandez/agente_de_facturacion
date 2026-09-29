@@ -1,8 +1,8 @@
 locals {
-  quicksight_account_id        = "503561412084"
-  quicksight_admin_principal   = "arn:aws:quicksight:us-east-1:503561412084:user/default/AWSReservedSSO_AWSAdministratorAccess_2dfa29f98f589a40/rnhernandez"
+  quicksight_account_id        = local.account_id
+  quicksight_admin_principal   = "${local.arn_quicksight}:user/default/AWSReservedSSO_AWSAdministratorAccess_2dfa29f98f589a40/rnhernandez"
   quicksight_service_role_name = "aws-quicksight-service-role-v0"
-  quicksight_service_role_arn  = "arn:aws:iam::503561412084:role/service-role/aws-quicksight-service-role-v0"
+  quicksight_service_role_arn  = "arn:${local.partition}:iam::${local.account_id}:role/service-role/aws-quicksight-service-role-v0"
 }
 
 # QuickSight must read the curated Parquet data and Athena query results.

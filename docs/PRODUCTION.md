@@ -13,7 +13,7 @@ JWT claim email → quicksight:ListUsers → ARN del usuario → embed con SU id
 Si la persona ya existe en QuickSight, el embed usa su usuario, con sus permisos y su RLS. El
 permiso IAM se otorga sobre `user/default/*`, no sobre un ARN fijo.
 
-Queda un `FALLBACK_QUICKSIGHT_USER_ARN` apuntando al administrador para quien no tenga usuario
+Queda un `SHARED_QUICKSIGHT_USER_ARN` apuntando al administrador para quien no tenga usuario
 QuickSight. **Eso es lo que hay que quitar antes de abrir el producto**: mientras exista, alguien
 sin usuario propio hereda permisos de administrador.
 
@@ -27,7 +27,7 @@ aws quicksight register-user --aws-account-id 503561412084 --namespace default \
   --profile dashboards-dev-infile --region us-east-1
 ```
 
-Luego borrar `FALLBACK_QUICKSIGHT_USER_ARN` de `application.tf`. La Lambda devolverá 403 con un
+Luego borrar `SHARED_QUICKSIGHT_USER_ARN` de `application.tf`. La Lambda devolverá 403 con un
 mensaje claro a quien no esté registrado, que es el comportamiento correcto.
 
 ## 2. Row-Level Security — pendiente

@@ -1,7 +1,7 @@
 locals {
-  web_bucket_name = "dashboards-dinamicos-web-503561412084"
+  web_bucket_name = "dashboards-dinamicos-web-${local.account_id}"
   lambda_name     = "dashboards-dinamicos-embedding-api-dev"
-  cognito_domain  = "ventas-inteligentes-dev-503561412084"
+  cognito_domain  = "ventas-inteligentes-dev-${local.account_id}"
   # QuickSight only accepts http:// for the literal "localhost" host.
   local_dev_origin = "http://localhost:5173"
 }
@@ -40,6 +40,33 @@ resource "aws_s3_bucket_versioning" "web" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "web" {
+  bucket = aws_s3_bucket.web.id
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+# Each deploy replaces the build; old versions are kept 30 days for rollback.
+resource "aws_s3_bucket_lifecycle_configuration" "web" {
+  bucket = aws_s3_bucket.web.id
+
+  rule {
+    id     = "noncurrent-versions"
+    status = "Enabled"
+    filter {}
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+
+  depends_on = [aws_s3_bucket_versioning.web]
+}
+
 resource "aws_cloudfront_origin_access_control" "web" {
   name                              = "dashboards-dinamicos-web-oac-dev"
   origin_access_control_origin_type = "s3"
@@ -52,6 +79,8 @@ resource "aws_cloudfront_distribution" "web" {
   comment             = "Ventas Inteligentes MLP (dev)"
   default_root_object = "index.html"
   price_class         = "PriceClass_100"
+  http_version        = "http2and3"
+  web_acl_id          = aws_wafv2_web_acl.web.arn
 
   origin {
     domain_name              = aws_s3_bucket.web.bucket_regional_domain_name
@@ -67,7 +96,8 @@ resource "aws_cloudfront_distribution" "web" {
     compress               = true
 
     # Managed-CachingOptimized
-    cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.web.id
   }
 
   # Single-page application routing.
@@ -91,9 +121,84 @@ resource "aws_cloudfront_distribution" "web" {
     }
   }
 
+  # With the default *.cloudfront.net certificate CloudFront keeps its own TLS
+  # floor and ignores minimum_protocol_version; TLS 1.2+ needs a custom domain
+  # with an ACM certificate (supported by the tenant module).
   viewer_certificate {
     cloudfront_default_certificate = true
-    minimum_protocol_version       = "TLSv1.2_2021"
+    # What AWS actually applies with the default certificate; declaring 1.2
+    # here only produced a permanent diff. TLS 1.2+ requires a custom domain.
+    minimum_protocol_version = "TLSv1"
+  }
+}
+
+/**
+ * Browser security headers. Wildcards for API Gateway and Cognito avoid a
+ * dependency cycle (both reference the distribution's domain). The CSP is
+ * report-only until the embedded dashboard and chat load without violations in
+ * the browser console; then set local.enforce_csp = true.
+ */
+locals {
+  enforce_csp = false
+
+  content_security_policy = join("; ", [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://*.execute-api.${local.region}.amazonaws.com https://*.auth.${local.region}.amazoncognito.com https://cognito-idp.${local.region}.amazonaws.com",
+    "frame-src https://*.quicksight.aws.amazon.com",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self' https://*.amazoncognito.com",
+    "object-src 'none'",
+  ])
+}
+
+resource "aws_cloudfront_response_headers_policy" "web" {
+  name    = "dashboards-dinamicos-web-security-dev"
+  comment = "Security headers for the Ventas Inteligentes SPA"
+
+  security_headers_config {
+    strict_transport_security {
+      access_control_max_age_sec = 63072000
+      include_subdomains         = true
+      override                   = true
+    }
+
+    content_type_options {
+      override = true
+    }
+
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+
+    dynamic "content_security_policy" {
+      for_each = local.enforce_csp ? [1] : []
+      content {
+        content_security_policy = local.content_security_policy
+        override                = true
+      }
+    }
+  }
+
+  dynamic "custom_headers_config" {
+    for_each = local.enforce_csp ? [] : [1]
+    content {
+      items {
+        header   = "Content-Security-Policy-Report-Only"
+        value    = local.content_security_policy
+        override = true
+      }
+    }
   }
 }
 
@@ -159,8 +264,21 @@ resource "aws_cognito_user_pool" "app" {
   auto_verified_attributes = ["email"]
   deletion_protection      = "ACTIVE"
 
+  # Internal pilot: anyone with a corporate address may create an account. The
+  # pre sign-up trigger rejects every other domain (cognito_signup.tf) and the
+  # emailed code proves the person owns the mailbox.
   admin_create_user_config {
-    allow_admin_create_user_only = true
+    allow_admin_create_user_only = false
+  }
+
+  lambda_config {
+    pre_sign_up = aws_lambda_function.cognito_pre_signup.arn
+  }
+
+  # A changed email only takes effect once verified; until then the old,
+  # verified address stays in the token. The embedding API maps identity by it.
+  user_attribute_update_settings {
+    attributes_require_verification_before_update = ["email"]
   }
 
   software_token_mfa_configuration {
@@ -195,8 +313,10 @@ resource "aws_cognito_user_pool" "app" {
     }
   }
 
+  # Threat protection enforced (Plus tier): the risk configuration below
+  # decides what happens with compromised passwords and risky sign-ins.
   user_pool_add_ons {
-    advanced_security_mode = "AUDIT"
+    advanced_security_mode = "ENFORCED"
   }
 }
 
@@ -228,15 +348,15 @@ resource "aws_cognito_user_pool_client" "web" {
   allowed_oauth_scopes                 = ["openid", "email", "profile"]
   supported_identity_providers         = ["COGNITO"]
 
-  callback_urls = [
-    "https://${aws_cloudfront_distribution.web.domain_name}/",
-    "${local.local_dev_origin}/",
-  ]
+  callback_urls = concat(
+    ["https://${aws_cloudfront_distribution.web.domain_name}/"],
+    [for origin in local.local_dev_origins : "${origin}/"],
+  )
 
-  logout_urls = [
-    "https://${aws_cloudfront_distribution.web.domain_name}/",
-    "${local.local_dev_origin}/",
-  ]
+  logout_urls = concat(
+    ["https://${aws_cloudfront_distribution.web.domain_name}/"],
+    [for origin in local.local_dev_origins : "${origin}/"],
+  )
 
   # Browser sign-in uses the Hosted UI with PKCE. Password-based admin auth
   # stays disabled so AWS credentials alone cannot mint user tokens.
@@ -258,10 +378,10 @@ resource "aws_cognito_user_pool_client" "web" {
 
 resource "aws_cognito_user" "initial_admin" {
   user_pool_id = aws_cognito_user_pool.app.id
-  username     = "rnhernandez@infile.com"
+  username     = var.app_admin_email
 
   attributes = {
-    email          = "rnhernandez@infile.com"
+    email          = var.app_admin_email
     email_verified = true
   }
 
@@ -303,11 +423,16 @@ resource "aws_iam_role_policy" "embedding_api" {
         Sid    = "WriteLambdaLogs"
         Effect = "Allow"
         Action = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
         ]
-        Resource = "arn:aws:logs:us-east-1:503561412084:log-group:/aws/lambda/${local.lambda_name}:*"
+        Resource = "${aws_cloudwatch_log_group.lambda["embedding-api"].arn}:*"
+      },
+      {
+        Sid      = "Tracing"
+        Effect   = "Allow"
+        Action   = ["xray:PutTraceSegments", "xray:PutTelemetryRecords"]
+        Resource = "*"
       },
       {
         # Any user in the default namespace, so each person embeds with their own
@@ -316,15 +441,15 @@ resource "aws_iam_role_policy" "embedding_api" {
         Effect = "Allow"
         Action = ["quicksight:GenerateEmbedUrlForRegisteredUser"]
         Resource = [
-          "arn:aws:quicksight:us-east-1:503561412084:user/default/*",
-          "arn:aws:quicksight:us-east-1:503561412084:dashboard/pulso-facturacion-dev",
+          "${local.arn_quicksight}:user/default/*",
+          "${local.arn_quicksight}:dashboard/pulso-facturacion-dev",
         ]
       },
       {
         Sid      = "ResolveCallerIdentity"
         Effect   = "Allow"
         Action   = ["quicksight:ListUsers"]
-        Resource = "arn:aws:quicksight:us-east-1:503561412084:user/default/*"
+        Resource = "${local.arn_quicksight}:user/default/*"
       },
       {
         # Read-only: lets the UI show when SPICE was last refreshed.
@@ -332,8 +457,8 @@ resource "aws_iam_role_policy" "embedding_api" {
         Effect = "Allow"
         Action = ["quicksight:ListIngestions"]
         Resource = [
-          "arn:aws:quicksight:us-east-1:503561412084:dataset/${aws_quicksight_data_set.sales.data_set_id}/ingestion/*",
-          "arn:aws:quicksight:us-east-1:503561412084:dataset/${aws_quicksight_data_set.comparativo.data_set_id}/ingestion/*",
+          "${local.arn_quicksight}:dataset/${aws_quicksight_data_set.sales.data_set_id}/ingestion/*",
+          "${local.arn_quicksight}:dataset/${aws_quicksight_data_set.comparativo.data_set_id}/ingestion/*",
         ]
       },
     ]
@@ -351,6 +476,15 @@ resource "aws_lambda_function" "embedding_api" {
   filename         = data.archive_file.embedding_api.output_path
   source_code_hash = data.archive_file.embedding_api.output_base64sha256
 
+  logging_config {
+    log_format = "Text"
+    log_group  = aws_cloudwatch_log_group.lambda["embedding-api"].name
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
+
   environment {
     variables = {
       QUICKSIGHT_ACCOUNT_ID = local.quicksight_account_id
@@ -360,12 +494,15 @@ resource "aws_lambda_function" "embedding_api" {
         aws_quicksight_data_set.comparativo.data_set_id,
       ])
 
-      # Single-tenant development: callers without their own QuickSight user
-      # fall back to this identity. Remove it before onboarding real users.
-      FALLBACK_QUICKSIGHT_USER_ARN = local.quicksight_admin_principal
-      ALLOWED_DOMAINS              = "https://${aws_cloudfront_distribution.web.domain_name},${local.local_dev_origin}"
-      CORS_ORIGIN                  = "https://${aws_cloudfront_distribution.web.domain_name}"
-      NODE_OPTIONS                 = "--enable-source-maps"
+      # Public test delivery: any verified email may use the shared Quick
+      # identity. Remove ALLOW_ANY_EMAIL from cognito_signup.tf and restore
+      # ALLOWED_EMAIL_DOMAINS here before using this outside a controlled test.
+
+      SHARED_QUICKSIGHT_USER_ARN = local.quicksight_admin_principal
+      ALLOWED_EMAIL_DOMAINS      = ""
+      ALLOWED_DOMAINS            = join(",", concat(["https://${aws_cloudfront_distribution.web.domain_name}"], local.local_dev_origins))
+      CORS_ORIGIN                = "https://${aws_cloudfront_distribution.web.domain_name}"
+      NODE_OPTIONS               = "--enable-source-maps"
     }
   }
 }
@@ -375,10 +512,10 @@ resource "aws_apigatewayv2_api" "embedding_api" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = [
-      "https://${aws_cloudfront_distribution.web.domain_name}",
-      local.local_dev_origin,
-    ]
+    allow_origins = concat(
+      ["https://${aws_cloudfront_distribution.web.domain_name}"],
+      local.local_dev_origins,
+    )
     allow_methods = ["GET", "OPTIONS"]
     allow_headers = ["authorization", "content-type"]
     max_age       = 300
@@ -430,6 +567,12 @@ resource "aws_apigatewayv2_stage" "default" {
     throttling_burst_limit = 20
     throttling_rate_limit  = 50
   }
+
+  # The caller is logged as the Cognito sub, never the email.
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_access.arn
+    format          = local.api_access_log_format
+  }
 }
 
 resource "aws_lambda_permission" "api_gateway" {
@@ -451,8 +594,11 @@ resource "aws_s3_object" "web_runtime_config" {
 
   content = jsonencode({
     apiBaseUrl      = aws_apigatewayv2_stage.default.invoke_url
-    cognitoDomain   = "https://${aws_cognito_user_pool_domain.app.domain}.auth.us-east-1.amazoncognito.com"
+    cognitoDomain   = "https://${aws_cognito_user_pool_domain.app.domain}.auth.${local.region}.amazoncognito.com"
     cognitoClientId = aws_cognito_user_pool_client.web.id
-    region          = "us-east-1"
+    region          = local.region
+    # Custom agent created by scripts/quicksight/sync_agent.py; pins the chat to
+    # the sales space. Remove this line to fall back to the default Quick chat.
+    quickChatAgentId = "ventas-inteligentes-analista"
   })
 }

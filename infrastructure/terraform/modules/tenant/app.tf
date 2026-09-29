@@ -9,7 +9,7 @@
  * Ported from the pilot's application.tf, where the account id was hardcoded.
  * Differences from the pilot, on purpose:
  *
- *   - No FALLBACK_QUICKSIGHT_USER_ARN. In the pilot, a caller without their own
+ *   - No SHARED_QUICKSIGHT_USER_ARN. In the pilot, a caller without their own
  *     QuickSight user inherited the administrator's identity. Here every app
  *     user gets a real QuickSight user (see aws_quicksight_user.app) and an
  *     unknown caller is rejected with 403.
@@ -17,8 +17,8 @@
  *     default. QuickSight rejects http://127.0.0.1 and only accepts http:// for
  *     the literal host "localhost", so local dev must use localhost:5173.
  *
- * No CloudWatch log groups are declared: an organization SCP forbids deleting
- * them, so Terraform must never own them.
+ * Log groups live in observability.tf with skip_destroy: an organization SCP
+ * forbids deleting them, so a destroy only forgets them.
  */
 
 locals {
@@ -79,6 +79,33 @@ resource "aws_s3_bucket_versioning" "web" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "web" {
+  bucket = aws_s3_bucket.web.id
+
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+# Each deploy replaces the build; old versions are kept 30 days for rollback.
+resource "aws_s3_bucket_lifecycle_configuration" "web" {
+  bucket = aws_s3_bucket.web.id
+
+  rule {
+    id     = "noncurrent-versions"
+    status = "Enabled"
+    filter {}
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+
+  depends_on = [aws_s3_bucket_versioning.web]
+}
+
 resource "aws_cloudfront_origin_access_control" "web" {
   name                              = "${local.prefix}-web-oac"
   origin_access_control_origin_type = "s3"
@@ -91,6 +118,8 @@ resource "aws_cloudfront_distribution" "web" {
   comment             = "Ventas Inteligentes - ${var.tenant_name}"
   default_root_object = "index.html"
   price_class         = var.cloudfront_price_class
+  http_version        = "http2and3"
+  web_acl_id          = var.enable_waf ? aws_wafv2_web_acl.web[0].arn : null
   aliases             = var.app_domain_aliases
   tags                = local.tags
 
@@ -108,7 +137,8 @@ resource "aws_cloudfront_distribution" "web" {
     compress               = true
 
     # Managed-CachingOptimized
-    cache_policy_id = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    cache_policy_id            = "658327ea-f89d-4fab-a63d-7e88639e58f6"
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.web.id
   }
 
   # Single-page application routing.
@@ -132,17 +162,89 @@ resource "aws_cloudfront_distribution" "web" {
     }
   }
 
+  # Note: with the default *.cloudfront.net certificate CloudFront keeps its own
+  # TLS floor; minimum_protocol_version only applies with app_certificate_arn.
   viewer_certificate {
     cloudfront_default_certificate = var.app_certificate_arn == null
     acm_certificate_arn            = var.app_certificate_arn
     ssl_support_method             = var.app_certificate_arn == null ? null : "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2021"
+    # With the default certificate AWS always applies TLSv1; TLS 1.2+ is
+    # enforced only with a custom domain and its ACM certificate.
+    minimum_protocol_version = var.app_certificate_arn == null ? "TLSv1" : "TLSv1.2_2021"
   }
 
   lifecycle {
     precondition {
       condition     = length(var.app_domain_aliases) == 0 || var.app_certificate_arn != null
       error_message = "app_domain_aliases requiere app_certificate_arn: un certificado ACM en us-east-1 para esos nombres."
+    }
+  }
+}
+
+/**
+ * Browser security headers. Wildcards for API Gateway and Cognito avoid a
+ * dependency cycle (both reference the distribution's domain). The CSP starts
+ * in report-only mode: violations show in the browser console without breaking
+ * the embedded dashboard or chat; enforce it once they are clean.
+ */
+locals {
+  content_security_policy = join("; ", [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://*.execute-api.${var.region}.amazonaws.com https://*.auth.${var.region}.amazoncognito.com https://cognito-idp.${var.region}.amazonaws.com",
+    "frame-src https://*.quicksight.aws.amazon.com",
+    "frame-ancestors 'none'",
+    "base-uri 'self'",
+    "form-action 'self' https://*.amazoncognito.com",
+    "object-src 'none'",
+  ])
+}
+
+resource "aws_cloudfront_response_headers_policy" "web" {
+  name    = "${local.prefix}-web-security"
+  comment = "Security headers for the Ventas Inteligentes SPA"
+
+  security_headers_config {
+    strict_transport_security {
+      access_control_max_age_sec = 63072000
+      include_subdomains         = true
+      override                   = true
+    }
+
+    content_type_options {
+      override = true
+    }
+
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+
+    dynamic "content_security_policy" {
+      for_each = var.content_security_policy_enforced ? [1] : []
+      content {
+        content_security_policy = local.content_security_policy
+        override                = true
+      }
+    }
+  }
+
+  dynamic "custom_headers_config" {
+    for_each = var.content_security_policy_enforced ? [] : [1]
+    content {
+      items {
+        header   = "Content-Security-Policy-Report-Only"
+        value    = local.content_security_policy
+        override = true
+      }
     }
   }
 }
@@ -214,6 +316,12 @@ resource "aws_cognito_user_pool" "app" {
     allow_admin_create_user_only = true
   }
 
+  # A changed email only takes effect once verified; until then the old,
+  # verified address stays in the token. The embedding API maps identity by it.
+  user_attribute_update_settings {
+    attributes_require_verification_before_update = ["email"]
+  }
+
   software_token_mfa_configuration {
     enabled = true
   }
@@ -246,8 +354,9 @@ resource "aws_cognito_user_pool" "app" {
     }
   }
 
+  # Threat protection needs the Plus tier; with Essentials it stays off.
   user_pool_add_ons {
-    advanced_security_mode = "AUDIT"
+    advanced_security_mode = var.cognito_user_pool_tier == "PLUS" ? "ENFORCED" : "OFF"
   }
 }
 
@@ -372,8 +481,8 @@ resource "aws_iam_role" "embedding_api" {
   })
 }
 
-# Log creation only. Terraform never manages or deletes log groups
-# because an organization SCP forbids CloudWatch deletions.
+# The log group is declared in observability.tf (retention, skip_destroy), so
+# the function only writes to it.
 resource "aws_iam_role_policy" "embedding_api" {
   name = local.embedding_lambda_name
   role = aws_iam_role.embedding_api.id
@@ -385,11 +494,16 @@ resource "aws_iam_role_policy" "embedding_api" {
         Sid    = "WriteLambdaLogs"
         Effect = "Allow"
         Action = [
-          "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
         ]
-        Resource = "arn:aws:logs:${var.region}:${var.account_id}:log-group:/aws/lambda/${local.embedding_lambda_name}:*"
+        Resource = "${aws_cloudwatch_log_group.lambda["embedding-api"].arn}:*"
+      },
+      {
+        Sid      = "Tracing"
+        Effect   = "Allow"
+        Action   = ["xray:PutTraceSegments", "xray:PutTelemetryRecords"]
+        Resource = "*"
       },
       {
         # Any user in the default namespace, so each person embeds with their own
@@ -434,6 +548,15 @@ resource "aws_lambda_function" "embedding_api" {
   source_code_hash = data.archive_file.embedding_api.output_base64sha256
   tags             = local.tags
 
+  logging_config {
+    log_format = "Text"
+    log_group  = aws_cloudwatch_log_group.lambda["embedding-api"].name
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
+
   environment {
     variables = {
       # AWS_ACCOUNT_ID is a reserved name and cannot be set on a Lambda.
@@ -444,7 +567,7 @@ resource "aws_lambda_function" "embedding_api" {
         aws_quicksight_data_set.periods.data_set_id,
       ])
 
-      # No FALLBACK_QUICKSIGHT_USER_ARN here: a caller with no QuickSight user
+      # No SHARED_QUICKSIGHT_USER_ARN here: a caller with no QuickSight user
       # of their own must be rejected, not promoted to the admin identity.
       ALLOWED_DOMAINS = join(",", local.app_origins)
       CORS_ORIGIN     = local.app_url
@@ -512,6 +635,13 @@ resource "aws_apigatewayv2_stage" "default" {
     throttling_burst_limit = 20
     throttling_rate_limit  = 50
   }
+
+  # Who called, which route, the result and why an authorizer rejected it.
+  # The caller is the Cognito sub, never the email.
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_access.arn
+    format          = local.api_access_log_format
+  }
 }
 
 # Account-wide permission (execution_arn/*/*), not per route: scoping it to one
@@ -533,10 +663,15 @@ resource "aws_s3_object" "web_runtime_config" {
   content_type  = "application/json"
   cache_control = "no-store"
 
-  content = jsonencode({
-    apiBaseUrl      = aws_apigatewayv2_stage.default.invoke_url
-    cognitoDomain   = "https://${aws_cognito_user_pool_domain.app.domain}.auth.${var.region}.amazoncognito.com"
-    cognitoClientId = aws_cognito_user_pool_client.web.id
-    region          = var.region
-  })
+  content = jsonencode(merge(
+    {
+      apiBaseUrl      = aws_apigatewayv2_stage.default.invoke_url
+      cognitoDomain   = "https://${aws_cognito_user_pool_domain.app.domain}.auth.${var.region}.amazoncognito.com"
+      cognitoClientId = aws_cognito_user_pool_client.web.id
+      region          = var.region
+    },
+    # Pins the embedded chat to the tenant's agent. Omitted, the app falls back
+    # to the default Quick chat.
+    var.quick_chat_agent_id == null ? {} : { quickChatAgentId = var.quick_chat_agent_id },
+  ))
 }

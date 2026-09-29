@@ -1,0 +1,105 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web-and-services:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint (oxlint)
+        run: npm run lint
+
+      - name: Format check (prettier)
+        run: npm run format:check
+
+      - name: Typecheck (tsc)
+        run: npm run typecheck
+
+      - name: Unit tests (vitest)
+        run: npm run test:coverage
+
+      - name: Build web app
+        run: npm run build:web
+
+      - name: Lambda bundles build
+        run: scripts/build_lambda_bundle.sh
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          if-no-files-found: ignore
+          retention-days: 7
+
+  python:
+    name: Ruff (ETL and scripts)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+      - run: uvx ruff@0.14.0 check .
+      - run: uvx ruff@0.14.0 format --check .
+
+  terraform:
+    name: Terraform fmt and validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.16.4
+
+      - name: fmt
+        run: terraform -chdir=infrastructure/terraform fmt -check -recursive -diff
+
+      - name: validate root module
+        working-directory: infrastructure/terraform
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+      - name: validate tenant module
+        working-directory: infrastructure/terraform/modules/tenant
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+      - name: validate bootstrap
+        working-directory: infrastructure/terraform/bootstrap
+        run: |
+          terraform init -backend=false -input=false
+          terraform validate
+
+  shell:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt-get update -q && sudo apt-get install -y -q shellcheck
+      - run: shellcheck -S warning scripts/*.sh

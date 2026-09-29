@@ -1,0 +1,10 @@
+node_modules/
+**/dist/
+build/
+coverage/
+package-lock.json
+infrastructure/quicksight/generated/
+infrastructure/terraform/
+data/
+docs/costos/
+*.md

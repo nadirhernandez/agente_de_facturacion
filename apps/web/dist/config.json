@@ -1,7 +1,0 @@
-{
-  "apiBaseUrl": "https://przb6i4xl5.execute-api.us-east-1.amazonaws.com/",
-  "cognitoDomain": "https://ventas-inteligentes-dev-503561412084.auth.us-east-1.amazoncognito.com",
-  "cognitoClientId": "33onu8vmtitrcaegfq88gpssie",
-  "region": "us-east-1",
-  "quickChatAgentId": "ventas-inteligentes-analista"
-}

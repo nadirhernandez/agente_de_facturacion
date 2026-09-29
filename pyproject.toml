@@ -1,0 +1,23 @@
+# Lint/format configuration for the Python code (Glue job and operator scripts).
+# There is no Python package to install; run with `uvx ruff check .` or via CI.
+[tool.ruff]
+target-version = "py311"
+line-length = 110
+extend-exclude = ["node_modules", "build", "infrastructure"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "N"]
+ignore = [
+  # Long lines are prose (agent/topic instructions), not code; the formatter handles code.
+  "E501",
+  # subprocess calls to the aws CLI are the point of the QuickSight scripts.
+  "S603", "S607",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Synthetic data generators: `random` is intentionally non-cryptographic.
+"scripts/generate_sales_demo.py" = ["S311"]
+"scripts/produce_invoices.py" = ["S311"]
+# PySpark convention `functions as F`; MERGE statements embed date literals that
+# are produced from parsed dates (date_literals), never from raw input.
+"etl/glue/flatten_invoices.py" = ["N812", "S608"]

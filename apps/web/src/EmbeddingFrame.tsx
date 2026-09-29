@@ -7,32 +7,38 @@ interface EmbeddingFrameProps {
   experience: EmbedExperience;
   url?: string;
   error?: string;
-  /** Agente de Quick al que se fija el chat. Sin él, se usa el iframe directo de siempre. */
+  /** Agente de Quick al que se fija el chat. Sin él, se usa el iframe directo. */
   chatAgentId?: string;
+  /** Se envía una sola vez al montar el chat; no se inyecta en el DOM del iframe. */
+  initialPrompt?: string;
+  onChatReady?: () => void;
   onRetry: () => void;
 }
 
-export function EmbeddingFrame({ title, experience, url, error, chatAgentId, onRetry }: EmbeddingFrameProps) {
-  const [mountError, setMountError] = useState<string>();
-  const shownError = error ?? mountError;
-
-  // Un error de montaje pertenece a una URL: al pedir otra, se descarta.
-  useEffect(() => setMountError(undefined), [url]);
+export function EmbeddingFrame({
+  title,
+  experience,
+  url,
+  error,
+  chatAgentId,
+  initialPrompt,
+  onChatReady,
+  onRetry,
+}: EmbeddingFrameProps) {
+  // A mount error belongs to the URL that failed: a new URL clears it by itself.
+  const [mountError, setMountError] = useState<{ url: string; message: string }>();
+  const shownError =
+    error ?? (mountError && mountError.url === url ? mountError.message : undefined);
 
   if (shownError) {
     return (
-      <section className="embed-state" aria-live="polite">
-        <div className="state-icon">!</div>
+      <section className="embed-state" role="alert">
+        <div aria-hidden="true" className="state-icon">
+          !
+        </div>
         <h2>No se pudo abrir {title.toLowerCase()}</h2>
         <p>{shownError}</p>
-        <button
-          className="secondary-button"
-          onClick={() => {
-            setMountError(undefined);
-            onRetry();
-          }}
-          type="button"
-        >
+        <button className="secondary-button" onClick={onRetry} type="button">
           Reintentar
         </button>
       </section>
@@ -42,17 +48,46 @@ export function EmbeddingFrame({ title, experience, url, error, chatAgentId, onR
   if (!url) {
     return (
       <section className="embed-state" aria-live="polite">
-        <div className="loading-mark" />
+        <div className="skeleton-shell" aria-hidden="true">
+          <span className="skeleton-bar wide" />
+          <span className="skeleton-bar" />
+          <span className="skeleton-panel" />
+        </div>
         <p>Cargando {title.toLowerCase()}…</p>
       </section>
     );
   }
 
-  if (experience === "chat" && chatAgentId) {
-    return <AgentChat agentId={chatAgentId} onError={setMountError} title={title} url={url} />;
+  if (!isQuickSightUrl(url)) {
+    return (
+      <section className="embed-state" role="alert">
+        <div aria-hidden="true" className="state-icon">
+          !
+        </div>
+        <h2>No se pudo abrir {title.toLowerCase()}</h2>
+        <p>La dirección recibida no es de Amazon Quick.</p>
+      </section>
+    );
   }
 
+  if (experience === "chat" && chatAgentId) {
+    return (
+      <AgentChat
+        agentId={chatAgentId}
+        initialPrompt={initialPrompt}
+        onError={(message) => setMountError({ url, message })}
+        onReady={onChatReady}
+        title={title}
+        url={url}
+      />
+    );
+  }
+
+  // No `sandbox`: the QuickSight dashboard needs scripts, same-origin storage,
+  // forms and popups (exports); the URL is already restricted to QuickSight over
+  // HTTPS by isQuickSightUrl and the page CSP `frame-src`.
   return (
+    // oxlint-disable-next-line react/iframe-missing-sandbox
     <iframe
       allow="fullscreen"
       className="embedded-experience"
@@ -67,32 +102,53 @@ let contextPromise: Promise<EmbeddingContext> | undefined;
 
 /** El SDK agrega un iframe oculto de control al body: se crea una vez por página. */
 function embeddingContext(): Promise<EmbeddingContext> {
-  contextPromise ??= createEmbeddingContext();
+  contextPromise ??= createEmbeddingContext().catch((error: unknown) => {
+    contextPromise = undefined;
+    throw error;
+  });
   return contextPromise;
+}
+
+/** Only QuickSight embed URLs over HTTPS are ever put in the iframe. */
+export function isQuickSightUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      url.protocol === "https:" &&
+      (url.hostname === "quicksight.aws.amazon.com" ||
+        url.hostname.endsWith(".quicksight.aws.amazon.com"))
+    );
+  } catch {
+    return false;
+  }
 }
 
 interface AgentChatProps {
   title: string;
   url: string;
   agentId: string;
+  initialPrompt?: string;
+  onReady?: () => void;
   onError: (message: string) => void;
 }
 
 /**
- * Chat de Quick fijado a un agente propio, ligado solo al espacio de ventas.
- * El SDK agrega estas opciones como parámetros de la URL de embedding.
+ * Chat fijado al agente de ventas. Private mode and hidden history prevent the
+ * shared pilot identity from exposing one tester's conversation to another.
  */
-function AgentChat({ title, url, agentId, onError }: AgentChatProps) {
+function AgentChat({ title, url, agentId, initialPrompt, onReady, onError }: AgentChatProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mountedUrl = useRef<string>(undefined);
+  // Capture only the prompt that belongs to this one-use embed URL. A state
+  // update after mount must never submit it twice.
+  const initialPromptRef = useRef(initialPrompt);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    // La URL trae un código de autorización de un solo uso. StrictMode vuelve
-    // a ejecutar este efecto en desarrollo sobre el mismo nodo; montarla dos
-    // veces deja el chat en blanco. Solo se monta de nuevo si la URL cambió.
+    // Each embed URL is mounted exactly once; re-runs caused by a new callback
+    // identity are no-ops.
     if (mountedUrl.current === url) return;
     mountedUrl.current = url;
     container.replaceChildren();
@@ -111,18 +167,21 @@ function AgentChat({ title, url, agentId, onError }: AgentChatProps) {
           {
             agentOptions: { fixedAgentId: agentId },
             promptOptions: {
-              // La conversación se queda en los datos de ventas.
+              initialPrompt: initialPromptRef.current,
+              showInitialPromptMessage: Boolean(initialPromptRef.current),
               showWebSearch: false,
               allowFileAttachments: false,
               showAgentKnowledgeBoundary: false,
+              showChatHistory: false,
+              enablePrivateMode: true,
             },
             footerOptions: { showBrandAttribution: false },
           },
         );
 
-        // El SDK no le pone nombre accesible al iframe.
         const iframe = container.querySelector("iframe");
         if (iframe) iframe.title = title;
+        onReady?.();
       } catch (caught) {
         console.error("No se pudo montar el chat del agente", caught);
         if (mountedUrl.current === url) {
@@ -130,7 +189,7 @@ function AgentChat({ title, url, agentId, onError }: AgentChatProps) {
         }
       }
     })();
-  }, [url, agentId, title, onError]);
+  }, [url, agentId, title, onError, onReady]);
 
   return <div className="embed-container" ref={containerRef} />;
 }
