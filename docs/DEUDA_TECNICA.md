@@ -16,6 +16,7 @@ piloto como producto. Cada punto dice qué falta, por qué se pospuso y qué des
 | 9 | El módulo tenant crea el bucket de datos en vez de recibirlo | Contradice el principio "los JSON ya están en el bucket" | Alta |
 | 10 | Estado y credenciales de los tenants acoplados a la cuenta piloto | Backend, perfil y `assume_role` apuntan a INFILE | Alta |
 | 11 | Dashboard, Topic y agente de Quick no son reproducibles por cliente | Solo existen en el piloto; scripts con defaults fijos | Alta |
+| 12 | Multimoneda (`eae4f28`) requiere backfill al desplegar | En `main`, no desplegado; sin backfill el dashboard queda vacío | Alta al desplegar |
 
 ## 1. Content-Security-Policy
 
@@ -100,6 +101,22 @@ Los reformateos de `ruff format` y `terraform fmt` entraron en el commit `eae4f2
 con cambios funcionales en `sql/model` (nueva tabla `31_agg_ventas_diario_moneda.sql`, vistas
 `10`, `20`, `30`, `40`) y `sales_alerts.mjs` que no pasaron por revisión ni por el CI antes de
 llegar a `main`. Conviene una revisión posterior de ese commit.
+
+## 12. Despliegue del soporte multimoneda (commit `eae4f28`)
+
+El commit está en `main` pero **no desplegado** (verificado el 2026-09-29: script de Glue en S3,
+Lambda `deploy-views` y vistas del catálogo siguen en la versión anterior). Cuando se aplique:
+
+1. `terraform apply` sube el job nuevo, actualiza las Lambdas y `deploy-views` crea
+   `agg_ventas_diario_moneda` **vacía** y reemplaza las vistas 20/30/40 para leer de ella.
+2. **Backfill obligatorio**, o el dataset de períodos y la pestaña Pulso quedan en blanco:
+   `INSERT INTO agg_ventas_diario_moneda SELECT fecha, 'GTQ', facturacion_total, ventas_sin_iva,
+   iva, facturas, unidades, actualizado_en FROM agg_ventas_diario` (todo el histórico es GTQ; el job
+   solo recalcula los días que toca cada carga nueva). Alternativa más cara: correr el job con
+   `--REPROCESS_ALL true`.
+3. Refresh completo de SPICE en ambos datasets.
+4. Antes de cargar la primera factura en USD: revisar que ningún visual del dashboard ni el Topic
+   sume importes sin filtrar o agrupar por `codigo_moneda`.
 
 ## 9. El módulo tenant debe recibir el bucket de datos, no crearlo
 
