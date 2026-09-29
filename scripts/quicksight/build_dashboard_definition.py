@@ -48,12 +48,15 @@ def subtitle(text: str) -> dict:
     }
 
 
-# Todos los montos son quetzales (codigo_moneda = GTQ). Sin formato explícito
-# Quick muestra "$"; con prefijo "Q" nunca aparece otra moneda.
-QUETZALES = {
+# Los importes están en su moneda original (GTQ o USD) y el tablero muestra una
+# sola moneda a la vez, elegida con el parámetro Moneda. Por eso el formato es
+# neutro (sin prefijo): un "Q" o "$" fijo etiquetaría mal la otra moneda. La
+# moneda visible va en los títulos con <<$Moneda>>.
+CURRENCY_PARAMETER = "Moneda"
+CURRENCY_TOKEN = f"<<${CURRENCY_PARAMETER}>>"
+IMPORTE = {
     "FormatConfiguration": {
         "NumberDisplayFormatConfiguration": {
-            "Prefix": "Q",
             "DecimalPlacesConfiguration": {"DecimalPlaces": 2},
             "NumberScale": "NONE",
             "SeparatorConfiguration": {
@@ -88,7 +91,7 @@ def numeric_measure(column_name: str, field_id: str) -> dict:
             "FieldId": field_id,
             "Column": field_reference(column_name),
             "AggregationFunction": {"SimpleNumericalAggregation": "SUM"},
-            "FormatConfiguration": ENTEROS if column_name in QUANTITY_COLUMNS else QUETZALES,
+            "FormatConfiguration": ENTEROS if column_name in QUANTITY_COLUMNS else IMPORTE,
         }
     }
 
@@ -228,15 +231,30 @@ def dashboard_definition() -> dict:
                 "SheetId": "f4b7de62-f81d-48fa-b411-64faace12957",
                 "Name": "Pulso de Facturación",
                 "ContentType": "INTERACTIVE",
+                "ParameterControls": [
+                    {
+                        "Dropdown": {
+                            "ParameterControlId": "control-moneda",
+                            "Title": "Moneda",
+                            "SourceParameterName": CURRENCY_PARAMETER,
+                            "Type": "SINGLE_SELECT",
+                            "SelectableValues": {"LinkToDataSetColumn": field_reference("codigo_moneda")},
+                            "DisplayOptions": {
+                                "TitleOptions": {"Visibility": "VISIBLE"},
+                                "SelectAllOptions": {"Visibility": "HIDDEN"},
+                            },
+                        }
+                    }
+                ],
                 "Visuals": [
                     kpi(
                         "kpi-facturacion-total",
-                        "Facturación total",
+                        "Facturación total · " + CURRENCY_TOKEN,
                         numeric_measure("facturacion_total_linea", "kpi-total-value"),
                     ),
                     kpi(
                         "kpi-ventas-sin-iva",
-                        "Ventas sin IVA",
+                        "Ventas sin IVA · " + CURRENCY_TOKEN,
                         numeric_measure("ventas_sin_iva_linea", "kpi-neto-value"),
                     ),
                     kpi(
@@ -251,25 +269,25 @@ def dashboard_definition() -> dict:
                     ),
                     line_chart(
                         "linea-tendencia-mensual",
-                        "Tendencia mensual de facturación",
+                        "Tendencia mensual de facturación · " + CURRENCY_TOKEN,
                         date_dimension("fecha", "tendencia-fecha"),
                         numeric_measure("facturacion_total_linea", "tendencia-total"),
                     ),
                     bar_chart(
                         "barras-region",
-                        "Regiones líderes por facturación",
+                        "Regiones líderes por facturación · " + CURRENCY_TOKEN,
                         categorical_dimension("region", "region-category"),
                         numeric_measure("facturacion_total_linea", "region-total"),
                     ),
                     bar_chart(
                         "barras-categoria",
-                        "Categorías líderes por ventas sin IVA",
+                        "Categorías líderes por ventas sin IVA · " + CURRENCY_TOKEN,
                         categorical_dimension("categoria", "categoria-category"),
                         numeric_measure("ventas_sin_iva_linea", "categoria-neto"),
                     ),
                     bar_chart(
                         "barras-producto",
-                        "Productos líderes por facturación",
+                        "Productos líderes por facturación · " + CURRENCY_TOKEN,
                         categorical_dimension("producto", "producto-category"),
                         numeric_measure("facturacion_total_linea", "producto-total"),
                     ),
@@ -300,19 +318,27 @@ def dashboard_definition() -> dict:
             }
         ],
         "CalculatedFields": [],
-        "ParameterDeclarations": [],
+        "ParameterDeclarations": [
+            {
+                "StringParameterDeclaration": {
+                    "ParameterValueType": "SINGLE_VALUED",
+                    "Name": CURRENCY_PARAMETER,
+                    "DefaultValues": {"StaticValues": ["GTQ"]},
+                }
+            }
+        ],
         "FilterGroups": [
             {
-                "FilterGroupId": "dashboard-moneda-gtq",
+                "FilterGroupId": "dashboard-moneda",
                 "Filters": [
                     {
                         "CategoryFilter": {
-                            "FilterId": "filtro-moneda-gtq",
+                            "FilterId": "filtro-moneda",
                             "Column": field_reference("codigo_moneda"),
                             "Configuration": {
-                                "FilterListConfiguration": {
+                                "CustomFilterConfiguration": {
                                     "MatchOperator": "EQUALS",
-                                    "CategoryValues": ["GTQ"],
+                                    "ParameterName": CURRENCY_PARAMETER,
                                     "NullOption": "NON_NULLS_ONLY",
                                 }
                             },

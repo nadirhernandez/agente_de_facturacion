@@ -13,10 +13,10 @@ piloto como producto. Cada punto dice qué falta, por qué se pospuso y qué des
 | 6 | Aviso de `npm audit` en `uuid` (transitiva del SDK de embedding) | Sin corrección disponible sin romper el SDK | Baja |
 | 7 | Sin tope de tiempo en splash ni en el montaje del chat | Un arranque lento se ve como cuelgue | Baja |
 | 8 | Cambios de formato Python/Terraform sin commitear | **Resuelto** en el commit `eae4f28` (2026-09-28) | — |
-| 9 | El módulo tenant crea el bucket de datos en vez de recibirlo | Contradice el principio "los JSON ya están en el bucket" | Alta |
+| 9 | ¿El módulo crea o recibe el bucket de datos? | **Resuelto por decisión (2026-09-29):** lo crea la IaC; el cliente deposita después | — |
 | 10 | Estado y credenciales de los tenants acoplados a la cuenta piloto | Backend, perfil y `assume_role` apuntan a INFILE | Alta |
 | 11 | Dashboard, Topic y agente de Quick no son reproducibles por cliente | Solo existen en el piloto; scripts con defaults fijos | Alta |
-| 12 | Multimoneda (`eae4f28`) requiere backfill al desplegar | En `main`, no desplegado; sin backfill el dashboard queda vacío | Alta al desplegar |
+| 12 | Despliegue del soporte multimoneda | Backfill automático listo (rama `multimoneda-seguro`); falta aplicar y republicar dashboard/Topic/agente | Alta |
 
 ## 1. Content-Security-Policy
 
@@ -102,42 +102,43 @@ con cambios funcionales en `sql/model` (nueva tabla `31_agg_ventas_diario_moneda
 `10`, `20`, `30`, `40`) y `sales_alerts.mjs` que no pasaron por revisión ni por el CI antes de
 llegar a `main`. Conviene una revisión posterior de ese commit.
 
-## 12. Despliegue del soporte multimoneda (commit `eae4f28`)
+## 12. Despliegue del soporte multimoneda
 
-El commit está en `main` pero **no desplegado** (verificado el 2026-09-29: script de Glue en S3,
-Lambda `deploy-views` y vistas del catálogo siguen en la versión anterior). Cuando se aplique:
+El commit `eae4f28` (modelo, job de Glue, Topic, agente) más la rama `multimoneda-seguro`
+(migración automática, dashboard con selector de moneda, alertas por moneda) están en el repo pero
+**no desplegados**. Estado verificado el 2026-09-29: script de Glue en S3, Lambda `deploy-views` y
+vistas del catálogo siguen en la versión anterior; la tabla `fct_lineas_factura` ya tiene
+`codigo_moneda` y el 100 % de las filas es GTQ.
 
-1. `terraform apply` sube el job nuevo, actualiza las Lambdas y `deploy-views` crea
-   `agg_ventas_diario_moneda` **vacía** y reemplaza las vistas 20/30/40 para leer de ella.
-2. **Backfill obligatorio**, o el dataset de períodos y la pestaña Pulso quedan en blanco:
-   `INSERT INTO agg_ventas_diario_moneda SELECT fecha, 'GTQ', facturacion_total, ventas_sin_iva,
-   iva, facturas, unidades, actualizado_en FROM agg_ventas_diario` (todo el histórico es GTQ; el job
-   solo recalcula los días que toca cada carga nueva). Alternativa más cara: correr el job con
-   `--REPROCESS_ALL true`.
-3. Refresh completo de SPICE en ambos datasets.
-4. Antes de cargar la primera factura en USD: revisar que ningún visual del dashboard ni el Topic
-   sume importes sin filtrar o agrupar por `codigo_moneda`.
+Lo que ya no es manual: `sql/model/migrations/10_backfill_agg_ventas_diario_moneda.sql` rellena
+`agg_ventas_diario_moneda` desde el detalle en cada despliegue (idempotente, probada de punta a
+punta en Athena con GTQ, USD en minúsculas y un documento anulado). Sin ella las vistas por moneda
+quedaban vacías hasta reprocesar todo.
 
-## 9. El módulo tenant debe recibir el bucket de datos, no crearlo
+Procedimiento de despliegue, en orden:
 
-Principio (ver [`PRINCIPIOS_DESPLIEGUE.md`](PRINCIPIOS_DESPLIEGUE.md), punto 1): el despliegue de un
-cliente empieza con los JSON ya en un bucket de su cuenta. Hoy `modules/tenant/main.tf` crea
-`vi-<tenant>-data-<account>` con toda su configuración, y expone `raw_delivery_uri` para que un
-sistema externo deposite ahí.
+1. `scripts/build_lambda_bundle.sh` y `terraform apply` en el piloto: sube el job, actualiza las
+   Lambdas (incluida la migración) y agrega `codigo_moneda` a los datasets. `deploy-views` corre en
+   el apply y deja el agregado por moneda poblado.
+2. Refresh completo de SPICE en ambos datasets (`refresh-spice` sin `jobRunId`, o desde consola).
+3. `python3 scripts/quicksight/build_dashboard_definition.py` y `aws quicksight update-analysis`
+   con el JSON generado, luego publicar el dashboard: incorpora el parámetro **Moneda** (control
+   desplegable, GTQ por defecto), formato numérico neutro y la moneda visible en cada título.
+4. `sync_topic.py` y `sync_agent.py`: instrucciones para separar siempre por moneda, `Q` y `US$`,
+   sin conversiones.
+5. Verificar con el chat: "¿cuánto facturamos el mes pasado?" debe responder por moneda cuando
+   existan ambas, y nunca un total combinado.
 
-**Cómo cerrarlo.**
+`agg_ventas_diario` (sin moneda) queda sin uso: se conserva para no borrar datos; retirarla más
+adelante junto con su archivo en `sql/model/tables`.
 
-1. Variables `data_bucket_name` (obligatoria) y `raw_prefix` (default `raw/`).
-2. Reemplazar `aws_s3_bucket.data` por `data "aws_s3_bucket"`; conservar como recursos gestionados
-   sobre el bucket existente solo lo que el pipeline necesita: notificación EventBridge, y de forma
-   opcional (`manage_data_bucket_hardening`) la política TLS-only, cifrado y lifecycle de resultados
-   de Athena y temporales de Glue.
-3. Quitar `data_writer_principals` y el output `raw_delivery_uri`; el punto de partida no es un
-   destino a registrar, es una fuente que ya existe.
-4. La ruta `warehouse/`, `athena-results/`, `quarantine/` y `glue-temp/` pueden vivir en el mismo
-   bucket bajo prefijos propios o en un segundo bucket creado por el módulo; decidir y documentar.
-5. Primera carga: `provision_tenant.sh` debe poder disparar el job de Glue con `--REPROCESS_ALL`
-   (o `start-ingestion`) para procesar lo que ya está en `raw/`.
+## 9. El bucket de datos lo crea la IaC (resuelto por decisión)
+
+Decisión del dueño del proyecto (2026-09-29): `terraform apply` crea el bucket de datos en la
+cuenta del cliente con toda su configuración y el cliente (o su sistema, autorizado con
+`data_writer_principals`) deposita los JSON después. Es lo que el módulo ya hace. Lo único que se
+retira es el concepto de "router central" y el uso del output `raw_delivery_uri` como destino a
+registrar en INFILE: sigue siendo útil como la ruta que se le entrega al cliente.
 
 ## 10. Estado y credenciales de los tenants sin pasar por la cuenta piloto
 

@@ -57,8 +57,10 @@ export function comparisonMonths(now = new Date()) {
 }
 
 /**
- * Month totals per region. The date bounds are literals on fecha, the fact
- * table's partition column, so Athena reads only those two months.
+ * Month totals per currency and region. Amounts in different currencies are
+ * never added together: each (moneda, region) pair is its own row. The date
+ * bounds are literals on fecha, the fact table's partition column, so Athena
+ * reads only those two months.
  */
 export function buildQuery(database, { mesActual, mesPrevio, hasta }) {
   if (!/^[a-z0-9_]+$/.test(database)) throw new Error(`Invalid ATHENA_DATABASE: ${database}`);
@@ -69,21 +71,22 @@ export function buildQuery(database, { mesActual, mesPrevio, hasta }) {
   return `
 WITH agregado AS (
   SELECT
+    codigo_moneda,
     region,
     sum(CASE WHEN fecha >= DATE '${mesActual}' THEN facturacion_total_linea ELSE 0 END) AS actual,
     sum(CASE WHEN fecha <  DATE '${mesActual}' THEN facturacion_total_linea ELSE 0 END) AS previo
   FROM ${database}.vw_ventas_comerciales
   WHERE fecha >= DATE '${mesPrevio}' AND fecha < DATE '${hasta}'
-    AND codigo_moneda = 'GTQ'
-  GROUP BY region
+  GROUP BY codigo_moneda, region
 )
 SELECT
+  codigo_moneda,
   region,
   round(actual, 2) AS facturacion_actual,
   round(previo, 2) AS facturacion_previa,
   CASE WHEN previo = 0 THEN NULL ELSE round((actual - previo) / previo * 100, 1) END AS variacion_pct
 FROM agregado
-ORDER BY variacion_pct ASC NULLS LAST
+ORDER BY codigo_moneda, variacion_pct ASC NULLS LAST
 `;
 }
 
@@ -108,8 +111,11 @@ async function runQuery(query) {
       const results = await athena.send(new GetQueryResultsCommand({ QueryExecutionId: id }));
       const [, ...rows] = results.ResultSet?.Rows ?? [];
       return rows.map((row) => {
-        const [region, actual, previo, variacion] = row.Data.map((cell) => cell.VarCharValue);
+        const [moneda, region, actual, previo, variacion] = row.Data.map(
+          (cell) => cell.VarCharValue,
+        );
         return {
+          moneda: moneda ?? "GTQ",
           region: region ?? "Sin región",
           actual: Number(actual ?? 0),
           previo: Number(previo ?? 0),
@@ -130,8 +136,14 @@ async function runQuery(query) {
   throw new Error(`Athena query ${id} timed out`);
 }
 
-const money = (value) =>
-  `Q ${value.toLocaleString("es-GT", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+/** Q for quetzales, US$ for dollars; never a bare "$" that could mean either. */
+export const CURRENCY_PREFIX = { GTQ: "Q", USD: "US$" };
+
+export const money = (value, moneda = "GTQ") =>
+  `${CURRENCY_PREFIX[moneda] ?? moneda} ${value.toLocaleString("es-GT", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 
 /**
  * Monthly review, scheduled by EventBridge on the 2nd of each month (the extra
@@ -160,14 +172,14 @@ export const handler = async (_event, _context, now = new Date()) => {
 
   const lines = drops.map(
     (row) =>
-      `• ${row.region}: ${row.variacion}%  (${money(row.actual)} vs ${money(row.previo)} el mes previo)`,
+      `• ${row.region} (${row.moneda}): ${row.variacion}%  (${money(row.actual, row.moneda)} vs ${money(row.previo, row.moneda)} el mes previo)`,
   );
 
   const growth = rows
     .filter((row) => row.variacion !== null && row.variacion > 0)
     .sort((a, b) => b.variacion - a.variacion)
     .slice(0, 2)
-    .map((row) => `• ${row.region}: +${row.variacion}%`);
+    .map((row) => `• ${row.region} (${row.moneda}): +${row.variacion}%`);
 
   const body = [
     `Caídas de facturación detectadas en ${mes}`,
@@ -178,7 +190,7 @@ export const handler = async (_event, _context, now = new Date()) => {
     ...(growth.length > 0 ? ["En crecimiento:", ...growth, ""] : []),
     `Revisa el detalle: ${process.env.APP_URL ?? ""}`,
     "",
-    "Métrica: facturación total con IVA, solo documentos emitidos, mes calendario completo (hora de Guatemala).",
+    "Métrica: facturación total con IVA por moneda (GTQ y USD por separado, sin conversión), solo documentos emitidos, mes calendario completo (hora de Guatemala).",
   ].join("\n");
 
   await sns.send(
