@@ -13,6 +13,9 @@ piloto como producto. Cada punto dice qué falta, por qué se pospuso y qué des
 | 6 | Aviso de `npm audit` en `uuid` (transitiva del SDK de embedding) | Sin corrección disponible sin romper el SDK | Baja |
 | 7 | Sin tope de tiempo en splash ni en el montaje del chat | Un arranque lento se ve como cuelgue | Baja |
 | 8 | Cambios de formato Python/Terraform sin commitear | Residuo de `ruff format` y `terraform fmt` | Baja |
+| 9 | El módulo tenant crea el bucket de datos en vez de recibirlo | Contradice el principio "los JSON ya están en el bucket" | Alta |
+| 10 | Estado y credenciales de los tenants acoplados a la cuenta piloto | Backend, perfil y `assume_role` apuntan a INFILE | Alta |
+| 11 | Dashboard, Topic y agente de Quick no son reproducibles por cliente | Solo existen en el piloto; scripts con defaults fijos | Alta |
 
 ## 1. Content-Security-Policy
 
@@ -97,3 +100,65 @@ que fue percepción de cuelgue, no fallo.
 funcional (`etl/glue/flatten_invoices.py`, `scripts/*.py`, `quicksight*.tf`, `.terraform.lock.hcl`).
 Quedaron en el árbol de trabajo sin commit para no mezclarlos. Revisar el diff, confirmar que es solo
 formato y commitearlos en un commit `style:` propio.
+
+## 9. El módulo tenant debe recibir el bucket de datos, no crearlo
+
+Principio (ver [`PRINCIPIOS_DESPLIEGUE.md`](PRINCIPIOS_DESPLIEGUE.md), punto 1): el despliegue de un
+cliente empieza con los JSON ya en un bucket de su cuenta. Hoy `modules/tenant/main.tf` crea
+`vi-<tenant>-data-<account>` con toda su configuración, y expone `raw_delivery_uri` para que un
+sistema externo deposite ahí.
+
+**Cómo cerrarlo.**
+
+1. Variables `data_bucket_name` (obligatoria) y `raw_prefix` (default `raw/`).
+2. Reemplazar `aws_s3_bucket.data` por `data "aws_s3_bucket"`; conservar como recursos gestionados
+   sobre el bucket existente solo lo que el pipeline necesita: notificación EventBridge, y de forma
+   opcional (`manage_data_bucket_hardening`) la política TLS-only, cifrado y lifecycle de resultados
+   de Athena y temporales de Glue.
+3. Quitar `data_writer_principals` y el output `raw_delivery_uri`; el punto de partida no es un
+   destino a registrar, es una fuente que ya existe.
+4. La ruta `warehouse/`, `athena-results/`, `quarantine/` y `glue-temp/` pueden vivir en el mismo
+   bucket bajo prefijos propios o en un segundo bucket creado por el módulo; decidir y documentar.
+5. Primera carga: `provision_tenant.sh` debe poder disparar el job de Glue con `--REPROCESS_ALL`
+   (o `start-ingestion`) para procesar lo que ya está en `raw/`.
+
+## 10. Estado y credenciales de los tenants sin pasar por la cuenta piloto
+
+Principio (punto 2): nada de un cliente depende de la cuenta `503561412084` ni de perfiles SSO de
+INFILE. Hoy `tenants/_template/main.tf` tiene backend S3 en el bucket de estado del piloto con
+`profile = "dashboards-dev-infile"` y un `assume_role` hacia `VentasInteligentesDeployer` desde la
+sesión del operador; `provision_tenant.sh` y `deploy_app.sh` leen el estado con ese perfil.
+
+**Cómo cerrarlo.**
+
+1. Bootstrap mínimo por cliente (`infrastructure/terraform/bootstrap`, parametrizado por cuenta):
+   bucket de estado versionado, cifrado y con lockfile, **en la cuenta del cliente**.
+2. Template: backend apuntando a ese bucket; provider sin `assume_role` fijo, usando las
+   credenciales que el operador tenga para la cuenta del cliente (perfil propio o rol otorgado por
+   el cliente). `allowed_account_ids = [var.account_id]` se mantiene como cerrojo.
+3. `provision_tenant.sh`, `deploy_app.sh`, `verify_tenant.sh`: eliminar cualquier referencia al
+   perfil del piloto; todo sale de `AWS_PROFILE` (o variables de entorno) de la cuenta del cliente.
+4. Borrar del código y los docs el concepto de "router central" y el output `raw_delivery_uri`.
+5. Actualizar `MULTI_TENANT.md`, que hoy describe el modelo acoplado como diseño.
+
+## 11. Dashboard, Topic y agente reproducibles por cliente
+
+Hoy ninguno de los tres existe fuera del piloto ni se crea con Terraform:
+
+- **Dashboard**: no hay `aws_quicksight_dashboard`/`template`/`analysis` en el repo.
+  `build_dashboard_definition.py` regenera el JSON del análisis del piloto (ids fijos) y no publica.
+  La app del tenant apunta a `vi-<tenant>-<env>-pulso-facturacion`, que nadie crea.
+- **Topic**: `sync_topic.py` sí acepta `--account-id --profile --sales-dataset-id
+  --period-dataset-id`, pero los docs lo invocan con `AWS_PROFILE`, que el script ignora.
+- **Agente**: `sync_agent.py` acepta cuenta y perfil, pero el ARN del dashboard está fijo al del
+  piloto y solo otorga permisos a un usuario.
+
+**Cómo cerrarlo.**
+
+1. Exportar la definición del análisis del piloto a un `aws_quicksight_template` y crear
+   `aws_quicksight_dashboard` en el módulo desde ese template, con los datasets del tenant como
+   `dataset_references`. Es la pieza más grande y la que hoy impide entregar algo visible.
+2. Parametrizar `sync_agent.py` (`--dashboard-id`, `--app-user-arns`) y corregir la invocación de
+   `sync_topic.py` en la documentación; o integrar ambos como pasos de `provision_tenant.sh`.
+3. Extender `verify_tenant.sh` para comprobar dashboard, Topic y agente.
+4. Corregir también `bulk_load_invoices.sh` y `produce_invoices.py` (defaults del piloto).

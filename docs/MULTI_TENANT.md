@@ -1,5 +1,16 @@
 # Despliegue por cuenta de cliente
 
+> **Aviso (2026-09-29).** Este documento describe el diseño original. Dos partes quedaron
+> **obsoletas** por decisión del dueño del proyecto y se corrigen en
+> [`PRINCIPIOS_DESPLIEGUE.md`](PRINCIPIOS_DESPLIEGUE.md): (a) el estado de Terraform y el
+> `assume_role` de los clientes **no** pasan por la cuenta piloto de INFILE; (b) **no existe un
+> "router central"** que deposite archivos: el despliegue parte de que los JSON ya están en un
+> bucket de la cuenta del cliente. Las secciones sobre `raw_delivery_uri`, el backend en
+> `dashboards-dinamicos-tfstate-503561412084` y el rol `VentasInteligentesDeployer` asumido desde
+> INFILE se conservan solo como referencia histórica hasta que el módulo se adapte
+> (`DEUDA_TECNICA.md`, puntos 9 a 11).
+
+
 Modelo: **una cuenta AWS por cliente**, dentro de tu organización. Tú despliegas y verificas; el
 cliente paga su propio consumo. Tu sistema deposita los JSON en el bucket del cliente y de ahí todo
 ocurre solo.

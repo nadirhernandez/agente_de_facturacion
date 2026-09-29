@@ -3,6 +3,10 @@
 > **Desplegado en `dev-infile` (503561412084) / us-east-1.**
 > App: https://d3ocvrp9ma213b.cloudfront.net
 > Guías: [`docs/RUNBOOK.md`](docs/RUNBOOK.md) · [`docs/MLP_OPERATIONS.md`](docs/MLP_OPERATIONS.md) · [`docs/APP_SECURITY.md`](docs/APP_SECURITY.md) · [`docs/DEUDA_TECNICA.md`](docs/DEUDA_TECNICA.md)
+>
+> **Modelo de despliegue (decisión fija):** cada cliente vive completo en su propia cuenta de AWS,
+> el despliegue parte de los JSON que **ya están** en un bucket de esa cuenta, y nada de un cliente
+> se acopla a la cuenta piloto de INFILE. Detalle en [`docs/PRINCIPIOS_DESPLIEGUE.md`](docs/PRINCIPIOS_DESPLIEGUE.md).
 
 ## Entregable final
 
