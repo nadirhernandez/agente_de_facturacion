@@ -1,7 +1,8 @@
--- Facturación diaria con los días sin venta en cero. Lee el agregado diario, no
--- el detalle: su costo no crece con el número de líneas.
+-- Facturación diaria por moneda, con los días sin venta en cero. Lee el
+-- agregado diario, no el detalle: su costo no crece con el número de líneas.
 CREATE OR REPLACE VIEW ${db}.vw_ventas_diario AS
 SELECT
+  c.codigo_moneda,
   c.fecha,
   c.anio,
   c.mes,
@@ -16,5 +17,6 @@ SELECT
   COALESCE(a.facturas, 0)          AS facturas,
   COALESCE(a.unidades, 0)          AS unidades
 FROM ${db}.vw_calendario c
-LEFT JOIN ${db}.agg_ventas_diario a
+LEFT JOIN ${db}.agg_ventas_diario_moneda a
   ON a.fecha = c.fecha
+ AND a.codigo_moneda = c.codigo_moneda

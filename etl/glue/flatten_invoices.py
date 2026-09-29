@@ -238,6 +238,11 @@ def split_valid(invoices):
         .when(F.col("doc_id").isNull() | (F.trim("doc_id") == ""), F.lit("sin_doc_id"))
         .when(F.col("_emitido_en").isNull(), F.lit("fecha_emision_invalida"))
         .when(~F.lower("estado").isin(*VALID_ESTADOS) | F.col("estado").isNull(), F.lit("estado_desconocido"))
+        .when(
+            F.col("codigo_moneda").isNull()
+            | ~F.upper(F.trim("codigo_moneda")).isin("GTQ", "USD"),
+            F.lit("moneda_desconocida"),
+        )
         .when(F.col("items").isNull() | (F.size("items") == 0), F.lit("sin_lineas"))
     )
     tagged = invoices.withColumn("_rechazo", reason)
@@ -255,7 +260,7 @@ def build_sales_lines(invoices):
         "fecha",
         F.lower("estado").alias("estado"),
         "country",
-        "codigo_moneda",
+        F.upper(F.trim("codigo_moneda")).alias("codigo_moneda"),
         "serie",
         "nit_receptor",
         "nombre_receptor",
@@ -392,29 +397,32 @@ def load_files(spark, pending, *, run_id, fct, ctl, agg, reprocess_all, quaranti
         publish_quarantine_notice(quarantine_path, run_id, rejected_count, reasons, bad_files, target)
 
     # --- Fact table ----------------------------------------------------------
-    new_dates = sorted(row["fecha"] for row in batch.select("fecha").distinct().collect())
+    # Keys a matched line currently sits on. A corrected date or currency must
+    # also refresh the bucket it leaves during a full reprocess.
+    new_keys = sorted(
+        (row["fecha"], row["codigo_moneda"])
+        for row in batch.select("fecha", "codigo_moneda").distinct().collect()
+    )
+    new_dates = sorted({day for day, _currency in new_keys})
     batch.createOrReplaceTempView("lote")
 
-    # Days a matched line currently sits on. A line that moves day (after the
-    # UTC-06:00 correction or a corrected emission date) must also refresh the
-    # total of the day it leaves.
     if reprocess_all:
-        previous_dates = [
-            row["fecha"]
+        previous_keys = [
+            (row["fecha"], row["codigo_moneda"])
             for row in spark.sql(f"""
-                SELECT DISTINCT t.fecha FROM {fct} t
+                SELECT DISTINCT t.fecha, t.codigo_moneda FROM {fct} t
                 JOIN lote s ON t.doc_id = s.doc_id AND t.linea = s.linea
             """).collect()
         ]
     else:
-        previous_dates = []
+        previous_keys = []
 
-    touched_dates = sorted(set(new_dates) | set(previous_dates))
+    touched_keys = sorted(set(new_keys) | set(previous_keys))
+    touched_dates = sorted({day for day, _currency in touched_keys})
 
     if new_dates:
         # Incremental: the literal date list limits the MERGE to the batch days
-        # instead of scanning the whole table. Reprocess: match everywhere so
-        # a line that changed day is updated, not duplicated.
+        # instead of scanning the whole table. Reprocess matches everywhere.
         date_scope = "" if reprocess_all else f"t.fecha IN ({date_literals(new_dates)}) AND "
         spark.sql(f"""
             MERGE INTO {fct} t
@@ -428,37 +436,41 @@ def load_files(spark, pending, *, run_id, fct, ctl, agg, reprocess_all, quaranti
             WHEN NOT MATCHED THEN INSERT *
         """)
 
-    # --- Daily aggregate -----------------------------------------------------
-    if touched_dates:
-        spark.createDataFrame([(day,) for day in touched_dates], "fecha date").createOrReplaceTempView(
-            "dias_lote"
-        )
+    # --- Daily aggregate by currency ---------------------------------------
+    if touched_keys:
+        spark.createDataFrame(
+            touched_keys, "fecha date, codigo_moneda string"
+        ).createOrReplaceTempView("claves_lote")
         spark.sql(f"""
             MERGE INTO {agg} a
             USING (
                 SELECT
                     d.fecha,
+                    d.codigo_moneda,
                     CAST(COALESCE(x.facturacion_total, 0) AS DECIMAL(18,2)) AS facturacion_total,
                     CAST(COALESCE(x.ventas_sin_iva, 0) AS DECIMAL(18,2))    AS ventas_sin_iva,
                     CAST(COALESCE(x.iva, 0) AS DECIMAL(18,2))               AS iva,
                     CAST(COALESCE(x.facturas, 0) AS BIGINT)                 AS facturas,
                     CAST(COALESCE(x.unidades, 0) AS BIGINT)                 AS unidades,
                     CAST(current_timestamp() AS TIMESTAMP_NTZ)              AS actualizado_en
-                FROM dias_lote d
+                FROM claves_lote d
                 LEFT JOIN (
                     SELECT
-                        fecha,
-                        sum(facturacion_total_linea) AS facturacion_total,
-                        sum(ventas_sin_iva_linea)    AS ventas_sin_iva,
-                        sum(iva_linea)               AS iva,
-                        count(DISTINCT doc_id)       AS facturas,
-                        sum(cantidad)                AS unidades
-                    FROM {fct}
-                    WHERE fecha IN (SELECT fecha FROM dias_lote) AND estado = 'emitido'
-                    GROUP BY fecha
-                ) x ON x.fecha = d.fecha
+                        f.fecha,
+                        f.codigo_moneda,
+                        sum(f.facturacion_total_linea) AS facturacion_total,
+                        sum(f.ventas_sin_iva_linea)    AS ventas_sin_iva,
+                        sum(f.iva_linea)               AS iva,
+                        count(DISTINCT f.doc_id)       AS facturas,
+                        sum(f.cantidad)                AS unidades
+                    FROM {fct} f
+                    JOIN claves_lote k
+                      ON k.fecha = f.fecha AND k.codigo_moneda = f.codigo_moneda
+                    WHERE f.estado = 'emitido'
+                    GROUP BY f.fecha, f.codigo_moneda
+                ) x ON x.fecha = d.fecha AND x.codigo_moneda = d.codigo_moneda
             ) s
-            ON a.fecha = s.fecha
+            ON a.fecha = s.fecha AND a.codigo_moneda = s.codigo_moneda
             WHEN MATCHED THEN UPDATE SET *
             WHEN NOT MATCHED THEN INSERT *
         """)
@@ -477,7 +489,7 @@ def load_files(spark, pending, *, run_id, fct, ctl, agg, reprocess_all, quaranti
     )
     # fecha_min drives the incremental-vs-full SPICE decision: on a reprocess it
     # must also cover the day a line moved away from.
-    oldest_previous = min(previous_dates) if previous_dates else None
+    oldest_previous = min(day for day, _currency in previous_keys) if previous_keys else None
     fecha_min = (
         F.least(F.col("fecha_min_docs"), F.lit(oldest_previous))
         if oldest_previous
@@ -528,7 +540,7 @@ def main() -> None:
     database = args["DATABASE"]
     fct = f"{CATALOG}.{database}.fct_lineas_factura"
     ctl = f"{CATALOG}.{database}.ctl_archivos_procesados"
-    agg = f"{CATALOG}.{database}.agg_ventas_diario"
+    agg = f"{CATALOG}.{database}.agg_ventas_diario_moneda"
 
     source = urlparse(args["SOURCE_PATH"])
     quarantine_path = optional_arg("QUARANTINE_PATH", f"s3://{source.netloc}/quarantine/").rstrip("/")

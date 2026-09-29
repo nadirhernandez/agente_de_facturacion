@@ -31,12 +31,12 @@ TOPIC_NAME = "Ventas Inteligentes"
 SALES_DATASET_ARN = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dataset/ventas-comerciales-dev"
 PERIOD_DATASET_ARN = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dataset/ventas-comparativo-dev"
 
-# NUMBER with a "Q" prefix instead of CURRENCY: CURRENCY without a symbol makes
-# Quick render dollars. Every amount in the model is GTQ.
-CURRENCY = {
+# Monetary fields contain their original currency. A static prefix would label
+# either GTQ or USD incorrectly, so visuals use a neutral number format and the
+# currency dimension supplies the unit.
+AMOUNT = {
     "DisplayFormat": "NUMBER",
     "DisplayFormatOptions": {
-        "Prefix": "Q",
         "DecimalSeparator": "DOT",
         "GroupingSeparator": ",",
         "UseGrouping": True,
@@ -50,26 +50,28 @@ PERCENT = {
 }
 
 CUSTOM_INSTRUCTIONS = """
-Responde siempre en español y muestra los montos en quetzales (Q) con dos decimales. Todos los montos están en quetzales guatemaltecos (GTQ): nunca uses el símbolo $ ni hables de dólares, tampoco en títulos, ejes ni etiquetas de los visuales. Indica el período, los filtros y la métrica usada. Si no hay datos suficientes, dilo y no inventes resultados.
+Responde siempre en español. Los importes están en su moneda original: GTQ significa quetzales y USD significa dólares estadounidenses. Muestra GTQ con prefijo Q y USD con prefijo US$, siempre con dos decimales. Indica el período, los filtros, la métrica y la moneda usada. Si no hay datos suficientes, dilo y no inventes resultados.
+
+Nunca sumes, promedies ni compares importes de monedas distintas. Filtra o agrupa siempre por codigo_moneda. Si la pregunta no especifica moneda y existen GTQ y USD, presenta resultados separados por moneda; no produzcas un total combinado ni conviertas importes porque no hay tasas de cambio en los datos.
 
 Usa únicamente documentos emitidos; los anulados ya están excluidos.
 
 Elige el dataset según la pregunta:
-- Facturación por día, semana, mes o año, y cualquier comparativo entre períodos: usa "Ventas por periodo".
-- Desglose por región, establecimiento, canal, cliente, categoría o producto: usa "Ventas comerciales".
+- Facturación por día, semana, mes o año, y cualquier comparativo entre períodos: usa "Ventas por periodo" y conserva la separación por moneda.
+- Desglose por región, establecimiento, canal, cliente, categoría o producto: usa "Ventas comerciales" y conserva la separación por moneda.
 - No sumes métricas de ambos datasets en un mismo resultado: tienen granularidad distinta.
 
 En "Ventas por periodo" filtra por granularidad: dia, semana, mes o anio. La columna periodo es la fecha de inicio del período.
 
 La semana va de lunes a domingo. Todas las fechas y horas están en hora de Guatemala (UTC-06:00): una factura emitida a las 19:30 pertenece a ese día.
 
-El comparativo por defecto es contra el período anterior inmediato, no contra el año anterior. Usa las columnas *_anterior y variacion_*_pct en lugar de recalcular.
+El comparativo por defecto es contra el período anterior inmediato de la misma moneda, no contra el año anterior. Usa las columnas *_anterior y variacion_*_pct en lugar de recalcular.
 
 Excluye los períodos con es_periodo_completo = false de los comparativos y adviértelo si el usuario pregunta por el período en curso: un período a medias siempre parece una caída.
 
-Definiciones: "facturación", "ingresos" y "ventas brutas" son facturación total con IVA; "ventas sin IVA" y "venta neta" son el monto gravable; "facturas" es el conteo de facturas distintas; "ticket promedio" es facturación entre facturas.
+Definiciones: "facturación", "ingresos" y "ventas brutas" son facturación total con IVA; "ventas sin IVA" y "venta neta" son el monto gravable; "facturas" es el conteo de facturas distintas; "ticket promedio" es facturación entre facturas, siempre dentro de una moneda.
 
-No existen costos, margen, inventario ni metas. No calcules margen, utilidad ni rentabilidad.
+No existen costos, margen, inventario, metas ni tasas de cambio. No calcules margen, utilidad, rentabilidad ni conversiones de moneda.
 
 Para series de tiempo usa líneas; para comparar categorías usa barras ordenadas de mayor a menor; para un solo número usa KPI. Al mostrar una variación incluye el valor de ambos períodos, no solo el porcentaje.
 """.strip()
@@ -95,7 +97,7 @@ def measure(name: str, friendly: str, synonyms: list[str] | None = None, **extra
         "ColumnDataRole": "MEASURE",
         "Aggregation": "SUM",
         "IsIncludedInTopic": True,
-        "DefaultFormatting": CURRENCY,
+        "DefaultFormatting": AMOUNT,
     }
     if synonyms:
         column["ColumnSynonyms"] = synonyms
@@ -125,6 +127,12 @@ def build_topic() -> dict:
         # "mes" is numeric, so it already sorts chronologically. ComparativeOrder
         # only accepts GREATER/LESSER_IS_BETTER or an explicit SPECIFIED list.
         dimension("mes", "Mes", NotAllowedAggregations=["SUM", "AVERAGE"]),
+        dimension(
+            "codigo_moneda",
+            "Moneda",
+            ["divisa", "código de moneda"],
+            ColumnDescription="GTQ para quetzales o USD para dólares estadounidenses",
+        ),
         measure(
             "facturacion_total_linea",
             "Facturación total",
@@ -162,6 +170,12 @@ def build_topic() -> dict:
         ),
         dimension("anio", "Año", NotAllowedAggregations=["SUM", "AVERAGE"]),
         dimension("mes", "Mes", NotAllowedAggregations=["SUM", "AVERAGE"]),
+        dimension(
+            "codigo_moneda",
+            "Moneda",
+            ["divisa", "código de moneda"],
+            ColumnDescription="Moneda original del período; nunca combinar GTQ y USD",
+        ),
         measure("facturacion_total", "Facturación del período", ["facturación", "ingresos"]),
         measure("ventas_sin_iva", "Ventas sin IVA del período", ["venta neta"]),
         measure("iva", "IVA del período"),
@@ -204,13 +218,13 @@ def build_topic() -> dict:
         "CustomInstructions": {"CustomInstructionsString": CUSTOM_INSTRUCTIONS},
         "Topic": {
             "Name": TOPIC_NAME,
-            "Description": "Facturación y ventas de Guatemala. Documentos emitidos únicamente.",
+            "Description": "Facturación y ventas de Guatemala en GTQ y USD. Documentos emitidos únicamente; importes separados por moneda.",
             "UserExperienceVersion": "NEW_READER_EXPERIENCE",
             "DataSets": [
                 {
                     "DatasetArn": SALES_DATASET_ARN,
                     "DatasetName": "Ventas comerciales",
-                    "DatasetDescription": "Una fila por línea de factura emitida.",
+                    "DatasetDescription": "Una fila por línea de factura emitida, con importes en su moneda original.",
                     "DataAggregation": {
                         "DatasetRowDateGranularity": "DAY",
                         "DefaultDateColumnName": "fecha",
@@ -221,8 +235,8 @@ def build_topic() -> dict:
                     "DatasetArn": PERIOD_DATASET_ARN,
                     "DatasetName": "Ventas por periodo",
                     "DatasetDescription": (
-                        "Una fila por período (día, semana, mes, año) con el período anterior "
-                        "y la variación ya calculados. Semana de lunes a domingo."
+                        "Una fila por moneda y período (día, semana, mes, año) con el período anterior "
+                        "de esa misma moneda y la variación ya calculados. Semana de lunes a domingo."
                     ),
                     "DataAggregation": {
                         "DatasetRowDateGranularity": "DAY",

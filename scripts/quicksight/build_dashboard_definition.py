@@ -301,7 +301,38 @@ def dashboard_definition() -> dict:
         ],
         "CalculatedFields": [],
         "ParameterDeclarations": [],
-        "FilterGroups": [],
+        "FilterGroups": [
+            {
+                "FilterGroupId": "dashboard-moneda-gtq",
+                "Filters": [
+                    {
+                        "CategoryFilter": {
+                            "FilterId": "filtro-moneda-gtq",
+                            "Column": field_reference("codigo_moneda"),
+                            "Configuration": {
+                                "FilterListConfiguration": {
+                                    "MatchOperator": "EQUALS",
+                                    "CategoryValues": ["GTQ"],
+                                    "NullOption": "NON_NULLS_ONLY",
+                                }
+                            },
+                        }
+                    }
+                ],
+                "ScopeConfiguration": {
+                    "SelectedSheets": {
+                        "SheetVisualScopingConfigurations": [
+                            {
+                                "SheetId": "f4b7de62-f81d-48fa-b411-64faace12957",
+                                "Scope": "ALL_VISUALS",
+                            }
+                        ]
+                    }
+                },
+                "Status": "ENABLED",
+                "CrossDataset": "SINGLE_DATASET",
+            }
+        ],
         "AnalysisDefaults": {
             "DefaultNewSheetConfiguration": {
                 "InteractiveLayoutConfiguration": {

@@ -1,22 +1,14 @@
--- Una fila por período y granularidad, con el período anterior inmediato y la
--- variación ya calculados. El chat filtra por granularidad en lugar de
--- reinventar la lógica de fechas en cada pregunta.
+-- Una fila por moneda, período y granularidad, con el período anterior de esa
+-- misma moneda. GTQ y USD nunca se suman ni se comparan entre sí.
 --
--- El conteo de facturas se puede sumar entre días porque una factura pertenece
--- a un solo día. Si eso cambiara, habría que recontar por período.
---
--- es_periodo_completo marca los períodos que no se pueden comparar tal cual,
--- porque comparar uno a medias contra uno completo exagera la variación:
---   - el período en curso: termina hoy o después (hoy en Guatemala, UTC-06:00)
---     o después del último día cargado;
---   - el primer período del histórico cuando los datos empiezan a media semana,
---     mes o año.
--- El dataset se refresca cada hora, así "hoy" no se queda atrasado en SPICE.
+-- es_periodo_completo excluye períodos en curso y el primer período parcial del
+-- histórico de cada moneda. La semana va de lunes a domingo.
 CREATE OR REPLACE VIEW ${db}.vw_ventas_comparativo AS
 WITH por_dia AS (
   SELECT
-    'dia'             AS granularidad,
-    fecha             AS periodo,
+    codigo_moneda,
+    'dia' AS granularidad,
+    fecha AS periodo,
     facturacion_total,
     ventas_sin_iva,
     iva,
@@ -26,39 +18,42 @@ WITH por_dia AS (
 ),
 por_semana AS (
   SELECT
-    'semana'               AS granularidad,
-    inicio_semana          AS periodo,
+    codigo_moneda,
+    'semana' AS granularidad,
+    inicio_semana AS periodo,
     sum(facturacion_total) AS facturacion_total,
-    sum(ventas_sin_iva)    AS ventas_sin_iva,
-    sum(iva)               AS iva,
-    sum(facturas)          AS facturas,
-    sum(unidades)          AS unidades
+    sum(ventas_sin_iva) AS ventas_sin_iva,
+    sum(iva) AS iva,
+    sum(facturas) AS facturas,
+    sum(unidades) AS unidades
   FROM ${db}.vw_ventas_diario
-  GROUP BY inicio_semana
+  GROUP BY codigo_moneda, inicio_semana
 ),
 por_mes AS (
   SELECT
-    'mes'                  AS granularidad,
-    inicio_mes             AS periodo,
+    codigo_moneda,
+    'mes' AS granularidad,
+    inicio_mes AS periodo,
     sum(facturacion_total) AS facturacion_total,
-    sum(ventas_sin_iva)    AS ventas_sin_iva,
-    sum(iva)               AS iva,
-    sum(facturas)          AS facturas,
-    sum(unidades)          AS unidades
+    sum(ventas_sin_iva) AS ventas_sin_iva,
+    sum(iva) AS iva,
+    sum(facturas) AS facturas,
+    sum(unidades) AS unidades
   FROM ${db}.vw_ventas_diario
-  GROUP BY inicio_mes
+  GROUP BY codigo_moneda, inicio_mes
 ),
 por_anio AS (
   SELECT
-    'anio'                                  AS granularidad,
+    codigo_moneda,
+    'anio' AS granularidad,
     CAST(date_trunc('year', fecha) AS date) AS periodo,
-    sum(facturacion_total)                  AS facturacion_total,
-    sum(ventas_sin_iva)                     AS ventas_sin_iva,
-    sum(iva)                                AS iva,
-    sum(facturas)                           AS facturas,
-    sum(unidades)                           AS unidades
+    sum(facturacion_total) AS facturacion_total,
+    sum(ventas_sin_iva) AS ventas_sin_iva,
+    sum(iva) AS iva,
+    sum(facturas) AS facturas,
+    sum(unidades) AS unidades
   FROM ${db}.vw_ventas_diario
-  GROUP BY CAST(date_trunc('year', fecha) AS date)
+  GROUP BY codigo_moneda, CAST(date_trunc('year', fecha) AS date)
 ),
 unificado AS (
   SELECT * FROM por_dia
@@ -68,10 +63,12 @@ unificado AS (
 ),
 limite AS (
   SELECT
+    codigo_moneda,
     min(fecha) AS primer_dia,
     max(fecha) AS ultimo_dia,
     CAST(current_timestamp AT TIME ZONE '-06:00' AS date) AS hoy
   FROM ${db}.vw_ventas_diario
+  GROUP BY codigo_moneda
 ),
 con_limites AS (
   SELECT
@@ -86,21 +83,30 @@ con_limites AS (
     l.ultimo_dia,
     l.hoy
   FROM unificado u
-  CROSS JOIN limite l
+  JOIN limite l ON l.codigo_moneda = u.codigo_moneda
 ),
 con_anterior AS (
   SELECT
     c.*,
-    lag(facturacion_total) OVER (PARTITION BY granularidad ORDER BY periodo) AS facturacion_total_anterior,
-    lag(ventas_sin_iva)    OVER (PARTITION BY granularidad ORDER BY periodo) AS ventas_sin_iva_anterior,
-    lag(facturas)          OVER (PARTITION BY granularidad ORDER BY periodo) AS facturas_anterior,
-    lag(unidades)          OVER (PARTITION BY granularidad ORDER BY periodo) AS unidades_anterior
+    lag(facturacion_total) OVER (
+      PARTITION BY codigo_moneda, granularidad ORDER BY periodo
+    ) AS facturacion_total_anterior,
+    lag(ventas_sin_iva) OVER (
+      PARTITION BY codigo_moneda, granularidad ORDER BY periodo
+    ) AS ventas_sin_iva_anterior,
+    lag(facturas) OVER (
+      PARTITION BY codigo_moneda, granularidad ORDER BY periodo
+    ) AS facturas_anterior,
+    lag(unidades) OVER (
+      PARTITION BY codigo_moneda, granularidad ORDER BY periodo
+    ) AS unidades_anterior
   FROM con_limites c
 )
 SELECT
+  codigo_moneda,
   granularidad,
   periodo,
-  year(periodo)  AS anio,
+  year(periodo) AS anio,
   month(periodo) AS mes,
   fin_periodo,
   (periodo >= primer_dia AND fin_periodo <= ultimo_dia AND fin_periodo < hoy) AS es_periodo_completo,

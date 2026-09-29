@@ -23,6 +23,8 @@ DOCUMENTS_PATH = ROOT / "data/curated/ventas_documentos_demo.csv"
 LINES_PATH = ROOT / "data/curated/ventas_lineas_demo.csv"
 RANDOM = random.Random(20260825)
 GT_OFFSET = timezone(timedelta(hours=-6))
+SUPPORTED_CURRENCIES = {"GTQ", "USD"}
+GTQ_PER_USD = 7.7
 
 PRODUCTS = [
     ("PROD-001", "Café en grano 500 g", "Alimentos", 68.00),
@@ -78,10 +80,11 @@ def weighted_product() -> tuple[str, str, str, float]:
     )[0]
 
 
-def make_item(line_number: int) -> tuple[dict, dict]:
+def make_item(line_number: int, currency: str = "GTQ") -> tuple[dict, dict]:
     code, description, category, base_price = weighted_product()
     quantity = RANDOM.randint(1, 8)
-    price = money(base_price * RANDOM.uniform(0.94, 1.08))
+    currency_base_price = base_price if currency == "GTQ" else base_price / GTQ_PER_USD
+    price = money(currency_base_price * RANDOM.uniform(0.94, 1.08))
     amount = money(quantity * price)
     taxable_amount = money(amount / 1.12)
     vat = money(amount - taxable_amount)
@@ -115,7 +118,20 @@ def make_item(line_number: int) -> tuple[dict, dict]:
     return item, enriched
 
 
-def create_invoice(number: int, issue_date: date) -> tuple[dict, list[dict], dict]:
+def create_invoice(
+    number: int,
+    issue_date: date,
+    currency: str = "GTQ",
+    cancel_rate: float = 0.025,
+    doc_prefix: str = "GT-DEMO",
+) -> tuple[dict, list[dict], dict]:
+    """Create one invoice, preserving the legacy GTQ/cancellation defaults."""
+    currency = currency.upper()
+    if currency not in SUPPORTED_CURRENCIES:
+        raise ValueError(f"Unsupported currency: {currency}")
+    if not 0 <= cancel_rate <= 1:
+        raise ValueError("cancel_rate must be between 0 and 1")
+
     branch_code, branch_name, department, municipality, channel = weighted_branch()
     nit, customer_name = RANDOM.choices(CUSTOMERS, weights=[20] + [8] * 11, k=1)[0]
     issued_at = datetime(
@@ -129,15 +145,15 @@ def create_invoice(number: int, issue_date: date) -> tuple[dict, list[dict], dic
     item_count = RANDOM.choices([1, 2, 3, 4], weights=[25, 42, 24, 9], k=1)[0]
     raw_items, enriched_items = [], []
     for line in range(1, item_count + 1):
-        raw_item, enriched_item = make_item(line)
+        raw_item, enriched_item = make_item(line, currency)
         raw_items.append(raw_item)
         enriched_items.append(enriched_item)
 
     total = money(sum(item["monto"] for item in raw_items))
     total_taxable = money(sum(item["impuestos"][0]["monto_gravable"] for item in raw_items))
     total_vat = money(sum(item["impuestos"][0]["monto_impuesto"] for item in raw_items))
-    state = "anulado" if RANDOM.random() < 0.025 else "emitido"
-    document_id = f"GT-DEMO-{number:06d}"
+    state = "anulado" if RANDOM.random() < cancel_rate else "emitido"
+    document_id = f"{doc_prefix}-{number:06d}"
     series = f"{chr(65 + ((number - 1) // 300))}{1 + ((number - 1) // 100) % 3}"
 
     invoice = {
@@ -149,7 +165,7 @@ def create_invoice(number: int, issue_date: date) -> tuple[dict, list[dict], dic
         "mes": issue_date.month,
         "dia": issue_date.day,
         "estado": state,
-        "codigo_moneda": "GTQ",
+        "codigo_moneda": currency,
         "nit_emisor": "12345678",
         "nit_receptor": nit,
         "gran_total": total,
@@ -158,8 +174,8 @@ def create_invoice(number: int, issue_date: date) -> tuple[dict, list[dict], dic
         "establecimiento_nombre": branch_name,
         "items": raw_items,
         "clase_documento": "FACTURA",
-        "dte_id": f"DTE-{number:08d}",
-        "datos_emision_id": f"EMI-{number:08d}",
+        "dte_id": f"{doc_prefix}-DTE-{number:08d}",
+        "datos_emision_id": f"{doc_prefix}-EMI-{number:08d}",
         "emision_ubicacion_temporal": "Guatemala",
         "exp": "N/A",
         "espectaculo": "N/A",
@@ -204,7 +220,7 @@ def create_invoice(number: int, issue_date: date) -> tuple[dict, list[dict], dic
         "anio": issue_date.year,
         "mes": issue_date.month,
         "estado": state,
-        "codigo_moneda": "GTQ",
+        "codigo_moneda": currency,
         "serie": series,
         "nit_receptor": nit,
         "cliente": customer_name,

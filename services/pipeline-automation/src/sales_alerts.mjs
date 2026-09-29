@@ -74,6 +74,7 @@ WITH agregado AS (
     sum(CASE WHEN fecha <  DATE '${mesActual}' THEN facturacion_total_linea ELSE 0 END) AS previo
   FROM ${database}.vw_ventas_comerciales
   WHERE fecha >= DATE '${mesPrevio}' AND fecha < DATE '${hasta}'
+    AND codigo_moneda = 'GTQ'
   GROUP BY region
 )
 SELECT

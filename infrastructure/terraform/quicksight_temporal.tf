@@ -11,6 +11,7 @@ locals {
     periodo                    = "DATETIME"
     anio                       = "INTEGER"
     mes                        = "INTEGER"
+    codigo_moneda              = "STRING"
     fin_periodo                = "DATETIME"
     es_periodo_completo        = "BIT"
     facturacion_total          = "DECIMAL"

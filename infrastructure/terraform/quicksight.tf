@@ -96,6 +96,10 @@ resource "aws_quicksight_data_set" "sales" {
         type = "INTEGER"
       }
       input_columns {
+        name = "codigo_moneda"
+        type = "STRING"
+      }
+      input_columns {
         name = "region"
         type = "STRING"
       }
