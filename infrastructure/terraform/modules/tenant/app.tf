@@ -673,5 +673,9 @@ resource "aws_s3_object" "web_runtime_config" {
     # Pins the embedded chat to the tenant's agent. Omitted, the app falls back
     # to the default Quick chat.
     var.quick_chat_agent_id == null ? {} : { quickChatAgentId = var.quick_chat_agent_id },
+    # The tenant's commercial name, shown large in the sidebar; the product
+    # (INsight by INFILE) stays in the footer. Defaults to tenant_name.
+    { clientName = coalesce(var.app_client_name, var.tenant_name) },
+    var.app_client_logo_url == null ? {} : { clientLogoUrl = var.app_client_logo_url },
   ))
 }

@@ -371,3 +371,15 @@ variable "enable_waf" {
   type        = bool
   default     = true
 }
+
+variable "app_client_name" {
+  description = "Nombre comercial que la app muestra en grande. Por defecto, tenant_name."
+  type        = string
+  default     = null
+}
+
+variable "app_client_logo_url" {
+  description = "URL del logo del cliente para la barra lateral (opcional)."
+  type        = string
+  default     = null
+}

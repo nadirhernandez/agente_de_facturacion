@@ -9,6 +9,10 @@ export interface RuntimeConfig {
    * que antes de existir este campo.
    */
   quickChatAgentId?: string;
+  /** Nombre comercial del cliente dueño de este espacio, mostrado en grande. */
+  clientName?: string;
+  /** Logo del cliente (URL absoluta o ruta bajo el mismo origen). Opcional. */
+  clientLogoUrl?: string;
 }
 
 let cached: RuntimeConfig | undefined;

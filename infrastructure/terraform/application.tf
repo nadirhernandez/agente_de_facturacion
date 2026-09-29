@@ -600,5 +600,8 @@ resource "aws_s3_object" "web_runtime_config" {
     # Custom agent created by scripts/quicksight/sync_agent.py; pins the chat to
     # the sales space. Remove this line to fall back to the default Quick chat.
     quickChatAgentId = "ventas-inteligentes-analista"
+    # Shown large in the sidebar: the workspace belongs to the client, the
+    # product (INsight by INFILE) stays in the footer.
+    clientName = var.app_client_name
   })
 }

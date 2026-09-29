@@ -6,6 +6,7 @@ export const config: RuntimeConfig = {
   cognitoClientId: "client-123",
   region: "us-east-1",
   quickChatAgentId: "agent-1",
+  clientName: "Empresa Inteligente S.A.",
 };
 
 const base64Url = (value: string) =>

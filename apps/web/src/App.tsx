@@ -16,6 +16,7 @@ import {
   type Session,
   type Tokens,
 } from "./auth";
+import { ClientIdentity, PRODUCT_NAME, TAGLINE, Wordmark } from "./Brand";
 import { EmbeddingFrame } from "./EmbeddingFrame";
 import { Icon, type IconName } from "./Icon";
 import { useSessionKeepAlive } from "./useSessionKeepAlive";
@@ -57,7 +58,7 @@ export const suggestedPrompts: ReadonlyArray<{
     title: "Comparar períodos",
     short: "¿Cómo vamos vs. el mes pasado?",
     prompt:
-      "Compara la facturación del último mes completo con el mes anterior. Incluye ambos valores y la variación porcentual.",
+      "Compara la facturación del último mes completo con el mes anterior, por moneda. Incluye ambos valores y la variación porcentual.",
   },
   {
     icon: "map-pin",
@@ -65,7 +66,7 @@ export const suggestedPrompts: ReadonlyArray<{
     title: "Ver líderes",
     short: "¿Qué regiones lideran?",
     prompt:
-      "¿Cuáles fueron las 5 regiones con mayor facturación en los últimos 30 días? Muéstralo como barras ordenadas.",
+      "¿Cuáles fueron las 5 regiones con mayor facturación en los últimos 30 días? Separa GTQ y USD y muéstralo como barras ordenadas.",
   },
   {
     icon: "package",
@@ -73,7 +74,7 @@ export const suggestedPrompts: ReadonlyArray<{
     title: "Encontrar el top 5",
     short: "¿Qué productos venden más?",
     prompt:
-      "¿Cuáles fueron los 5 productos con mayor facturación en el último mes completo? Incluye el monto en quetzales.",
+      "¿Cuáles fueron los 5 productos con mayor facturación en USD en el último mes completo? Incluye el monto en dólares.",
   },
   {
     icon: "users",
@@ -81,7 +82,7 @@ export const suggestedPrompts: ReadonlyArray<{
     title: "Analizar clientes",
     short: "¿Quiénes compran más?",
     prompt:
-      "¿Quiénes fueron los 5 clientes con mayor facturación en el último mes completo? Incluye el total en quetzales.",
+      "¿Quiénes fueron los 5 clientes con mayor facturación en GTQ en el último mes completo? Incluye el total en quetzales.",
   },
 ];
 
@@ -102,13 +103,15 @@ const exactTime = (iso: string) =>
     hour12: false,
   });
 
-function Brand() {
+/** Big product mark for the screens that have nothing else on them (login, boot). */
+function ProductHero() {
   return (
-    <div className="brand">
-      <span className="brand-mark">
-        <Icon name="trending-up" size={16} />
+    <div className="product-hero">
+      <span className="brand-mark large">
+        <Icon name="trending-up" size={22} />
       </span>
-      <span>Ventas Inteligentes</span>
+      <Wordmark size="lg" />
+      <p className="tagline">{TAGLINE}</p>
     </div>
   );
 }
@@ -139,9 +142,7 @@ function NavButtons({
 function AuthRedirect() {
   return (
     <main className="auth-redirect" aria-live="polite">
-      <span className="brand-mark">
-        <Icon name="trending-up" size={16} />
-      </span>
+      <ProductHero />
       <span className="loading-mark small" />
       <span className="sr-only">Abriendo inicio de sesión…</span>
     </main>
@@ -160,10 +161,7 @@ function GateCard({
   return (
     <main className="gate">
       <div className="gate-card">
-        <span className="brand-mark">
-          <Icon name="trending-up" size={16} />
-        </span>
-        <h1>Ventas Inteligentes</h1>
+        <ProductHero />
         <p className="gate-error" role="alert">
           {message}
         </p>
@@ -280,6 +278,11 @@ export default function App() {
   const idToken = session?.idToken;
   const config = session?.config;
 
+  // Browser tab: "INsight · Empresa Inteligente S.A."
+  useEffect(() => {
+    document.title = config?.clientName ? `${PRODUCT_NAME} · ${config.clientName}` : PRODUCT_NAME;
+  }, [config?.clientName]);
+
   useEffect(() => {
     if (!config || !idToken) return;
 
@@ -337,12 +340,13 @@ export default function App() {
   const embedError = current?.error;
   const status = statusFrom(freshness, embedError);
   const userEmail = tokenEmail(session.idToken);
+  const { clientName, clientLogoUrl } = session.config;
 
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <Brand />
-        <p className="workspace-label">Espacio de trabajo</p>
+        <ClientIdentity logoUrl={clientLogoUrl} name={clientName} />
+        <p className="workspace-label">Menú</p>
         <nav aria-label="Navegación principal">
           <NavButtons activeView={activeView} onSelect={selectView} />
         </nav>
@@ -370,11 +374,15 @@ export default function App() {
             <Icon name="log-out" size={15} />
             Cerrar sesión
           </button>
+
+          <div className="sidebar-product">
+            <Wordmark size="sm" />
+          </div>
         </div>
       </aside>
 
       <header className="mobile-header">
-        <Brand />
+        <ClientIdentity compact logoUrl={clientLogoUrl} name={clientName} />
         <button
           aria-label="Cerrar sesión"
           className="mobile-signout"
@@ -395,7 +403,7 @@ export default function App() {
 
         <header className="topbar">
           <div>
-            <p className="eyebrow">VENTAS · GUATEMALA</p>
+            <p className="eyebrow">{clientName ? `${clientName} · Ventas` : "Ventas"}</p>
             <h1>{pageTitle}</h1>
             <p className="subtitle">{pageDescription}</p>
           </div>
@@ -519,6 +527,10 @@ export default function App() {
           />
         </section>
       </main>
+
+      <footer className="mobile-product">
+        <Wordmark size="sm" />
+      </footer>
 
       <nav aria-label="Navegación móvil" className="mobile-nav">
         <NavButtons activeView={activeView} compact onSelect={selectView} />

@@ -119,6 +119,11 @@ describe("App (authenticated)", () => {
     expect(await screen.findAllByText("actualizado hace 5 min")).toHaveLength(2);
     // Signed-in identity comes from the ID token claims.
     expect(screen.getByText("ana@example.com")).toBeInTheDocument();
+    // The client owns the workspace (sidebar + mobile header); the product stays in the footer.
+    expect(screen.getAllByText("Empresa Inteligente S.A.").length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByText("Empresa Inteligente S.A. · Ventas")).toBeInTheDocument();
+    expect(screen.getAllByLabelText("INsight").length).toBeGreaterThanOrEqual(1);
+    expect(document.title).toBe("INsight · Empresa Inteligente S.A.");
   });
 
   it("collapses the suggestions once a question is sent and reopens them for a new conversation", async () => {

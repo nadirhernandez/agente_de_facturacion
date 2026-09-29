@@ -58,15 +58,6 @@ button svg {
   position: sticky;
   top: 0;
 }
-.brand {
-  align-items: center;
-  color: #fff;
-  display: flex;
-  font-size: 16px;
-  font-weight: 750;
-  gap: 10px;
-  letter-spacing: -0.02em;
-}
 .brand-mark {
   align-items: center;
   background: linear-gradient(135deg, #3b8df5, #2563eb);
@@ -78,12 +69,137 @@ button svg {
   justify-content: center;
   width: 30px;
 }
+.brand-mark.large {
+  border-radius: 14px;
+  height: 48px;
+  width: 48px;
+}
+
+/* Product wordmark: "IN" (INFILE) always in the accent color. */
+.wordmark {
+  display: inline-grid;
+  gap: 1px;
+  justify-items: start;
+  line-height: 1;
+}
+.wordmark-name {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.wordmark-name b {
+  color: #3b8df5;
+  font-weight: 800;
+}
+.wordmark-vendor {
+  color: #88a9c4;
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+}
+.wordmark-sm .wordmark-name {
+  font-size: 15px;
+}
+.wordmark-md .wordmark-name {
+  font-size: 20px;
+}
+.wordmark-lg {
+  justify-items: center;
+}
+.wordmark-lg .wordmark-name {
+  font-size: 34px;
+}
+.wordmark-lg .wordmark-vendor {
+  font-size: 12px;
+}
+.product-hero {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+}
+.product-hero .wordmark-name {
+  color: #102a43;
+}
+.product-hero .wordmark-vendor {
+  color: #57718b;
+}
+.tagline {
+  color: #63778a;
+  font-size: 14px;
+  margin: 0 0 10px;
+}
+
+/* Client identity: the workspace belongs to them, so their name goes large. */
+.client-identity {
+  align-items: center;
+  color: #fff;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+.client-mark {
+  align-items: center;
+  background: linear-gradient(135deg, #3b8df5, #2563eb);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+  color: #fff;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  height: 38px;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  width: 38px;
+}
+.client-logo {
+  border-radius: 8px;
+  height: 38px;
+  object-fit: contain;
+  width: 38px;
+}
+.client-name {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+.client-identity.compact .client-mark,
+.client-identity.compact .client-logo {
+  border-radius: 8px;
+  font-size: 11px;
+  height: 28px;
+  width: 28px;
+}
+.client-identity.compact .client-name {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sidebar-product {
+  border-top: 1px solid #31516e;
+  display: flex;
+  justify-content: center;
+  padding-top: 12px;
+}
+.sidebar-product .wordmark {
+  justify-items: center;
+}
+.sidebar-product .wordmark-name {
+  color: #e6f0fa;
+}
+.mobile-product {
+  display: none;
+}
 .workspace-label {
   color: #88a9c4;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  margin: 30px 10px 8px;
+  margin: 28px 10px 8px;
+  text-transform: uppercase;
+}
+.eyebrow {
   text-transform: uppercase;
 }
 .sidebar nav {
@@ -779,12 +895,20 @@ h1 {
     justify-content: space-between;
     padding: 0 17px;
   }
-  .mobile-header .brand {
-    font-size: 14px;
+  .mobile-header .client-identity {
+    min-width: 0;
   }
-  .mobile-header .brand-mark {
-    height: 27px;
-    width: 27px;
+  .mobile-product {
+    color: #102a43;
+    display: flex;
+    justify-content: center;
+    padding: 14px 0 4px;
+  }
+  .mobile-product .wordmark {
+    justify-items: center;
+  }
+  .mobile-product .wordmark-vendor {
+    color: #57718b;
   }
   .mobile-signout {
     background: transparent;

@@ -43,3 +43,9 @@ variable "alerts_email" {
     error_message = "alerts_email debe ser un correo válido."
   }
 }
+
+variable "app_client_name" {
+  description = "Nombre comercial del cliente que ve la app (se muestra en grande en la interfaz). El piloto usa un nombre de demostración."
+  type        = string
+  default     = "Empresa Inteligente S.A."
+}

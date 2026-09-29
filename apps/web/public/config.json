@@ -3,5 +3,6 @@
   "cognitoDomain": "https://ventas-inteligentes-dev-503561412084.auth.us-east-1.amazoncognito.com",
   "cognitoClientId": "33onu8vmtitrcaegfq88gpssie",
   "region": "us-east-1",
-  "quickChatAgentId": "ventas-inteligentes-analista"
+  "quickChatAgentId": "ventas-inteligentes-analista",
+  "clientName": "Empresa Inteligente S.A."
 }
