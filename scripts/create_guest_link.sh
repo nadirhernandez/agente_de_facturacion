@@ -51,6 +51,7 @@ aws cognito-idp admin-create-user \
   --user-pool-id "$USER_POOL_ID" \
   --username "$GUEST_EMAIL" \
   --temporary-password "$GUEST_PASSWORD" \
+  --user-attributes Name=email,Value="$GUEST_EMAIL" Name=email_verified,Value=true \
   --message-action SUPPRESS \
   --region "$REGION" >/dev/null
 
