@@ -806,14 +806,6 @@ h1 {
   justify-items: center;
   max-width: 440px;
 }
-.splash-client {
-  color: #b9d8ff;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  margin: 0 0 6px;
-  text-transform: uppercase;
-}
 .splash .brand-mark.large {
   box-shadow: 0 14px 40px rgba(37, 99, 235, 0.45);
   height: 64px;

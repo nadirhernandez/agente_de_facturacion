@@ -75,7 +75,7 @@ describe("App (unauthenticated)", () => {
     render(<App splashMs={0} />);
 
     const button = await screen.findByRole("button", { name: /Iniciar sesión/ });
-    expect(screen.getByText("Empresa Inteligente S.A.")).toBeInTheDocument();
+    expect(screen.queryByText("Empresa Inteligente S.A.")).not.toBeInTheDocument();
     expect(screen.getByLabelText("INsight")).toBeInTheDocument();
     expect(screen.getByText("Insight desde adentro de su facturación.")).toBeInTheDocument();
     expect(auth.signIn).not.toHaveBeenCalled();

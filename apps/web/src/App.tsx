@@ -274,18 +274,12 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number } = {}
   if (bootError) {
     return <Landing error={bootError} onSignIn={() => window.location.reload()} />;
   }
-  if (!splashDone || !session) return <Splash busy clientName={session?.config.clientName} />;
+  if (!splashDone || !session) return <Splash busy />;
 
   // Branded entry point. The button opens Cognito Managed Login, which also
   // carries the corporate sign-up link.
   if (!session.idToken) {
-    return (
-      <Landing
-        clientName={session.config.clientName}
-        error={session.error}
-        onSignIn={() => void signIn(session.config)}
-      />
-    );
+    return <Landing error={session.error} onSignIn={() => void signIn(session.config)} />;
   }
 
   const { title: pageTitle, description: pageDescription } = viewCopy[activeView];

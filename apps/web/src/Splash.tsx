@@ -7,22 +7,12 @@ export const SPLASH_MS = 1400;
 
 /**
  * Full-screen dark canvas used for the boot splash and the login landing.
- * The client's name (when the tenant configured one) sits above the product
- * mark: it is their workspace, INsight is the tool.
+ * Only the product brand lives here: the client's identity belongs inside the app.
  */
-export function Splash({
-  clientName,
-  children,
-  busy = false,
-}: {
-  clientName?: string;
-  children?: ReactNode;
-  busy?: boolean;
-}) {
+export function Splash({ children, busy = false }: { children?: ReactNode; busy?: boolean }) {
   return (
     <main className="splash" aria-busy={busy || undefined} aria-live="polite">
       <div className="splash-content">
-        {clientName && <p className="splash-client">{clientName}</p>}
         <span className="brand-mark large">
           <Icon name="trending-up" size={22} />
         </span>
@@ -36,17 +26,9 @@ export function Splash({
 }
 
 /** Login landing: branded entry with a single action that opens Managed Login. */
-export function Landing({
-  clientName,
-  error,
-  onSignIn,
-}: {
-  clientName?: string;
-  error?: string;
-  onSignIn: () => void;
-}) {
+export function Landing({ error, onSignIn }: { error?: string; onSignIn: () => void }) {
   return (
-    <Splash clientName={clientName}>
+    <Splash>
       {error && (
         <p className="splash-error" role="alert">
           {error}
