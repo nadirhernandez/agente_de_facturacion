@@ -25,25 +25,20 @@ export function EmbeddingFrame({
   onChatReady,
   onRetry,
 }: EmbeddingFrameProps) {
-  const [mountError, setMountError] = useState<string>();
-  const shownError = error ?? mountError;
-
-  useEffect(() => setMountError(undefined), [url]);
+  // A mount error belongs to the URL that failed: a new URL clears it by itself.
+  const [mountError, setMountError] = useState<{ url: string; message: string }>();
+  const shownError =
+    error ?? (mountError && mountError.url === url ? mountError.message : undefined);
 
   if (shownError) {
     return (
       <section className="embed-state" role="alert">
-        <div aria-hidden="true" className="state-icon">!</div>
+        <div aria-hidden="true" className="state-icon">
+          !
+        </div>
         <h2>No se pudo abrir {title.toLowerCase()}</h2>
         <p>{shownError}</p>
-        <button
-          className="secondary-button"
-          onClick={() => {
-            setMountError(undefined);
-            onRetry();
-          }}
-          type="button"
-        >
+        <button className="secondary-button" onClick={onRetry} type="button">
           Reintentar
         </button>
       </section>
@@ -66,7 +61,9 @@ export function EmbeddingFrame({
   if (!isQuickSightUrl(url)) {
     return (
       <section className="embed-state" role="alert">
-        <div aria-hidden="true" className="state-icon">!</div>
+        <div aria-hidden="true" className="state-icon">
+          !
+        </div>
         <h2>No se pudo abrir {title.toLowerCase()}</h2>
         <p>La dirección recibida no es de Amazon Quick.</p>
       </section>
@@ -78,7 +75,7 @@ export function EmbeddingFrame({
       <AgentChat
         agentId={chatAgentId}
         initialPrompt={initialPrompt}
-        onError={setMountError}
+        onError={(message) => setMountError({ url, message })}
         onReady={onChatReady}
         title={title}
         url={url}
@@ -86,7 +83,11 @@ export function EmbeddingFrame({
     );
   }
 
+  // No `sandbox`: the QuickSight dashboard needs scripts, same-origin storage,
+  // forms and popups (exports); the URL is already restricted to QuickSight over
+  // HTTPS by isQuickSightUrl and the page CSP `frame-src`.
   return (
+    // oxlint-disable-next-line react/iframe-missing-sandbox
     <iframe
       allow="fullscreen"
       className="embedded-experience"
@@ -112,8 +113,10 @@ function embeddingContext(): Promise<EmbeddingContext> {
 export function isQuickSightUrl(value: string): boolean {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && (
-      url.hostname === "quicksight.aws.amazon.com" || url.hostname.endsWith(".quicksight.aws.amazon.com")
+    return (
+      url.protocol === "https:" &&
+      (url.hostname === "quicksight.aws.amazon.com" ||
+        url.hostname.endsWith(".quicksight.aws.amazon.com"))
     );
   } catch {
     return false;
@@ -139,13 +142,13 @@ function AgentChat({ title, url, agentId, initialPrompt, onReady, onError }: Age
   // Capture only the prompt that belongs to this one-use embed URL. A state
   // update after mount must never submit it twice.
   const initialPromptRef = useRef(initialPrompt);
-  const onReadyRef = useRef(onReady);
-  onReadyRef.current = onReady;
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
+    // Each embed URL is mounted exactly once; re-runs caused by a new callback
+    // identity are no-ops.
     if (mountedUrl.current === url) return;
     mountedUrl.current = url;
     container.replaceChildren();
@@ -178,7 +181,7 @@ function AgentChat({ title, url, agentId, initialPrompt, onReady, onError }: Age
 
         const iframe = container.querySelector("iframe");
         if (iframe) iframe.title = title;
-        onReadyRef.current?.();
+        onReady?.();
       } catch (caught) {
         console.error("No se pudo montar el chat del agente", caught);
         if (mountedUrl.current === url) {
@@ -186,7 +189,7 @@ function AgentChat({ title, url, agentId, initialPrompt, onReady, onError }: Age
         }
       }
     })();
-  }, [url, agentId, title, onError]);
+  }, [url, agentId, title, onError, onReady]);
 
   return <div className="embed-container" ref={containerRef} />;
 }
