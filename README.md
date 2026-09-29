@@ -10,12 +10,30 @@ El MLP se entrega como una **aplicación web mínima para usuarios comerciales**
 
 La pantalla incluye:
 
-1. El dashboard embebido **Pulso de Facturación**.
-2. Una experiencia de preguntas en lenguaje natural sobre el modelo de ventas.
-3. Filtros por período, departamento, establecimiento, canal y categoría.
-4. Una opción de guardar o compartir la vista filtrada (segunda iteración).
+1. **Analista de Ventas**: chat en lenguaje natural sobre el modelo de ventas, fijado a un agente
+   de Amazon Quick, con preguntas sugeridas para arrancar.
+2. **Pulso de Facturación**: el dashboard embebido con indicadores y evolución de la facturación.
+   Los filtros de período, región, establecimiento, canal y categoría viven dentro del dashboard.
+3. Indicador de frescura de datos (última carga a SPICE) visible en todo momento.
+
+Guardar o compartir vistas filtradas quedó fuera del alcance mientras la identidad de QuickSight sea
+compartida (ver [`docs/APP_SECURITY.md`](docs/APP_SECURITY.md)).
 
 QuickSight es el motor analítico embebido. La consola de QuickSight queda para que un administrador gestione datasets, Topics, permisos y el dashboard base.
+
+## Desarrollo local
+
+```bash
+npm install
+npm run dev:web        # Vite en http://localhost:5173
+npm run lint           # ESLint en apps/ y services/
+npm run typecheck      # tsc --noEmit del frontend
+npm test               # Vitest en todos los workspaces
+npm run build          # build del frontend y bundles de Lambda
+```
+
+Los mismos comandos corren en CI (`.github/workflows/ci.yml`) junto con `terraform fmt -check` y
+`terraform validate`.
 
 ## Flujo de demostración
 
@@ -80,4 +98,3 @@ de `data/raw/`.
 - Facturación real o datos personales reales.
 - Creación libre de dashboards por cualquier usuario.
 - Integración definitiva con ERP/DTE; en el MLP se emula con los JSONL incluidos.
-# agente_de_facturacion

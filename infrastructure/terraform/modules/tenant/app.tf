@@ -9,7 +9,7 @@
  * Ported from the pilot's application.tf, where the account id was hardcoded.
  * Differences from the pilot, on purpose:
  *
- *   - No FALLBACK_QUICKSIGHT_USER_ARN. In the pilot, a caller without their own
+ *   - No SHARED_QUICKSIGHT_USER_ARN. In the pilot, a caller without their own
  *     QuickSight user inherited the administrator's identity. Here every app
  *     user gets a real QuickSight user (see aws_quicksight_user.app) and an
  *     unknown caller is rejected with 403.
@@ -567,7 +567,7 @@ resource "aws_lambda_function" "embedding_api" {
         aws_quicksight_data_set.periods.data_set_id,
       ])
 
-      # No FALLBACK_QUICKSIGHT_USER_ARN here: a caller with no QuickSight user
+      # No SHARED_QUICKSIGHT_USER_ARN here: a caller with no QuickSight user
       # of their own must be rejected, not promoted to the admin identity.
       ALLOWED_DOMAINS = join(",", local.app_origins)
       CORS_ORIGIN     = local.app_url

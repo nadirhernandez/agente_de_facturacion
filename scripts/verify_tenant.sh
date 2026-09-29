@@ -206,9 +206,9 @@ check "API de embedding" bash -c \
 check "lambda de embedding" aws_q lambda get-function --function-name "${EMBEDDING_API}"
 # La identidad de reserva del piloto daba permisos de administrador a cualquiera
 # que iniciara sesión sin usuario propio de QuickSight. No debe existir aquí.
-check "sin identidad de QuickSight de reserva" bash -c \
+check "sin identidad compartida de QuickSight" bash -c \
   "aws lambda get-function-configuration --function-name '${EMBEDDING_API}' --region '${REGION}' \
-   --query 'Environment.Variables.FALLBACK_QUICKSIGHT_USER_ARN' --output text | grep -qx None"
+   --query 'Environment.Variables.SHARED_QUICKSIGHT_USER_ARN' --output text | grep -qx None"
 
 # La distribución se identifica por su origen, que es el bucket del frontend.
 app_domain="$(aws_q cloudfront list-distributions \
