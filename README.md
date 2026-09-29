@@ -7,6 +7,8 @@
 > **Modelo de despliegue (decisión fija):** cada cliente vive completo en su propia cuenta de AWS,
 > el despliegue parte de los JSON que **ya están** en un bucket de esa cuenta, y nada de un cliente
 > se acopla a la cuenta piloto de INFILE. Detalle en [`docs/PRINCIPIOS_DESPLIEGUE.md`](docs/PRINCIPIOS_DESPLIEGUE.md).
+>
+> **Demo rápida:** genera un link de acceso sin cuenta con `bash scripts/create_guest_link.sh`. Ver [`docs/ACCESO_INVITADOS.md`](docs/ACCESO_INVITADOS.md).
 
 ## Entregable final
 

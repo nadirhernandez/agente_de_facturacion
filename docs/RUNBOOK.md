@@ -9,6 +9,7 @@
 | Hosted UI Cognito | https://ventas-inteligentes-dev-503561412084.auth.us-east-1.amazoncognito.com |
 | Client ID (público) | `33onu8vmtitrcaegfq88gpssie` |
 | Usuario inicial | `rnhernandez@infile.com` |
+| **Link de invitado** | `bash scripts/create_guest_link.sh` → ver [`docs/ACCESO_INVITADOS.md`](../docs/ACCESO_INVITADOS.md) |
 
 Cognito envía la contraseña temporal por correo. En el primer ingreso pide cambiarla.
 
