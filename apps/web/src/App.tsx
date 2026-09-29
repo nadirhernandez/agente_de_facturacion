@@ -352,7 +352,7 @@ export default function App() {
             <Icon name="database" size={15} />
             <div>
               <span>{status.text}</span>
-              {status.detail && <small>{status.detail} · hora GT</small>}
+              {status.detail && <small>{status.detail}</small>}
             </div>
           </div>
 
@@ -362,7 +362,7 @@ export default function App() {
             </span>
             <div>
               <span title={userEmail}>{userEmail ?? "Sesión activa"}</span>
-              <small>GTQ · UTC-06:00</small>
+              <small>Sesión iniciada</small>
             </div>
           </div>
 
