@@ -14,6 +14,30 @@
         "SheetId": "f4b7de62-f81d-48fa-b411-64faace12957",
         "Name": "Pulso de Facturaci\u00f3n",
         "ContentType": "INTERACTIVE",
+        "ParameterControls": [
+          {
+            "Dropdown": {
+              "ParameterControlId": "control-moneda",
+              "Title": "Moneda",
+              "SourceParameterName": "Moneda",
+              "Type": "SINGLE_SELECT",
+              "SelectableValues": {
+                "LinkToDataSetColumn": {
+                  "DataSetIdentifier": "VentasComerciales",
+                  "ColumnName": "codigo_moneda"
+                }
+              },
+              "DisplayOptions": {
+                "TitleOptions": {
+                  "Visibility": "VISIBLE"
+                },
+                "SelectAllOptions": {
+                  "Visibility": "HIDDEN"
+                }
+              }
+            }
+          }
+        ],
         "Visuals": [
           {
             "KPIVisual": {
@@ -21,7 +45,7 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Facturaci\u00f3n total</visual-title>"
+                  "PlainText": "Facturaci\u00f3n total \u00b7 <<$Moneda>>"
                 }
               },
               "Subtitle": {
@@ -46,7 +70,6 @@
                         "FormatConfiguration": {
                           "FormatConfiguration": {
                             "NumberDisplayFormatConfiguration": {
-                              "Prefix": "Q",
                               "DecimalPlacesConfiguration": {
                                 "DecimalPlaces": 2
                               },
@@ -94,7 +117,7 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Ventas sin IVA</visual-title>"
+                  "PlainText": "Ventas sin IVA \u00b7 <<$Moneda>>"
                 }
               },
               "Subtitle": {
@@ -119,7 +142,6 @@
                         "FormatConfiguration": {
                           "FormatConfiguration": {
                             "NumberDisplayFormatConfiguration": {
-                              "Prefix": "Q",
                               "DecimalPlacesConfiguration": {
                                 "DecimalPlaces": 2
                               },
@@ -286,7 +308,7 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Tendencia mensual de facturaci\u00f3n</visual-title>"
+                  "PlainText": "Tendencia mensual de facturaci\u00f3n \u00b7 <<$Moneda>>"
                 }
               },
               "Subtitle": {
@@ -322,7 +344,6 @@
                           "FormatConfiguration": {
                             "FormatConfiguration": {
                               "NumberDisplayFormatConfiguration": {
-                                "Prefix": "Q",
                                 "DecimalPlacesConfiguration": {
                                   "DecimalPlaces": 2
                                 },
@@ -367,7 +388,7 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Regiones l\u00edderes por facturaci\u00f3n</visual-title>"
+                  "PlainText": "Regiones l\u00edderes por facturaci\u00f3n \u00b7 <<$Moneda>>"
                 }
               },
               "Subtitle": {
@@ -404,7 +425,6 @@
                           "FormatConfiguration": {
                             "FormatConfiguration": {
                               "NumberDisplayFormatConfiguration": {
-                                "Prefix": "Q",
                                 "DecimalPlacesConfiguration": {
                                   "DecimalPlaces": 2
                                 },
@@ -455,7 +475,7 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Categor\u00edas l\u00edderes por ventas sin IVA</visual-title>"
+                  "PlainText": "Categor\u00edas l\u00edderes por ventas sin IVA \u00b7 <<$Moneda>>"
                 }
               },
               "Subtitle": {
@@ -492,7 +512,6 @@
                           "FormatConfiguration": {
                             "FormatConfiguration": {
                               "NumberDisplayFormatConfiguration": {
-                                "Prefix": "Q",
                                 "DecimalPlacesConfiguration": {
                                   "DecimalPlaces": 2
                                 },
@@ -543,7 +562,7 @@
               "Title": {
                 "Visibility": "VISIBLE",
                 "FormatText": {
-                  "RichText": "<visual-title>Productos l\u00edderes por facturaci\u00f3n</visual-title>"
+                  "PlainText": "Productos l\u00edderes por facturaci\u00f3n \u00b7 <<$Moneda>>"
                 }
               },
               "Subtitle": {
@@ -580,7 +599,6 @@
                           "FormatConfiguration": {
                             "FormatConfiguration": {
                               "NumberDisplayFormatConfiguration": {
-                                "Prefix": "Q",
                                 "DecimalPlacesConfiguration": {
                                   "DecimalPlaces": 2
                                 },
@@ -708,8 +726,54 @@
       }
     ],
     "CalculatedFields": [],
-    "ParameterDeclarations": [],
-    "FilterGroups": [],
+    "ParameterDeclarations": [
+      {
+        "StringParameterDeclaration": {
+          "ParameterValueType": "SINGLE_VALUED",
+          "Name": "Moneda",
+          "DefaultValues": {
+            "StaticValues": [
+              "GTQ"
+            ]
+          }
+        }
+      }
+    ],
+    "FilterGroups": [
+      {
+        "FilterGroupId": "dashboard-moneda",
+        "Filters": [
+          {
+            "CategoryFilter": {
+              "FilterId": "filtro-moneda",
+              "Column": {
+                "DataSetIdentifier": "VentasComerciales",
+                "ColumnName": "codigo_moneda"
+              },
+              "Configuration": {
+                "CustomFilterConfiguration": {
+                  "MatchOperator": "EQUALS",
+                  "ParameterName": "Moneda",
+                  "NullOption": "NON_NULLS_ONLY"
+                }
+              }
+            }
+          }
+        ],
+        "ScopeConfiguration": {
+          "SelectedSheets": {
+            "SheetVisualScopingConfigurations": [
+              {
+                "SheetId": "f4b7de62-f81d-48fa-b411-64faace12957",
+                "Scope": "ALL_VISUALS"
+              }
+            ]
+          }
+        },
+        "Status": "ENABLED",
+        "CrossDataset": "SINGLE_DATASET"
+      }
+    ],
     "AnalysisDefaults": {
       "DefaultNewSheetConfiguration": {
         "InteractiveLayoutConfiguration": {

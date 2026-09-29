@@ -35,6 +35,10 @@ def field_reference(column_name: str) -> dict:
 
 
 def title(text: str) -> dict:
+    # PlainText when the title contains a parameter token (<<$…>>); RichText
+    # otherwise. QuickSight's rich-text parser treats < as XML and rejects <<.
+    if "<<$" in text:
+        return {"Visibility": "VISIBLE", "FormatText": {"PlainText": text}}
     return {
         "Visibility": "VISIBLE",
         "FormatText": {"RichText": f"<visual-title>{text}</visual-title>"},
