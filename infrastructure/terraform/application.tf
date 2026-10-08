@@ -258,11 +258,13 @@ resource "aws_cognito_user_pool" "app" {
   auto_verified_attributes = ["email"]
   deletion_protection      = "ACTIVE"
 
-  # Internal pilot: anyone with a corporate address may create an account. The
-  # pre sign-up trigger rejects every other domain (cognito_signup.tf) and the
-  # emailed code proves the person owns the mailbox.
+  # Invite only: solo un administrador crea usuarios; no hay autorregistro. Se
+  # deshabilitó el self sign-up para que ningún prospecto externo pueda crear
+  # una cuenta por su cuenta en esta cuenta piloto (que además tiene datos
+  # reales de INFILE). El pre sign-up trigger (cognito_signup.tf) sigue
+  # filtrando dominio como segunda barrera para los usuarios que cree el admin.
   admin_create_user_config {
-    allow_admin_create_user_only = false
+    allow_admin_create_user_only = true
   }
 
   lambda_config {
