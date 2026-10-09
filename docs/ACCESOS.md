@@ -41,6 +41,18 @@ Requisitos de contraseña: 12+ caracteres, mayúscula, minúscula, número y sí
 
 El script imprime qué va a ver la persona (real o demo) para que lo confirmes antes de avisarle.
 
+## Cuenta demo permanente (compartible)
+
+Para enseñar la demo sin generar links: una cuenta fija, sin vencimiento, que ve solo datos
+sintéticos. Creada el 2026-10-08 con `--permanent`.
+
+| Usuario | Contraseña | Ve |
+|---|---|---|
+| `demo@insight-demo.com` | `INsight-Demo-2026!` | demo sintética |
+
+Cualquiera con estas credenciales entra; si hay que cerrarla, `./scripts/create_app_user.sh
+demo@insight-demo.com --delete` (o cambiar la clave con `aws cognito-idp admin-set-user-password`).
+
 ## Link de invitado (sin cuenta, un solo uso)
 
 ```bash
