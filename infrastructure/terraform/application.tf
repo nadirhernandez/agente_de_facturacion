@@ -556,38 +556,46 @@ locals {
 locals {
   app_public_url = "https://${aws_cloudfront_distribution.web.domain_name}"
 
+  # Neutral light page, one navy card in the centre (the brand), justified
+  # executive copy. No coloured frame around the card.
   invite_email_html = <<-HTML
     <!doctype html>
     <html lang="es">
-    <body style="margin:0;padding:0;background:#0f2238;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0f2238;padding:32px 16px;">
+    <body style="margin:0;padding:0;background:#f3f4f6;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f4f6;padding:40px 16px;">
         <tr><td align="center">
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#132b47;border-radius:14px;padding:36px 32px;color:#e8eef6;">
-            <tr><td align="center" style="padding-bottom:20px;">
-              <div style="font-size:34px;font-weight:800;letter-spacing:-0.5px;">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#132b47;border-radius:12px;color:#e8eef6;">
+            <tr><td align="center" style="padding:34px 40px 8px 40px;">
+              <div style="font-size:30px;font-weight:800;letter-spacing:-0.5px;line-height:1;">
                 <span style="color:#3b82f6;">IN</span><span style="color:#ffffff;">sight</span>
               </div>
-              <div style="font-size:12px;color:#9fb3c8;letter-spacing:2px;text-transform:uppercase;">by INFILE</div>
+              <div style="font-size:11px;color:#9fb3c8;letter-spacing:2px;text-transform:uppercase;margin-top:6px;">by INFILE</div>
             </td></tr>
-            <tr><td style="font-size:16px;line-height:1.55;">
-              <p style="margin:0 0 14px;">Hola,</p>
-              <p style="margin:0 0 14px;">Le dimos acceso a <strong>INsight</strong>, el analista de ventas que responde, en lenguaje natural, sobre su facturación electrónica.</p>
-              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:18px 0;background:#0f2238;border-radius:10px;width:100%;">
-                <tr><td style="padding:16px 18px;font-size:15px;">
-                  <div style="color:#9fb3c8;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Usuario</div>
-                  <div style="font-weight:600;margin-bottom:12px;">{username}</div>
-                  <div style="color:#9fb3c8;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Contraseña temporal</div>
-                  <div style="font-weight:600;font-family:Menlo,Consolas,monospace;">{####}</div>
-                </td></tr>
+            <tr><td style="padding:18px 40px 0 40px;font-size:15px;line-height:1.7;text-align:justify;">
+              <p style="margin:0 0 14px;text-align:left;">Estimado(a) usuario(a):</p>
+              <p style="margin:0 0 14px;">INFILE le ha habilitado el acceso a <strong style="color:#ffffff;">INsight</strong>, la plataforma de análisis conversacional sobre su facturación electrónica. A continuación encontrará sus credenciales de ingreso.</p>
+              <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin:20px 0;background:#0f2238;border-radius:8px;">
+                <tr>
+                  <td style="padding:14px 18px 6px 18px;font-size:11px;color:#9fb3c8;text-transform:uppercase;letter-spacing:1px;width:44%;">Usuario</td>
+                  <td style="padding:14px 18px 6px 0;font-size:15px;color:#ffffff;font-weight:600;">{username}</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 18px 14px 18px;font-size:11px;color:#9fb3c8;text-transform:uppercase;letter-spacing:1px;">Contraseña temporal</td>
+                  <td style="padding:6px 18px 14px 0;font-size:15px;color:#ffffff;font-weight:600;font-family:Menlo,Consolas,monospace;">{####}</td>
+                </tr>
               </table>
-              <p style="margin:0 0 22px;">Al entrar por primera vez le pediremos elegir su propia contraseña.</p>
+              <p style="margin:0 0 14px;">Por seguridad, el sistema le solicitará definir una contraseña personal en su primer ingreso. La contraseña temporal tiene una vigencia de tres días.</p>
+              <p style="margin:0 0 24px;text-align:left;">Puede ingresar a través del siguiente enlace:</p>
               <p style="margin:0 0 26px;text-align:center;">
-                <a href="${local.app_public_url}" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;font-weight:700;padding:13px 26px;border-radius:10px;">Entrar a INsight</a>
+                <a href="${local.app_public_url}" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:13px 28px;border-radius:8px;letter-spacing:0.3px;">Ingresar a INsight</a>
               </p>
-              <p style="margin:0;font-size:13px;color:#9fb3c8;line-height:1.5;">Si el botón no funciona, copie este enlace en su navegador:<br><a href="${local.app_public_url}" style="color:#7fb0ff;">${local.app_public_url}</a></p>
+              <p style="margin:0;font-size:12px;color:#9fb3c8;line-height:1.5;text-align:left;">Enlace directo: <a href="${local.app_public_url}" style="color:#7fb0ff;">${local.app_public_url}</a></p>
             </td></tr>
-            <tr><td style="padding-top:26px;font-size:12px;color:#7f93a8;line-height:1.5;border-top:1px solid #1e3a5a;margin-top:20px;">
-              Este acceso es personal. Si no esperaba este correo, puede ignorarlo.<br>INFILE, S.A. · Guatemala
+            <tr><td style="padding:24px 40px 30px 40px;">
+              <div style="border-top:1px solid #1e3a5a;padding-top:16px;font-size:12px;color:#7f93a8;line-height:1.6;text-align:justify;">
+                Este acceso es personal e intransferible. Si no solicitó esta cuenta, le agradecemos ignorar este mensaje.<br>
+                <strong style="color:#b8c7d8;">INFILE, S.A.</strong> &middot; Guatemala
+              </div>
             </td></tr>
           </table>
         </td></tr>
