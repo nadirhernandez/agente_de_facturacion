@@ -49,3 +49,31 @@ variable "app_client_name" {
   type        = string
   default     = "Empresa Inteligente S.A."
 }
+
+# --- Correo de invitación de Cognito ------------------------------------------
+# Por defecto Cognito envía desde no-reply@verificationemail.com (llega a cualquier
+# destinatario). Para enviar desde una dirección de INFILE vía SES hay que salir
+# del sandbox de SES primero; si no, los prospectos no reciben la invitación.
+variable "cognito_email_via_ses" {
+  description = "true para enviar los correos de Cognito desde una identidad SES de INFILE (requiere SES fuera de sandbox)."
+  type        = bool
+  default     = false
+}
+
+variable "cognito_ses_source_arn" {
+  description = "ARN de la identidad SES (correo o dominio verificado) usada como remitente."
+  type        = string
+  default     = "arn:aws:ses:us-east-1:503561412084:identity/rnhernandez@infile.com"
+}
+
+variable "cognito_from_email" {
+  description = "Remitente visible, con nombre. Debe pertenecer a la identidad SES."
+  type        = string
+  default     = "INsight by INFILE <rnhernandez@infile.com>"
+}
+
+variable "cognito_reply_to_email" {
+  description = "Dirección a la que llegan las respuestas al correo de invitación."
+  type        = string
+  default     = "rnhernandez@infile.com"
+}

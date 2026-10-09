@@ -96,3 +96,33 @@ recurso está de más o de menos.
 - Sirve para **un** conjunto de datos reales. Un segundo cliente real va en su propia cuenta AWS
   (`PRINCIPIOS_DESPLIEGUE.md`), no en una tercera identidad.
 - El registro público está deshabilitado a propósito: solo un administrador crea usuarios.
+
+## El correo de invitación
+
+Cuando se crea una cuenta sin `--password`, Cognito envía la invitación con la plantilla de
+INsight (asunto "Su acceso a INsight by INFILE", HTML con marca, usuario, contraseña temporal y
+botón a la app). La plantilla vive en `infrastructure/terraform/application.tf`
+(`local.invite_email_html`); al cambiarla, `terraform apply -target=aws_cognito_user_pool.app`.
+
+Para reenviar la invitación a alguien que aún no ha entrado:
+
+```bash
+aws cognito-idp admin-create-user --user-pool-id us-east-1_Di1X9vNSS \
+  --username persona@infile.com --message-action RESEND --desired-delivery-mediums EMAIL \
+  --profile dashboards-dev-infile --region us-east-1
+```
+
+**Remitente.** Hoy sale de `no-reply@verificationemail.com` (el de Cognito): llega a cualquier
+destinatario, límite 50 correos/día. Para que salga de una dirección de INFILE vía SES:
+
+1. Sacar la cuenta de SES del sandbox (consola SES → "Request production access"; ~24 h). En
+   sandbox SES solo entrega a direcciones verificadas, por eso **no se activa antes**: los
+   prospectos no recibirían la invitación. Conviene verificar el dominio `infile.com` en SES para
+   poder usar un remitente como `insight@infile.com`.
+2. En Terraform poner `cognito_email_via_ses = true` (y ajustar `cognito_from_email` /
+   `cognito_ses_source_arn` si se usa otra identidad) y aplicar el pool.
+
+**Probar cómo le llega a alguien.** Si el correo de INFILE es Google Workspace, crear la cuenta
+con un alias propio (`rnhernandez+prueba@infile.com`): Google lo entrega al buzón de
+`rnhernandez@infile.com`, pero para Cognito es un usuario distinto, así se ve la invitación
+completa sin tocar la cuenta real. Borrarlo después con `--delete`.

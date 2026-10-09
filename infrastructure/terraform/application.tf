@@ -265,6 +265,29 @@ resource "aws_cognito_user_pool" "app" {
   # filtrando dominio como segunda barrera para los usuarios que cree el admin.
   admin_create_user_config {
     allow_admin_create_user_only = true
+
+    # What a new user receives when an admin creates their account
+    # (scripts/create_app_user.sh). {username} and {####} are filled by Cognito.
+    invite_message_template {
+      email_subject = "Su acceso a INsight by INFILE"
+      email_message = local.invite_email_html
+      sms_message   = "INsight by INFILE: su usuario es {username} y su contraseña temporal es {####}"
+    }
+  }
+
+  # Who the email comes from. COGNITO_DEFAULT sends from no-reply@verificationemail.com
+  # (works for any recipient, 50 emails/day). DEVELOPER sends from an SES identity
+  # of INFILE, but while the SES account is in sandbox it can only deliver to
+  # verified addresses, so prospects would never get their invitation. Flip
+  # var.cognito_email_via_ses to true once SES production access is granted.
+  dynamic "email_configuration" {
+    for_each = var.cognito_email_via_ses ? [1] : []
+    content {
+      email_sending_account  = "DEVELOPER"
+      source_arn             = var.cognito_ses_source_arn
+      from_email_address     = var.cognito_from_email
+      reply_to_email_address = var.cognito_reply_to_email
+    }
   }
 
   lambda_config {
@@ -525,6 +548,53 @@ locals {
 
   # Verified email domains that get the real identity. Everyone else is demo.
   real_email_domains = ["infile.com"]
+}
+
+# Invitation email. Cognito requires the literal placeholders {username} and
+# {####} somewhere in the body; the rest is free HTML (inline styles only, no
+# external assets: most mail clients block them).
+locals {
+  app_public_url = "https://${aws_cloudfront_distribution.web.domain_name}"
+
+  invite_email_html = <<-HTML
+    <!doctype html>
+    <html lang="es">
+    <body style="margin:0;padding:0;background:#0f2238;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#0f2238;padding:32px 16px;">
+        <tr><td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:520px;background:#132b47;border-radius:14px;padding:36px 32px;color:#e8eef6;">
+            <tr><td align="center" style="padding-bottom:20px;">
+              <div style="font-size:34px;font-weight:800;letter-spacing:-0.5px;">
+                <span style="color:#3b82f6;">IN</span><span style="color:#ffffff;">sight</span>
+              </div>
+              <div style="font-size:12px;color:#9fb3c8;letter-spacing:2px;text-transform:uppercase;">by INFILE</div>
+            </td></tr>
+            <tr><td style="font-size:16px;line-height:1.55;">
+              <p style="margin:0 0 14px;">Hola,</p>
+              <p style="margin:0 0 14px;">Le dimos acceso a <strong>INsight</strong>, el analista de ventas que responde, en lenguaje natural, sobre su facturación electrónica.</p>
+              <table role="presentation" cellspacing="0" cellpadding="0" style="margin:18px 0;background:#0f2238;border-radius:10px;width:100%;">
+                <tr><td style="padding:16px 18px;font-size:15px;">
+                  <div style="color:#9fb3c8;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Usuario</div>
+                  <div style="font-weight:600;margin-bottom:12px;">{username}</div>
+                  <div style="color:#9fb3c8;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Contraseña temporal</div>
+                  <div style="font-weight:600;font-family:Menlo,Consolas,monospace;">{####}</div>
+                </td></tr>
+              </table>
+              <p style="margin:0 0 22px;">Al entrar por primera vez le pediremos elegir su propia contraseña.</p>
+              <p style="margin:0 0 26px;text-align:center;">
+                <a href="${local.app_public_url}" style="display:inline-block;background:#3b82f6;color:#ffffff;text-decoration:none;font-weight:700;padding:13px 26px;border-radius:10px;">Entrar a INsight</a>
+              </p>
+              <p style="margin:0;font-size:13px;color:#9fb3c8;line-height:1.5;">Si el botón no funciona, copie este enlace en su navegador:<br><a href="${local.app_public_url}" style="color:#7fb0ff;">${local.app_public_url}</a></p>
+            </td></tr>
+            <tr><td style="padding-top:26px;font-size:12px;color:#7f93a8;line-height:1.5;border-top:1px solid #1e3a5a;margin-top:20px;">
+              Este acceso es personal. Si no esperaba este correo, puede ignorarlo.<br>INFILE, S.A. · Guatemala
+            </td></tr>
+          </table>
+        </td></tr>
+      </table>
+    </body>
+    </html>
+  HTML
 }
 
 resource "aws_quicksight_user" "app" {
