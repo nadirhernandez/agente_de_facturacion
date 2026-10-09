@@ -31,16 +31,19 @@ vi.mock("./EmbeddingFrame", () => ({
     url,
     initialPrompt,
     experience,
+    chatAgentId,
   }: {
     url?: string;
     initialPrompt?: string;
     experience: string;
+    chatAgentId?: string;
   }) => (
     <div
       data-testid="frame"
       data-url={url ?? ""}
       data-prompt={initialPrompt ?? ""}
       data-experience={experience}
+      data-agent={chatAgentId ?? ""}
     />
   ),
 }));
@@ -227,6 +230,29 @@ describe("App (authenticated)", () => {
       expect(screen.getByTestId("frame")).toHaveAttribute("data-url", `${EMBED}chat-2`),
     );
     expect(screen.getByTestId("frame")).toHaveAttribute("data-prompt", "");
+  });
+
+  it("pins the chat to the agent the API chose for this identity", async () => {
+    api.getEmbedUrl.mockResolvedValue({
+      embedUrl: `${EMBED}chat-9`,
+      expiresAt: "2026-09-28T13:00:00Z",
+      agentId: "agente-de-la-api",
+    });
+    render(<App splashMs={0} />);
+
+    await screen.findByRole("heading", { level: 1 });
+    await waitFor(() =>
+      expect(screen.getByTestId("frame")).toHaveAttribute("data-agent", "agente-de-la-api"),
+    );
+  });
+
+  it("falls back to the configured agent when the API returns none", async () => {
+    render(<App splashMs={0} />);
+
+    await screen.findByRole("heading", { level: 1 });
+    await waitFor(() =>
+      expect(screen.getByTestId("frame")).toHaveAttribute("data-agent", config.quickChatAgentId!),
+    );
   });
 
   it("ends the session when the API says the token expired", async () => {

@@ -184,22 +184,55 @@ GET /embed?chat          -> HTTP 200 + embedUrl
 GET /embed sin token     -> HTTP 401
 ```
 
-`ALLOW_ADMIN_USER_PASSWORD_AUTH` se habilitó solo para esa prueba y ya fue retirado: los flujos
-activos son `ALLOW_USER_SRP_AUTH` y `ALLOW_REFRESH_TOKEN_AUTH`. Para repetir la prueba hay que
-habilitarlo temporalmente en `application.tf`.
+`ALLOW_ADMIN_USER_PASSWORD_AUTH` está habilitado en el app client (es un flujo solo de servidor:
+exige credenciales de administrador) porque `scripts/create_guest_link.sh` lo usa para emitir
+links de invitado. La app sigue entrando con SRP.
 
-### Agregar más usuarios
+### Agregar usuarios: quién ve qué lo decide el dominio del correo
+
+El registro público está deshabilitado: solo un administrador crea usuarios. Y **el correo decide
+qué datos ve la persona** (detalle en `docs/APP_SECURITY.md`, "dos identidades"):
+
+| Correo | Identidad de Quick que recibe | Datos del chat |
+|---|---|---|
+| `@infile.com` | `app-infile-real` | reales de INFILE |
+| cualquier otro dominio (prospectos) | `app-demo-sintetico` | sintéticos de demo |
+
+No hay que tocar QuickSight ni licencias para dar acceso: ambas identidades ya existen y ya tienen
+sus permisos. Basta crear el usuario en Cognito con el correo correcto:
 
 ```bash
+# Prospecto (verá la demo con datos sintéticos)
 aws cognito-idp admin-create-user --user-pool-id us-east-1_Di1X9vNSS \
-  --username persona@empresa.com \
-  --user-attributes Name=email,Value=persona@empresa.com Name=email_verified,Value=true \
+  --username prospecto@suempresa.com \
+  --user-attributes Name=email,Value=prospecto@suempresa.com Name=email_verified,Value=true \
+  --desired-delivery-mediums EMAIL --profile dashboards-dev-infile --region us-east-1
+
+# Persona de INFILE (verá los datos reales)
+aws cognito-idp admin-create-user --user-pool-id us-east-1_Di1X9vNSS \
+  --username persona@infile.com \
+  --user-attributes Name=email,Value=persona@infile.com Name=email_verified,Value=true \
   --desired-delivery-mediums EMAIL --profile dashboards-dev-infile --region us-east-1
 ```
 
-Recuerda la limitación pendiente: todos los usuarios comparten el mismo usuario QuickSight, así que
-verían los mismos datos con permisos de autor. No agregar usuarios de negocio antes de aprovisionar
-un usuario QuickSight por persona y aplicar RLS.
+Para un acceso puntual sin cuenta, `bash scripts/create_guest_link.sh` emite un link de un solo
+uso: el invitado es `guest-…@infile-demo.com`, dominio distinto de `infile.com`, así que **siempre
+cae en la demo sintética**.
+
+Auditoría de la frontera (hacerla después de cualquier cambio en Quick):
+
+```bash
+python3 scripts/quicksight/grant_chat_access.py --set demo --principal app-demo-sintetico --audit
+python3 scripts/quicksight/grant_chat_access.py --set real --principal app-infile-real --audit
+```
+
+Cada comando termina en `OK: la identidad ve solo su juego.` o falla señalando la fuga.
+
+Si cambia el topic, el agente o se recrea el demo: `sync_topic.py --topic-id ventas-demo
+--topic-name "Ventas Demo"` y `sync_agent.py --space-id ventas-demo --space-name "Ventas Demo"
+--agent-id ventas-demo-analista --agent-name "Analista de Ventas (Demo)" --topic-id ventas-demo
+--dashboard-id ""`, y luego `grant_chat_access.py --set demo` otra vez (los recursos nuevos nacen
+sin permisos para la identidad).
 
 ## Productor de datos
 

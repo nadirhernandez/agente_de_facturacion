@@ -79,12 +79,43 @@ export function isAllowedEmail(email, domains = csv(process.env.ALLOWED_EMAIL_DO
 }
 
 /**
- * Shared identity mode. With SHARED_QUICKSIGHT_USER_ARN set, every verified
- * and allowed caller embeds as that single QuickSight user: same dashboard,
- * same agent, same permissions, and the same chat history. Meant for an
- * internal pilot only; the tenant module never sets it.
+ * Which shared identity, if any, a caller gets. Decided here, server-side,
+ * from the verified email in the Cognito token, so a browser cannot choose.
+ *
+ *   - email domain in REAL_EMAIL_DOMAINS and REAL_QUICKSIGHT_USER_ARN set
+ *       -> the "real" identity (INFILE data), its agent and dashboard.
+ *   - otherwise, DEMO_QUICKSIGHT_USER_ARN set
+ *       -> the "demo" identity (synthetic data), its agent and dashboard.
+ *   - neither set (the tenant module)
+ *       -> undefined: each person embeds as their own QuickSight user.
+ *
+ * The security boundary is in Quick, not here: each identity is only granted
+ * its own agent/space/topic/datasets (scripts/quicksight/grant_chat_access.py),
+ * so even a tampered agentId cannot reach the other set.
  */
-const sharedIdentityArn = () => process.env.SHARED_QUICKSIGHT_USER_ARN || undefined;
+export function sharedIdentityFor(email, env = process.env) {
+  const domain = email?.includes("@") ? email.slice(email.lastIndexOf("@") + 1) : "";
+  const realDomains = csv(env.REAL_EMAIL_DOMAINS);
+  if (domain && realDomains.includes(domain) && env.REAL_QUICKSIGHT_USER_ARN) {
+    return {
+      kind: "real",
+      userArn: env.REAL_QUICKSIGHT_USER_ARN,
+      agentId: env.REAL_CHAT_AGENT_ID || undefined,
+      dashboardId: env.REAL_DASHBOARD_ID || env.DASHBOARD_ID,
+      dataSetIds: env.REAL_DATA_SET_IDS || env.DATA_SET_IDS,
+    };
+  }
+  if (env.DEMO_QUICKSIGHT_USER_ARN) {
+    return {
+      kind: "demo",
+      userArn: env.DEMO_QUICKSIGHT_USER_ARN,
+      agentId: env.DEMO_CHAT_AGENT_ID || undefined,
+      dashboardId: env.DEMO_DASHBOARD_ID || env.DASHBOARD_ID,
+      dataSetIds: env.DEMO_DATA_SET_IDS || env.DATA_SET_IDS,
+    };
+  }
+  return undefined;
+}
 
 /**
  * email -> QuickSight user ARN (or null for "no user"), with a TTL so that a
@@ -139,12 +170,12 @@ async function resolveQuickSightUserArn(email) {
   return arn ?? undefined;
 }
 
-function experienceConfigurationFor(experience, { shared }) {
+function experienceConfigurationFor(experience, { shared, dashboardId }) {
   switch (experience) {
     case "dashboard":
       return {
         Dashboard: {
-          InitialDashboardId: required("DASHBOARD_ID"),
+          InitialDashboardId: dashboardId || required("DASHBOARD_ID"),
           FeatureConfigurations: {
             Bookmarks: { Enabled: false },
             SharedView: { Enabled: false },
@@ -165,9 +196,9 @@ function experienceConfigurationFor(experience, { shared }) {
  * Last successful SPICE ingestion per dataset. This is what the UI should show:
  * SPICE is a copy, so "up to date" only means "as of the last refresh".
  */
-async function datasetFreshness() {
+async function datasetFreshness(dataSetIds) {
   const accountId = required("QUICKSIGHT_ACCOUNT_ID");
-  const datasetIds = required("DATA_SET_IDS")
+  const datasetIds = (dataSetIds || required("DATA_SET_IDS"))
     .split(",")
     .map((id) => id.trim())
     .filter(Boolean);
@@ -252,7 +283,9 @@ export const handler = async (event) => {
   const path = event.requestContext?.http?.path ?? event.rawPath ?? "";
   if (path.endsWith("/status")) {
     try {
-      return response(200, await datasetFreshness());
+      // Freshness of the datasets the caller's identity actually sees.
+      const statusEmail = verifiedEmail(event.requestContext?.authorizer?.jwt?.claims ?? {});
+      return response(200, await datasetFreshness(sharedIdentityFor(statusEmail)?.dataSetIds));
     } catch (error) {
       console.error(
         JSON.stringify({ message: "Failed to read dataset freshness", error: errorInfo(error) }),
@@ -283,19 +316,21 @@ export const handler = async (event) => {
     }
   }
 
-  const shared = sharedIdentityArn();
+  const claims = event.requestContext?.authorizer?.jwt?.claims ?? {};
+  const email = verifiedEmail(claims);
+  const caller = claims.sub ?? "unknown";
+
+  // Identity first: the dashboard to embed depends on it.
+  const shared = sharedIdentityFor(email);
   const experience = event.queryStringParameters?.experience;
   const experienceConfiguration = experienceConfigurationFor(experience, {
     shared: Boolean(shared),
+    dashboardId: shared?.dashboardId,
   });
 
   if (!experienceConfiguration) {
     return response(400, { message: "experience must be dashboard or chat" });
   }
-
-  const claims = event.requestContext?.authorizer?.jwt?.claims ?? {};
-  const email = verifiedEmail(claims);
-  const caller = claims.sub ?? "unknown";
 
   if (!isAllowedEmail(email)) {
     console.warn(
@@ -311,7 +346,7 @@ export const handler = async (event) => {
   }
 
   try {
-    const userArn = shared ?? (await resolveQuickSightUserArn(email));
+    const userArn = shared?.userArn ?? (await resolveQuickSightUserArn(email));
     if (!userArn) {
       return response(403, {
         message: "Tu cuenta aún no tiene acceso a los tableros. Contacta al administrador.",
@@ -336,13 +371,16 @@ export const handler = async (event) => {
         caller,
         callerRef: callerRef(email),
         experience,
-        identity: shared ? "shared" : "own",
+        identity: shared ? `shared:${shared.kind}` : "own",
       }),
     );
 
     return response(200, {
       embedUrl: result.EmbedUrl,
       expiresAt: new Date(Date.now() + SESSION_MINUTES * 60 * 1000).toISOString(),
+      // The chat agent for this caller's identity. Informative for the UI: the
+      // real boundary is that the identity can only read its own agent.
+      ...(shared?.agentId ? { agentId: shared.agentId } : {}),
     });
   } catch (error) {
     console.error(

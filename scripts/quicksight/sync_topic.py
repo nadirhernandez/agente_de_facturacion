@@ -69,11 +69,13 @@ El comparativo por defecto es contra el período anterior inmediato de la misma 
 
 Excluye los períodos con es_periodo_completo = false de los comparativos y adviértelo si el usuario pregunta por el período en curso: un período a medias siempre parece una caída.
 
-Definiciones: "facturación", "ingresos" y "ventas brutas" son facturación total con IVA; "ventas sin IVA" y "venta neta" son el monto gravable; "facturas" es el conteo de facturas distintas; "ticket promedio" es facturación entre facturas, siempre dentro de una moneda.
+Definiciones: "facturación", "ingresos" y "ventas brutas" son facturación total con IVA; "ventas sin IVA" y "venta neta" son el monto gravable; "facturas" es el conteo de facturas distintas; "promedio por factura" es facturación entre facturas, siempre dentro de una moneda.
 
 No existen costos, margen, inventario, metas ni tasas de cambio. No calcules margen, utilidad, rentabilidad ni conversiones de moneda.
 
 Para series de tiempo usa líneas; para comparar categorías usa barras ordenadas de mayor a menor; para un solo número usa KPI. Al mostrar una variación incluye el valor de ambos períodos, no solo el porcentaje.
+
+Una factura se identifica por su número de autorización (columna Factura). Cuando el usuario pida una factura específica, filtra por ese número y muestra una tabla con todas sus líneas: producto, unidades, facturación total y moneda, más la fecha, el cliente y el establecimiento. No agregues ni sumes entre varias facturas distintas en ese caso; muestra el detalle de ese documento. Muestra el número de autorización completo, sin truncarlo.
 """.strip()
 
 
@@ -120,8 +122,9 @@ def build_topic() -> dict:
         dimension(
             "factura_id",
             "Factura",
-            ["documento", "dte"],
+            ["documento", "dte", "número de autorización", "numero de autorizacion", "autorización"],
             AllowedAggregations=["DISTINCT_COUNT"],
+            ColumnDescription="Número de autorización de la factura (identificador único del documento ante la SAT)",
         ),
         dimension("anio", "Año", NotAllowedAggregations=["SUM", "AVERAGE"]),
         # "mes" is numeric, so it already sorts chronologically. ComparativeOrder
@@ -283,8 +286,9 @@ def topic_exists() -> bool:
 
 
 def configure(args: argparse.Namespace) -> None:
-    global ACCOUNT_ID, REGION, PROFILE, TOPIC_ID, SALES_DATASET_ARN, PERIOD_DATASET_ARN
+    global ACCOUNT_ID, REGION, PROFILE, TOPIC_ID, TOPIC_NAME, SALES_DATASET_ARN, PERIOD_DATASET_ARN
     ACCOUNT_ID, REGION, PROFILE, TOPIC_ID = args.account_id, args.region, args.profile, args.topic_id
+    TOPIC_NAME = args.topic_name
     SALES_DATASET_ARN = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dataset/{args.sales_dataset_id}"
     PERIOD_DATASET_ARN = f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dataset/{args.period_dataset_id}"
 
@@ -296,6 +300,7 @@ def main() -> None:
     parser.add_argument("--region", default=REGION, help="Región de QuickSight")
     parser.add_argument("--profile", default=PROFILE, help="Perfil de AWS CLI")
     parser.add_argument("--topic-id", default=TOPIC_ID, help="Id del topic")
+    parser.add_argument("--topic-name", default=TOPIC_NAME, help="Nombre visible del topic")
     parser.add_argument(
         "--sales-dataset-id", default="ventas-comerciales-dev", help="Dataset de ventas comerciales"
     )

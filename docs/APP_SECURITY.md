@@ -48,36 +48,56 @@ La Lambda resuelve la identidad de QuickSight por el claim `email` del token.
 
 | | Piloto (`application.tf`) | Módulo (`modules/tenant/app.tf`) |
 |---|---|---|
-| Registro | Público: cualquier correo verificable (`ALLOW_ANY_EMAIL` en el trigger pre sign-up) | Solo invitados |
-| Identidad de QuickSight | Compartida: todos embeben como `SHARED_QUICKSIGHT_USER_ARN` (el administrador) | Propia; sin usuario de QuickSight → 403 |
-| Aprovisionamiento | Ninguno | `aws_quicksight_user` por cada correo de `app_users` |
+| Registro | Solo invitados (`allow_admin_create_user_only = true` desde 2026-10-08) | Solo invitados |
+| Identidad de QuickSight | **Dos compartidas, elegidas por dominio del correo** (ver abajo) | Propia; sin usuario de QuickSight → 403 |
+| Aprovisionamiento | `aws_quicksight_user.app["demo"]` y `["real"]` (Reader Pro) | `aws_quicksight_user` por cada correo de `app_users` |
 
 En modo compartido la Lambda desactiva `StatePersistence` del dashboard y el chat se monta con
 `enablePrivateMode` y `showChatHistory: false`, para que los filtros y conversaciones de una
-persona no aparezcan a otra. El log `Embed URL issued` (con `sub` y hash del correo) es el único
-registro de quién estuvo detrás de cada sesión.
+persona no aparezcan a otra. El log `Embed URL issued` (con `sub`, hash del correo e
+`identity: shared:demo|shared:real|own`) es el registro de quién estuvo detrás de cada sesión.
 
-### Riesgo aceptado para el piloto
+### Piloto: dos identidades, dos juegos de datos (desde 2026-10-08)
 
-> **Estado (2026-09-28):** el piloto queda con registro público e identidad compartida. El
-> propietario del proyecto acepta este riesgo de forma explícita mientras la aplicación sirva
-> solo para demostración con datos sintéticos.
+La cuenta piloto tiene **datos sintéticos** (demo para prospectos) y **datos reales de INFILE** en
+la misma cuenta. El chat es la superficie principal, así que la frontera de seguridad es "con qué
+identidad de Quick se embebe y qué puede leer esa identidad":
 
-Lo que implica:
+| Identidad (Quick) | Quién la recibe | Agente | Space / topic | Datasets (SPICE) |
+|---|---|---|---|---|
+| `app-demo-sintetico` | cualquier correo **fuera** de `REAL_EMAIL_DOMAINS` | `ventas-demo-analista` | `ventas-demo` | `ventas-comerciales-dev`, `ventas-comparativo-dev` |
+| `app-infile-real` | correos `@infile.com` (`REAL_EMAIL_DOMAINS`) | `ventas-inteligentes-analista` | `ventas-inteligentes` | `ventas-infile-real`, `ventas-comparativo-real` |
 
-- Cualquier persona que verifique un correo puede entrar y usar el dashboard y el chat con los
-  permisos del administrador de QuickSight.
-- No hay aislamiento entre personas más allá del modo privado del chat.
-- Los datos expuestos son los sintéticos de `data/`, sin información real.
+Reglas que lo hacen seguro, en orden de importancia:
 
-Condiciones para retirar el riesgo antes de cargar datos reales o abrir a usuarios externos:
+1. **La decisión la toma la Lambda, no el navegador.** `sharedIdentityFor(email)` en
+   `services/embedding-api/src/handler.mjs` lee el dominio del correo *verificado* del token de
+   Cognito y elige identidad, agente y dashboard. La API devuelve `agentId`; el frontend solo lo
+   usa para fijar el chat.
+2. **Cada identidad solo puede leer su juego.** `scripts/quicksight/grant_chat_access.py --set
+   demo|real` concede lectura (viewer) de agente, space, topic, datasets y dashboard de **un**
+   juego, y `--audit` falla si la identidad tiene algo del otro. Esto es lo que detiene a un
+   visitante que cambie el `agentId` en el navegador: Quick responde `401 Authorization denied by
+   resource policy` y el chat muestra "We can't open this chat agent". Verificado el 2026-10-08
+   con Playwright contra la app desplegada (demo→demo responde con cifras sintéticas, real→real
+   con cifras INFILE, demo→agente real bloqueado).
+3. **El administrador ya no es la identidad de la app.** `SHARED_QUICKSIGHT_USER_ARN` (el admin
+   SSO, dueño de todo) desapareció de la Lambda. El admin administra; nunca se entrega a un
+   navegador.
+4. **Mínimo privilegio.** Las dos identidades son `READER_PRO` (lo mínimo que admite el chat),
+   no autoras ni administradoras. Un usuario `READER` sin Pro no puede usar agentes.
+5. **Un fallback que nunca apunta a lo real.** `config.json` conserva `quickChatAgentId` solo
+   como respaldo si la API no devolviera agente, y vale el agente **demo**.
 
-1. En `cognito_signup.tf`, quitar `ALLOW_ANY_EMAIL` y poner los dominios permitidos en
-   `ALLOWED_EMAIL_DOMAINS`; o pasar a `allow_admin_create_user_only = true`.
-2. En `application.tf`, eliminar `SHARED_QUICKSIGHT_USER_ARN` y crear un `aws_quicksight_user`
-   por persona (el módulo ya lo hace). El código de la Lambda no cambia: sin la variable resuelve
-   la identidad por correo y devuelve 403 a quien no tenga usuario.
-3. Volver a llenar `ALLOWED_EMAIL_DOMAINS` en la Lambda como segunda barrera.
+Límites conocidos de este modelo (prototipo):
+
+- Las personas de INFILE comparten la identidad `app-infile-real`: historial de chat compartido
+  (mitigado con modo privado y sin historial). Para historial por persona, el camino es el del
+  módulo: un `aws_quicksight_user` por correo.
+- Sirve para **un** conjunto de datos reales. Si entrara data real de un segundo cliente a esta
+  cuenta, la separación correcta es por cuenta (`docs/PRINCIPIOS_DESPLIEGUE.md`), no una tercera
+  identidad.
+- Costo: dos licencias Reader Pro (US$20/mes cada una), independientes del número de prospectos.
 
 `verify_tenant.sh` ya falla si un tenant tiene la variable compartida, así que el módulo no puede
 heredar esta configuración por accidente.

@@ -2,9 +2,15 @@ import type { RuntimeConfig } from "./config";
 
 export type EmbedExperience = "dashboard" | "chat";
 
-interface EmbedResponse {
+export interface EmbedResponse {
   embedUrl: string;
   expiresAt: string;
+  /**
+   * Chat agent for the caller's identity (demo vs real), decided by the API
+   * from the verified email. Absent in per-user deployments (tenant module),
+   * where config.quickChatAgentId applies.
+   */
+  agentId?: string;
 }
 
 /** The API rejected the token (expired or revoked): the user must sign in again. */

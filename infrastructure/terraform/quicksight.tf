@@ -1,4 +1,14 @@
 locals {
+  # What an embedding identity needs to query a dataset through a topic/agent.
+  # Same set scripts/quicksight/grant_chat_access.py grants; keep them aligned.
+  quicksight_dataset_reader_actions = [
+    "quicksight:DescribeDataSet",
+    "quicksight:DescribeDataSetPermissions",
+    "quicksight:PassDataSet",
+    "quicksight:DescribeIngestion",
+    "quicksight:ListIngestions",
+  ]
+
   quicksight_account_id        = local.account_id
   quicksight_admin_principal   = "${local.arn_quicksight}:user/default/AWSReservedSSO_AWSAdministratorAccess_2dfa29f98f589a40/rnhernandez"
   quicksight_service_role_name = "aws-quicksight-service-role-v0"
@@ -25,7 +35,9 @@ resource "aws_iam_role_policy" "quicksight_data_access" {
         Effect = "Allow"
         Action = ["s3:GetObject"]
         Resource = [
-          "${aws_s3_bucket.data.arn}/curated/*"
+          "${aws_s3_bucket.data.arn}/curated/*",
+          # Real INFILE data loaded by scripts/load_real_day.sh (docs/CARGA_DATOS_REALES.md).
+          "${aws_s3_bucket.data.arn}/curated-real/*",
         ]
       },
       {
@@ -195,6 +207,13 @@ resource "aws_quicksight_data_set" "sales" {
       "quicksight:CancelIngestion",
       "quicksight:UpdateDataSetPermissions"
     ]
+  }
+
+  # The demo identity the app embeds prospects with reads the synthetic data
+  # (see locals.app_identities in application.tf). Read-only, never owner.
+  permissions {
+    principal = aws_quicksight_user.app["demo"].arn
+    actions   = local.quicksight_dataset_reader_actions
   }
 }
 

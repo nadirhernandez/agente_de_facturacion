@@ -7,7 +7,7 @@ import {
   QuickSightClient,
 } from "@aws-sdk/client-quicksight";
 
-import { handler, isAllowedEmail, verifiedEmail } from "../src/handler.mjs";
+import { handler, isAllowedEmail, sharedIdentityFor, verifiedEmail } from "../src/handler.mjs";
 
 const quicksight = mockClient(QuickSightClient);
 
@@ -19,7 +19,21 @@ const BASE_ENV = {
   CORS_ORIGIN: "https://app.example.com",
 };
 
-const SHARED_ARN = "arn:aws:quicksight:us-east-1:123456789012:user/default/admin";
+const DEMO_ARN = "arn:aws:quicksight:us-east-1:123456789012:user/default/app-demo-sintetico";
+const REAL_ARN = "arn:aws:quicksight:us-east-1:123456789012:user/default/app-infile-real";
+
+// The pilot's two-identity setup: demo for everyone, real for @infile.com.
+const SPLIT_ENV = {
+  REAL_EMAIL_DOMAINS: "infile.com",
+  DEMO_QUICKSIGHT_USER_ARN: DEMO_ARN,
+  DEMO_CHAT_AGENT_ID: "ventas-demo-analista",
+  DEMO_DASHBOARD_ID: "pulso-facturacion-dev",
+  DEMO_DATA_SET_IDS: "ds-lines,ds-periods",
+  REAL_QUICKSIGHT_USER_ARN: REAL_ARN,
+  REAL_CHAT_AGENT_ID: "ventas-inteligentes-analista",
+  REAL_DASHBOARD_ID: "pulso-facturacion-real",
+  REAL_DATA_SET_IDS: "ds-real-lines,ds-real-periods",
+};
 
 function apiEvent({
   method = "GET",
@@ -129,15 +143,49 @@ describe("handler: request validation", () => {
   });
 });
 
-describe("handler: shared identity mode", () => {
+describe("sharedIdentityFor", () => {
+  it("routes @infile.com to the real identity and everyone else to demo", () => {
+    expect(sharedIdentityFor("ana@infile.com", SPLIT_ENV)).toMatchObject({
+      kind: "real",
+      userArn: REAL_ARN,
+      agentId: "ventas-inteligentes-analista",
+      dashboardId: "pulso-facturacion-real",
+      dataSetIds: "ds-real-lines,ds-real-periods",
+    });
+    expect(sharedIdentityFor("ana@example.com", SPLIT_ENV)).toMatchObject({
+      kind: "demo",
+      userArn: DEMO_ARN,
+      agentId: "ventas-demo-analista",
+      dashboardId: "pulso-facturacion-dev",
+    });
+  });
+
+  it("matches the exact domain only: look-alikes get demo", () => {
+    expect(sharedIdentityFor("ana@mail.infile.com", SPLIT_ENV).kind).toBe("demo");
+    expect(sharedIdentityFor("ana@infile.com.evil.io", SPLIT_ENV).kind).toBe("demo");
+    expect(sharedIdentityFor("ana@notinfile.com", SPLIT_ENV).kind).toBe("demo");
+  });
+
+  it("falls back to demo when the real identity is not configured", () => {
+    const env = { ...SPLIT_ENV, REAL_QUICKSIGHT_USER_ARN: "" };
+    expect(sharedIdentityFor("ana@infile.com", env).kind).toBe("demo");
+  });
+
+  it("returns undefined when no shared identity is configured (tenant module)", () => {
+    expect(sharedIdentityFor("ana@infile.com", {})).toBeUndefined();
+    expect(sharedIdentityFor(undefined, SPLIT_ENV).kind).toBe("demo");
+  });
+});
+
+describe("handler: two shared identities routed by email domain", () => {
   beforeEach(() => {
-    process.env.SHARED_QUICKSIGHT_USER_ARN = SHARED_ARN;
+    process.env = { ...BASE_ENV, ...SPLIT_ENV };
     quicksight
       .on(GenerateEmbedUrlForRegisteredUserCommand)
       .resolves({ EmbedUrl: "https://us-east-1.quicksight.aws.amazon.com/embed/abc" });
   });
 
-  it("embeds the dashboard as the shared user without persisting state", async () => {
+  it("embeds the demo dashboard as the demo user without persisting state", async () => {
     const response = await handler(apiEvent({ experience: "dashboard" }));
 
     expect(response.statusCode).toBe(200);
@@ -147,7 +195,7 @@ describe("handler: shared identity mode", () => {
     const [call] = quicksight.commandCalls(GenerateEmbedUrlForRegisteredUserCommand);
     expect(call.args[0].input).toMatchObject({
       AwsAccountId: "123456789012",
-      UserArn: SHARED_ARN,
+      UserArn: DEMO_ARN,
       AllowedDomains: ["https://app.example.com", "http://localhost:5173"],
       SessionLifetimeInMinutes: 60,
       ExperienceConfiguration: {
@@ -164,19 +212,60 @@ describe("handler: shared identity mode", () => {
     expect(quicksight.commandCalls(ListUsersCommand)).toHaveLength(0);
   });
 
-  it("embeds Quick chat", async () => {
+  it("embeds Quick chat for a prospect as the demo user and returns the demo agent", async () => {
     const response = await handler(apiEvent({ experience: "chat" }));
     expect(response.statusCode).toBe(200);
+    expect(body(response).agentId).toBe("ventas-demo-analista");
     const [call] = quicksight.commandCalls(GenerateEmbedUrlForRegisteredUserCommand);
+    expect(call.args[0].input.UserArn).toBe(DEMO_ARN);
     expect(call.args[0].input.ExperienceConfiguration).toEqual({ QuickChat: {} });
   });
 
-  it("never logs the caller's email", async () => {
+  it("embeds Quick chat for @infile.com as the real user and returns the real agent", async () => {
+    const response = await handler(
+      apiEvent({
+        experience: "chat",
+        claims: { sub: "s9", email: "Luis@INFILE.com", email_verified: "true" },
+      }),
+    );
+    expect(response.statusCode).toBe(200);
+    expect(body(response).agentId).toBe("ventas-inteligentes-analista");
+    const [call] = quicksight.commandCalls(GenerateEmbedUrlForRegisteredUserCommand);
+    expect(call.args[0].input.UserArn).toBe(REAL_ARN);
+  });
+
+  it("embeds the real dashboard for @infile.com", async () => {
+    await handler(
+      apiEvent({
+        experience: "dashboard",
+        claims: { sub: "s9", email: "luis@infile.com", email_verified: "true" },
+      }),
+    );
+    const [call] = quicksight.commandCalls(GenerateEmbedUrlForRegisteredUserCommand);
+    expect(call.args[0].input.ExperienceConfiguration.Dashboard.InitialDashboardId).toBe(
+      "pulso-facturacion-real",
+    );
+  });
+
+  it("never logs the caller's email and records which identity was used", async () => {
     await handler(apiEvent());
     const logged = console.log.mock.calls.map((args) => String(args[0])).join("\n");
     expect(logged).toContain("Embed URL issued");
     expect(logged).not.toContain("ana@example.com");
-    expect(logged).toContain('"identity":"shared"');
+    expect(logged).toContain('"identity":"shared:demo"');
+  });
+
+  it("reports freshness of the datasets the caller's identity sees", async () => {
+    quicksight.on(ListIngestionsCommand).resolves({ Ingestions: [] });
+    await handler(
+      apiEvent({
+        path: "/status",
+        experience: null,
+        claims: { sub: "s9", email: "luis@infile.com", email_verified: "true" },
+      }),
+    );
+    const ids = quicksight.commandCalls(ListIngestionsCommand).map((c) => c.args[0].input.DataSetId);
+    expect(ids.sort()).toEqual(["ds-real-lines", "ds-real-periods"]);
   });
 
   it("returns 500 with a generic message when QuickSight fails", async () => {

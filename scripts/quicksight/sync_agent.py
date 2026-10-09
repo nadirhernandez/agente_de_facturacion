@@ -43,9 +43,16 @@ SPACE_ID = "ventas-inteligentes"
 SPACE_NAME = "Ventas Inteligentes"
 SPACE_DESCRIPTION = "Facturación emitida en Guatemala en GTQ y USD: modelo semántico certificado y dashboard."
 
+# Action connectors a ligar / desligar (se llenan desde la línea de comandos).
+ACTION_CONNECTORS: list[str] = []
+ACTION_CONNECTORS_TO_REMOVE: list[str] = []
+
 AGENT_ID = "ventas-inteligentes-analista"
 AGENT_NAME = "Analista de Ventas"
-AGENT_DESCRIPTION = "Responde preguntas sobre la facturación de la empresa usando solo sus datos de ventas."
+AGENT_DESCRIPTION = (
+    "Analista de facturación electrónica (FEL) de Guatemala. Responde sobre las ventas de su empresa "
+    "a partir de sus Documentos Tributarios Electrónicos certificados, usando solo sus propios datos."
+)
 
 # The QuickSight identity the app embeds with. The agent is private until shared.
 APP_USER_ARN = (
@@ -57,13 +64,13 @@ APP_USER_ARN = (
 # the synonyms, aggregation rules and instructions that make answers correct.
 SPACE_RESOURCES = [
     ("TOPIC", f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:topic/ventas-inteligentes"),
-    ("DASHBOARD", f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dashboard/pulso-facturacion-dev"),
+    ("DASHBOARD", f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:dashboard/pulso-facturacion-real"),
 ]
 
 WELCOME_MESSAGE = (
-    "Hola, soy su analista de ventas. Puedo analizar facturación en quetzales y dólares, "
-    "facturas, unidades y ticket promedio; comparar períodos y desglosar por región, "
-    "sucursal, canal, cliente, categoría o producto, siempre separado por moneda."
+    "Hola, soy su analista de ventas sobre sus facturas electrónicas FEL. Analizo facturación en "
+    "quetzales y dólares, facturas, unidades y promedio por factura; comparo períodos, desgloso por "
+    "región, cliente o producto, y busco una factura por su número de autorización."
 )
 
 # API limit: 3 prompts, 100 characters each.
@@ -74,7 +81,9 @@ STARTER_PROMPTS = [
 ]
 
 IDENTITY = """
-Eres el Analista de Ventas de la empresa. Tu único trabajo es responder preguntas sobre la facturación y las ventas de la empresa usando sus datos: facturación, facturas, unidades, ticket promedio, clientes, productos, categorías, canales, establecimientos y regiones de Guatemala.
+Eres el Analista de Ventas de su empresa, especialista en la facturación electrónica de Guatemala. Trabajas sobre los Documentos Tributarios Electrónicos (DTE) que su empresa emite bajo el Régimen de Factura Electrónica en Línea (FEL) de la SAT: documentos certificados, firmados electrónicamente y con número de autorización, que son la fuente legal y definitiva de sus ventas.
+
+Tu único trabajo es responder preguntas sobre la facturación y las ventas de su empresa usando esos datos: facturación, facturas, unidades, promedio por factura, clientes, productos, categorías, canales, establecimientos y regiones de Guatemala. Entiendes que una factura FEL no es un PDF sino un documento tributario registrado ante la SAT, que el emisor es su empresa y el receptor es su cliente identificado por NIT, y que la facturación de un período es lo que esos documentos certifican.
 """.strip()
 
 TONE = """
@@ -96,7 +105,7 @@ Responde únicamente con base en los datos del espacio Ventas Inteligentes. Nunc
 
 Si una pregunta no se puede responder con estos datos, dilo en una frase y sugiere una pregunta parecida que sí puedas responder.
 
-Si te preguntan algo que no tiene que ver con las ventas de la empresa, responde con amabilidad que solo puedes ayudar con sus datos de ventas y ofrece un ejemplo de pregunta.
+Si te preguntan algo que no tiene que ver con las ventas de su empresa, responde con amabilidad que solo puedes ayudar con sus datos de ventas y ofrece un ejemplo de pregunta.
 
 No existen costos, margen, utilidad, inventario, metas ni tasas de cambio en los datos. No los calcules ni los supongas; si los piden, explica que esos datos no están disponibles.
 
@@ -106,6 +115,14 @@ La semana va de lunes a domingo. El comparativo por defecto es contra el períod
 
 Solo cuentan documentos emitidos; los anulados ya están excluidos.
 
+Naturaleza de los datos (Régimen FEL de Guatemala): cada fila proviene de un Documento Tributario Electrónico certificado ante la SAT. Los tipos que puedes encontrar son factura (FACT, la venta principal), nota de crédito (NCRE, que corrige o anula total o parcialmente una factura previa y por tanto reduce la venta), nota de débito (NDEB, que aumenta el monto de una factura previa), y variantes como factura cambiaria o de pequeño contribuyente. FEL es inmutable: una factura emitida no se borra, se corrige con una nota de crédito. Por eso, cuando veas un documento con descripción de anulación, devolución o ajuste, trátalo como una corrección de otra factura y adviértelo, no lo presentes como una venta más ni lo sumes a ciegas con la factura original.
+
+Una factura se identifica por su número de autorización (columna Factura), un identificador único que la SAT asigna al certificarla. Cuando el usuario pida una factura específica, filtra por ese número y muestra sus líneas en una tabla: producto, unidades, facturación total y moneda, con la fecha, el cliente y el establecimiento. En ese caso no sumes ni mezcles varias facturas; muestra el detalle de ese documento y su número de autorización completo, sin truncar.
+
+Si tienes disponibles las acciones de documentos FEL, úsalas así: cuando el usuario pida ver, abrir, descargar o compartir una factura como PDF, llama a pdf_factura_fel con su número de autorización y entrega el enlace al PDF certificado. Cuando pida el detalle certificado de un documento o un dato que no esté en los datos de ventas (receptor completo, certificador, fecha de certificación, anulación, descuentos), llama a resumen_factura_fel y responde con esos datos. Solo llama a xml_factura_fel si el usuario pide expresamente el XML. Si una acción responde que el documento no existe, díselo tal cual y verifica con el usuario el número de autorización. Si no tienes esas acciones, indícale que puede consultar el documento certificado en el verificador público con ese mismo número de autorización.
+
+El emisor de todos los documentos es su empresa; el receptor es el cliente, identificado por su NIT. Cuando hables de "clientes" te refieres a receptores de las facturas. Los importes con IVA son la facturación total; el monto gravable es la venta sin IVA.
+
 Responde siempre en español, aunque la pregunta llegue en otro idioma.
 """.strip()
 
@@ -113,9 +130,23 @@ POLL_SECONDS = 5
 POLL_LIMIT = 36  # three minutes
 
 
-def configure(account_id: str, region: str, profile: str, app_user_arn: str | None) -> None:
-    """Apunta el script a otra cuenta/región; sin argumentos, queda el piloto."""
+def configure(
+    account_id: str,
+    region: str,
+    profile: str,
+    app_user_arn: str | None,
+    *,
+    space_id: str | None = None,
+    space_name: str | None = None,
+    agent_id: str | None = None,
+    agent_name: str | None = None,
+    topic_id: str | None = None,
+    dashboard_id: str | None = None,
+) -> None:
+    """Apunta el script a otra cuenta/región y, opcionalmente, a otro juego
+    space/agente/topic/dashboard. Sin argumentos, queda el piloto (datos reales)."""
     global ACCOUNT_ID, REGION, PROFILE, APP_USER_ARN, SPACE_RESOURCES
+    global SPACE_ID, SPACE_NAME, AGENT_ID, AGENT_NAME
     old_account, old_region = ACCOUNT_ID, REGION
     ACCOUNT_ID, REGION, PROFILE = account_id, region, profile
     # Los ARN por defecto se reescriben con la cuenta y región elegidas.
@@ -124,9 +155,35 @@ def configure(account_id: str, region: str, profile: str, app_user_arn: str | No
     SPACE_RESOURCES = [(kind, arn.replace(prefix_old, prefix_new, 1)) for kind, arn in SPACE_RESOURCES]
     APP_USER_ARN = app_user_arn or APP_USER_ARN.replace(prefix_old, prefix_new, 1)
 
+    # Un segundo juego (p. ej. el demo con datos sintéticos) reutiliza persona e
+    # instrucciones, pero vive en su propio space con su propio topic/dashboard.
+    SPACE_ID = space_id or SPACE_ID
+    SPACE_NAME = space_name or SPACE_NAME
+    AGENT_ID = agent_id or AGENT_ID
+    AGENT_NAME = agent_name or AGENT_NAME
+    if topic_id or dashboard_id:
+        resources = []
+        for kind, arn in SPACE_RESOURCES:
+            if kind == "TOPIC" and topic_id:
+                arn = f"{prefix_new}topic/{topic_id}"
+            if kind == "DASHBOARD" and dashboard_id is not None:
+                if dashboard_id == "":
+                    # --dashboard-id "" : sin dashboard, el chat es la única superficie.
+                    continue
+                arn = f"{prefix_new}dashboard/{dashboard_id}"
+            resources.append((kind, arn))
+        SPACE_RESOURCES = resources
+
 
 def client():
     return boto3.Session(profile_name=PROFILE, region_name=REGION).client("quicksight")
+
+
+def connector_arn(value: str) -> str:
+    """Acepta el id o el ARN de un Action Connector y devuelve siempre el ARN."""
+    if value.startswith("arn:"):
+        return value
+    return f"arn:aws:quicksight:{REGION}:{ACCOUNT_ID}:action-connector/{value}"
 
 
 def list_space_resources(qs) -> list[dict]:
@@ -174,13 +231,16 @@ def validate_limits() -> None:
 
 
 def prompt_input() -> dict:
+    # Las instrucciones nombran el space al que el agente debe limitarse; si el
+    # juego usa otro space (p. ej. el demo), el nombre debe coincidir.
+    instructions = CUSTOM_INSTRUCTIONS.replace("del espacio Ventas Inteligentes", f"del espacio {SPACE_NAME}")
     return {
         "NewPrompt": {
             "Identity": IDENTITY,
             "Tone": TONE,
             "OutputStyle": OUTPUT_STYLE,
             "ResponseLength": RESPONSE_LENGTH,
-            "CustomInstructions": CUSTOM_INSTRUCTIONS,
+            "CustomInstructions": instructions,
         }
     }
 
@@ -260,7 +320,10 @@ def ensure_agent(qs, space_arn: str) -> dict:
         existing = None
 
     if existing is None:
-        qs.create_agent(**common, Spaces=[space_arn], AgentLifecycle="PUBLISHED")
+        create = dict(common, Spaces=[space_arn], AgentLifecycle="PUBLISHED")
+        if ACTION_CONNECTORS:
+            create["ActionConnectors"] = [connector_arn(c) for c in ACTION_CONNECTORS]
+        qs.create_agent(**create)
         print(f"agente {AGENT_ID}: creado")
     else:
         linked = existing.get("Spaces") or []
@@ -271,8 +334,27 @@ def ensure_agent(qs, space_arn: str) -> dict:
         if extra:
             # Exactly one knowledge source: the sales space.
             update["SpacesToRemove"] = extra
+        # Action connectors (MCP y otros) se agregan sin quitar los que ya tenga:
+        # la lista la administra quien los crea en la consola o por API.
+        # UpdateAgent exige el ARN; se acepta el id y se construye el ARN.
+        current_connectors = set(existing.get("ActionConnectors") or [])
+        to_add = [
+            arn for arn in (connector_arn(c) for c in ACTION_CONNECTORS) if arn not in current_connectors
+        ]
+        to_remove = [
+            arn for arn in (connector_arn(c) for c in ACTION_CONNECTORS_TO_REMOVE) if arn in current_connectors
+        ]
+        if to_add:
+            update["ActionConnectorsToAdd"] = to_add
+        if to_remove:
+            update["ActionConnectorsToRemove"] = to_remove
+        # `common` siempre lleva CustomPromptInput completo: UpdateAgent lo
+        # reemplaza entero y omitirlo deja al agente sin instrucciones.
         qs.update_agent(**update)
-        print(f"agente {AGENT_ID}: actualizado")
+        detail = "".join(
+            [f" (+{len(to_add)} action connector)" if to_add else "", f" (-{len(to_remove)} action connector)" if to_remove else ""]
+        )
+        print(f"agente {AGENT_ID}: actualizado{detail}")
 
     agent = wait_until_active(qs)
 
@@ -377,9 +459,56 @@ def main() -> None:
         default=None,
         help="Usuario de QuickSight de la app (por defecto, el del piloto en esa cuenta)",
     )
+    # Un segundo juego space/agente (p. ej. el demo sintético) con la misma persona.
+    parser.add_argument("--space-id", default=None, help=f"Id del space (por defecto {SPACE_ID})")
+    parser.add_argument("--space-name", default=None, help=f"Nombre del space (por defecto {SPACE_NAME!r})")
+    parser.add_argument("--agent-id", default=None, help=f"Id del agente (por defecto {AGENT_ID})")
+    parser.add_argument("--agent-name", default=None, help=f"Nombre del agente (por defecto {AGENT_NAME!r})")
+    parser.add_argument("--topic-id", default=None, help="Topic a ligar al space (por defecto ventas-inteligentes)")
+    parser.add_argument(
+        "--dashboard-id",
+        default=None,
+        help='Dashboard a ligar al space (por defecto pulso-facturacion-real; "" para ninguno)',
+    )
+    parser.add_argument(
+        "--action-connector",
+        action="append",
+        default=[],
+        metavar="ACTION_CONNECTOR_ID",
+        help=(
+            "Id de un Action Connector (por ejemplo el MCP de documentos FEL creado en la consola) "
+            "que debe quedar ligado al agente. Repetible. Ver docs/MCP_QUICK.md."
+        ),
+    )
+    parser.add_argument(
+        "--remove-action-connector",
+        action="append",
+        default=[],
+        metavar="ACTION_CONNECTOR_ID",
+        help=(
+            "Id de un Action Connector a desligar del agente. Repetible. Usa siempre esta opción en "
+            "lugar de un UpdateAgent a mano: UpdateAgent reemplaza CustomPromptInput completo y, si "
+            "no se envía, deja al agente sin instrucciones."
+        ),
+    )
     args = parser.parse_args()
 
-    configure(args.account_id, args.region, args.profile, args.app_user_arn)
+    global ACTION_CONNECTORS, ACTION_CONNECTORS_TO_REMOVE
+    ACTION_CONNECTORS = list(args.action_connector)
+    ACTION_CONNECTORS_TO_REMOVE = list(args.remove_action_connector)
+
+    configure(
+        args.account_id,
+        args.region,
+        args.profile,
+        args.app_user_arn,
+        space_id=args.space_id,
+        space_name=args.space_name,
+        agent_id=args.agent_id,
+        agent_name=args.agent_name,
+        topic_id=args.topic_id,
+        dashboard_id=args.dashboard_id,
+    )
     validate_limits()
 
     if args.show:

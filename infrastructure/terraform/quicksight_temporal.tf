@@ -77,6 +77,13 @@ resource "aws_quicksight_data_set" "comparativo" {
       "quicksight:UpdateDataSetPermissions",
     ]
   }
+
+  # The demo identity the app embeds prospects with reads the synthetic data
+  # (see locals.app_identities in application.tf). Read-only, never owner.
+  permissions {
+    principal = aws_quicksight_user.app["demo"].arn
+    actions   = local.quicksight_dataset_reader_actions
+  }
 }
 
 resource "aws_quicksight_ingestion" "comparativo_initial" {

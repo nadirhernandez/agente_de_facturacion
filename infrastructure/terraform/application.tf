@@ -356,7 +356,13 @@ resource "aws_cognito_user_pool_client" "web" {
 
   # Browser sign-in uses the Hosted UI with PKCE. Password-based admin auth
   # stays disabled so AWS credentials alone cannot mint user tokens.
-  explicit_auth_flows = ["ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_USER_SRP_AUTH"]
+  # ALLOW_ADMIN_USER_PASSWORD_AUTH is server-side only (needs admin credentials):
+  # scripts/create_guest_link.sh signs a guest in with it to mint one-time links.
+  explicit_auth_flows = [
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH",
+    "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+  ]
 
   access_token_validity  = 60
   id_token_validity      = 60
@@ -438,7 +444,8 @@ resource "aws_iam_role_policy" "embedding_api" {
         Action = ["quicksight:GenerateEmbedUrlForRegisteredUser"]
         Resource = [
           "${local.arn_quicksight}:user/default/*",
-          "${local.arn_quicksight}:dashboard/pulso-facturacion-dev",
+          "${local.arn_quicksight}:dashboard/${local.app_chat.demo.dashboard_id}",
+          "${local.arn_quicksight}:dashboard/${local.app_chat.real.dashboard_id}",
         ]
       },
       {
@@ -453,12 +460,75 @@ resource "aws_iam_role_policy" "embedding_api" {
         Effect = "Allow"
         Action = ["quicksight:ListIngestions"]
         Resource = [
-          "${local.arn_quicksight}:dataset/${aws_quicksight_data_set.sales.data_set_id}/ingestion/*",
-          "${local.arn_quicksight}:dataset/${aws_quicksight_data_set.comparativo.data_set_id}/ingestion/*",
+          for id in concat(local.app_chat.demo.data_set_ids, local.app_chat.real.data_set_ids) :
+          "${local.arn_quicksight}:dataset/${id}/ingestion/*"
         ]
       },
     ]
   })
+}
+
+# ---------------------------------------------------------------------------
+# App identities in Quick. The chat is the product, so the security boundary is
+# "which Quick identity embeds, and what that identity can see". Two shared
+# identities, both Reader Pro (the chat agent needs Pro):
+#
+#   app_demo  -> prospects (any email outside REAL_EMAIL_DOMAINS). Only the
+#                synthetic agent/space/topic/datasets are shared with it.
+#   app_real  -> INFILE staff (@infile.com). Only the real agent/space/topic/
+#                datasets are shared with it.
+#
+# The admin SSO user is no longer the identity the app embeds with: it owns
+# the resources but is never handed to a browser. Which identity a caller gets
+# is decided server-side in the embedding Lambda from the verified email
+# domain in the Cognito token, so a visitor cannot pick the other one.
+# Permissions are granted with scripts/quicksight/grant_chat_access.py.
+# ---------------------------------------------------------------------------
+locals {
+  app_identities = {
+    demo = {
+      user_name = "app-demo-sintetico"
+      email     = "rnhernandez+insight-demo@infile.com"
+    }
+    real = {
+      user_name = "app-infile-real"
+      email     = "rnhernandez+insight-real@infile.com"
+    }
+  }
+
+  # Chat agents and dashboards per identity. Agents and topics are created by
+  # scripts/quicksight/sync_topic.py and sync_agent.py (no Terraform resource
+  # exists for them yet); dashboards -dev are Terraform, -real were loaded by
+  # scripts/load_real_day.sh (see docs/CARGA_DATOS_REALES.md).
+  app_chat = {
+    demo = {
+      agent_id     = "ventas-demo-analista"
+      dashboard_id = "pulso-facturacion-dev"
+      data_set_ids = [
+        aws_quicksight_data_set.sales.data_set_id,
+        aws_quicksight_data_set.comparativo.data_set_id,
+      ]
+    }
+    real = {
+      agent_id     = "ventas-inteligentes-analista"
+      dashboard_id = "pulso-facturacion-real"
+      data_set_ids = ["ventas-infile-real", "ventas-comparativo-real"]
+    }
+  }
+
+  # Verified email domains that get the real identity. Everyone else is demo.
+  real_email_domains = ["infile.com"]
+}
+
+resource "aws_quicksight_user" "app" {
+  for_each = local.app_identities
+
+  aws_account_id = local.quicksight_account_id
+  namespace      = "default"
+  identity_type  = "QUICKSIGHT"
+  user_name      = each.value.user_name
+  email          = each.value.email
+  user_role      = "READER_PRO"
 }
 
 resource "aws_lambda_function" "embedding_api" {
@@ -484,21 +554,34 @@ resource "aws_lambda_function" "embedding_api" {
   environment {
     variables = {
       QUICKSIGHT_ACCOUNT_ID = local.quicksight_account_id
-      DASHBOARD_ID          = "pulso-facturacion-dev"
-      DATA_SET_IDS = join(",", [
-        aws_quicksight_data_set.sales.data_set_id,
-        aws_quicksight_data_set.comparativo.data_set_id,
-      ])
 
-      # Public test delivery: any verified email may use the shared Quick
-      # identity. Remove ALLOW_ANY_EMAIL from cognito_signup.tf and restore
-      # ALLOWED_EMAIL_DOMAINS here before using this outside a controlled test.
+      # Two shared identities, chosen server-side by the caller's verified
+      # email domain (see locals.app_identities / app_chat above). The former
+      # SHARED_QUICKSIGHT_USER_ARN (the admin) is gone on purpose: the admin
+      # owns everything and must never be the identity a browser embeds with.
+      REAL_EMAIL_DOMAINS = join(",", local.real_email_domains)
 
-      SHARED_QUICKSIGHT_USER_ARN = local.quicksight_admin_principal
-      ALLOWED_EMAIL_DOMAINS      = ""
-      ALLOWED_DOMAINS            = join(",", concat(["https://${aws_cloudfront_distribution.web.domain_name}"], local.local_dev_origins))
-      CORS_ORIGIN                = "https://${aws_cloudfront_distribution.web.domain_name}"
-      NODE_OPTIONS               = "--enable-source-maps"
+      DEMO_QUICKSIGHT_USER_ARN = aws_quicksight_user.app["demo"].arn
+      DEMO_CHAT_AGENT_ID       = local.app_chat.demo.agent_id
+      DEMO_DASHBOARD_ID        = local.app_chat.demo.dashboard_id
+      DEMO_DATA_SET_IDS        = join(",", local.app_chat.demo.data_set_ids)
+
+      REAL_QUICKSIGHT_USER_ARN = aws_quicksight_user.app["real"].arn
+      REAL_CHAT_AGENT_ID       = local.app_chat.real.agent_id
+      REAL_DASHBOARD_ID        = local.app_chat.real.dashboard_id
+      REAL_DATA_SET_IDS        = join(",", local.app_chat.real.data_set_ids)
+
+      # Kept for the handler's fallback path (per-user identity, as the tenant
+      # module uses): dashboard and freshness when no shared identity applies.
+      DASHBOARD_ID = local.app_chat.demo.dashboard_id
+      DATA_SET_IDS = join(",", local.app_chat.demo.data_set_ids)
+
+      # Self sign-up is disabled in the pool (admin creates users), so every
+      # caller was invited; the domain gate decides demo vs real, not access.
+      ALLOWED_EMAIL_DOMAINS = ""
+      ALLOWED_DOMAINS       = join(",", concat(["https://${aws_cloudfront_distribution.web.domain_name}"], local.local_dev_origins))
+      CORS_ORIGIN           = "https://${aws_cloudfront_distribution.web.domain_name}"
+      NODE_OPTIONS          = "--enable-source-maps"
     }
   }
 }
@@ -593,9 +676,10 @@ resource "aws_s3_object" "web_runtime_config" {
     cognitoDomain   = "https://${aws_cognito_user_pool_domain.app.domain}.auth.${local.region}.amazoncognito.com"
     cognitoClientId = aws_cognito_user_pool_client.web.id
     region          = local.region
-    # Custom agent created by scripts/quicksight/sync_agent.py; pins the chat to
-    # the sales space. Remove this line to fall back to the default Quick chat.
-    quickChatAgentId = "ventas-inteligentes-analista"
+    # Fallback only. The embedding API now returns the agent for the caller's
+    # identity (demo vs real); this static value is used if the API omits it.
+    # It must always be the demo agent: a stale frontend must never pin real.
+    quickChatAgentId = local.app_chat.demo.agent_id
     # Shown large in the sidebar: the workspace belongs to the client, the
     # product (INsight by INFILE) stays in the footer.
     clientName = var.app_client_name

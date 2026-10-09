@@ -91,6 +91,8 @@ export const suggestedPrompts: ReadonlyArray<{
 interface EmbedState {
   view: View;
   url?: string;
+  /** Agent chosen by the API for this caller's identity; falls back to config. */
+  agentId?: string;
   error?: string;
 }
 
@@ -200,7 +202,9 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number } = {}
 
       try {
         const response = await getEmbedUrl(auth.config, auth.idToken, viewToExperience[view]);
-        if (seq === requestSeq.current) setEmbed({ view, url: response.embedUrl });
+        if (seq === requestSeq.current) {
+          setEmbed({ view, url: response.embedUrl, agentId: response.agentId });
+        }
       } catch (caught) {
         if (seq !== requestSeq.current) return;
         if (caught instanceof SessionExpiredError) {
@@ -464,7 +468,7 @@ export default function App({ splashMs = SPLASH_MS }: { splashMs?: number } = {}
           className={activeView === "chat" ? "experience-card chat-card" : "experience-card"}
         >
           <EmbeddingFrame
-            chatAgentId={session.config.quickChatAgentId}
+            chatAgentId={current?.agentId ?? session.config.quickChatAgentId}
             error={embedError}
             experience={viewToExperience[activeView]}
             initialPrompt={activeView === "chat" ? pendingPrompt : undefined}
