@@ -455,6 +455,13 @@ resource "aws_iam_role_policy" "embedding_api" {
         Resource = "${local.arn_quicksight}:user/default/*"
       },
       {
+        # Guest links: read the parked tokens once and delete them (one-time use).
+        Sid      = "ExchangeGuestTokens"
+        Effect   = "Allow"
+        Action   = ["s3:GetObject", "s3:DeleteObject"]
+        Resource = "${aws_s3_bucket.data.arn}/guest-tokens/*"
+      },
+      {
         # Read-only: lets the UI show when SPICE was last refreshed.
         Sid    = "ReadDatasetFreshness"
         Effect = "Allow"
@@ -575,6 +582,10 @@ resource "aws_lambda_function" "embedding_api" {
       # module uses): dashboard and freshness when no shared identity applies.
       DASHBOARD_ID = local.app_chat.demo.dashboard_id
       DATA_SET_IDS = join(",", local.app_chat.demo.data_set_ids)
+
+      # One-time guest links (scripts/create_guest_link.sh) park the guest's
+      # tokens under guest-tokens/ in the data bucket; /guest reads and deletes.
+      DATA_BUCKET = aws_s3_bucket.data.id
 
       # Self sign-up is disabled in the pool (admin creates users), so every
       # caller was invited; the domain gate decides demo vs real, not access.
